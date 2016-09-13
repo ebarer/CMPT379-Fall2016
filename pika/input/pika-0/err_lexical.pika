@@ -1,0 +1,8 @@
+exec {
+    const nickels := 11.
+    const pennies := 5.
+    const % value := 
+    			 nickels * 5 +
+    			 pennies.
+    print value, _n_.
+}

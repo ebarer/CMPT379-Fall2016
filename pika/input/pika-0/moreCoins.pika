@@ -1,0 +1,19 @@
+exec {
+    const toonies := 2.
+    const loonies := 3.
+    const quarters := 5.
+    const dimes := 3.
+    const nickels := 7.
+    const pennies := 17.
+    const value := toonies * 200 + 
+    			   loonies * 100 +
+    			   quarters * 25 +
+    			   dimes * 10 +
+    			   nickels * 5 +
+    			   pennies.
+    print value, _n_.
+    
+    const ncoins := toonies + loonies + quarters + dimes + nickels + pennies.
+	print ncoins, _n_.
+}
+

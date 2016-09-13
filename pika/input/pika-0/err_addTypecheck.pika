@@ -1,0 +1,14 @@
+exec {
+    const quarters := 5.
+    const dimes := 3.
+    const nickels := 8.
+    const pennies := 17.
+    const value := quarters * 25 +
+    			 dimes * 10 +
+    			 nickels * 5 +
+    			 pennies.
+    print value, _n_.
+
+    const bad := _false_ + _true_.
+    print bad, _n_.
+}

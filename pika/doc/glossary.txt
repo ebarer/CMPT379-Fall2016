@@ -1,0 +1,14 @@
+Glossary of terms used in bunting compiler.  Standard compiler terms are not defined here.
+
+punctuator:		semi-standard term for a punctuation or operator token. 
+				typically, a punctuator is composed of non-alphanumeric characters.
+				Examples include: + - > = ; { ) , ++ -=
+				
+lextant:		bunting-only term meaning "lexical constant".  These are tokens with
+				constant lexemes: the keywords and punctuators.
+				
+ASM:			abstract stack machine.  When used as a suffix to a method name,
+				it means that the method returns code for the ASM.
+
+...Imp:			A base implementation of an interface.  For example, TokenImp is a
+				base implementation for the interface Token.

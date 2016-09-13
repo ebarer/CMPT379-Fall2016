@@ -1,0 +1,10 @@
+exec {
+    const nickels := 11.
+    const pennies := 5.
+    const value := 
+    			 nickels * 5 +
+    			 pennies.
+    print value, _n_.
+    const bad := 25 * _true_.
+    print bad, _n_.
+}

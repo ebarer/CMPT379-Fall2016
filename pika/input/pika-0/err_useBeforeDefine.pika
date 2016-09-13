@@ -1,0 +1,10 @@
+exec {
+    const nickels := 11.
+    const pennies := 5 + undefinedvariable.
+    
+    const undefinedvariable := 
+    			 nickels * 5 +
+    			 pennies.
+    print undefinedvariable, _n_.
+
+}

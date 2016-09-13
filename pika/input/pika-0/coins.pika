@@ -1,0 +1,24 @@
+exec {
+	const quarters :=  5.
+	const dimes    :=  3.
+	const nickels  :=  7.
+	const pennies  := 17.
+    
+	const value := quarters * 25 +
+    			 dimes    * 10 +
+    			 nickels  *  5 +
+    			 pennies.
+	print value, _n_.
+    
+	const ncoins := quarters + dimes + nickels + pennies.
+	print ncoins, _n_.
+    
+	const moredimes := dimes > nickels.
+	print moredimes;.
+
+	const boot := _true_.
+	const boof := _false_.
+    
+	print boot; boof, _n_.
+	print boot, boof, _n_.
+}
