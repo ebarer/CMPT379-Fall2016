@@ -365,7 +365,7 @@ public class Parser {
 	
 	// if the current token is one of the given lextants, read the next token.
 	// otherwise, give a syntax error and read next token (to avoid endless looping).
-	private void expect(Lextant ...lextants ) {
+	private void expect(Lextant ...lextants) {
 		if(!nowReading.isLextant(lextants)) {
 			syntaxError(nowReading, "expecting " + Arrays.toString(lextants));
 		}
