@@ -35,10 +35,24 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	protected Token findNextToken() {
 		LocatedChar ch = nextNonWhitespaceChar();
 		
+		// How best to handle checking for a number when being
+		// forced to append a return call  
 		if(ch.isDigit()) {
 			return scanNumber(ch);
 		}
-		else if(ch.isLowerCase()) {
+		else if(isPunctuatorStart(ch)) {
+			if(ch.isSign()) {
+				LocatedChar ch2 = input.next();
+				if(ch2.isDigit() || ch2.getCharacter() == '.') {
+					return scanNumber(ch2);	
+				} else {
+					input.pushback(ch2);
+				}
+			}
+			
+			return PunctuatorScanner.scan(ch, input);
+		}
+		else if(ch.isLowerCase() || ch.isUpperCase()) {
 			return scanIdentifier(ch);
 		}
 		else if(isPunctuatorStart(ch)) {
@@ -66,12 +80,13 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	//////////////////////////////////////////////////////////////////////////////
 	// Integer lexical analysis	
 
-	private Token scanNumber(LocatedChar firstChar) {
+	private Token scanNumber(LocatedChar ...chars) {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(firstChar.getCharacter());
+		for(int i = 0; i < chars.length; i++){
+			buffer.append(chars[i].getCharacter());
+	    }
 		appendSubsequentDigits(buffer);
-		
-		return NumberToken.make(firstChar.getLocation(), buffer.toString());
+		return NumberToken.make(chars[0].getLocation(), buffer.toString());
 	}
 	private void appendSubsequentDigits(StringBuffer buffer) {
 		LocatedChar c = input.next();
@@ -89,9 +104,14 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	private Token scanIdentifier(LocatedChar firstChar) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(firstChar.getCharacter());
-		appendSubsequentLowercase(buffer);
+		appendSubsequentCharacters(buffer);
 
 		String lexeme = buffer.toString();
+		// If identifier exceeds 32 characters,  
+		if(lexeme.length() > 32) {
+			lexicalError(firstChar);
+		}
+		
 		if(Keyword.isAKeyword(lexeme)) {
 			return LextantToken.make(firstChar.getLocation(), lexeme, Keyword.forLexeme(lexeme));
 		}
@@ -99,9 +119,9 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			return IdentifierToken.make(firstChar.getLocation(), lexeme);
 		}
 	}
-	private void appendSubsequentLowercase(StringBuffer buffer) {
+	private void appendSubsequentCharacters(StringBuffer buffer) {
 		LocatedChar c = input.next();
-		while(c.isLowerCase()) {
+		while(c.isLowerCase() || c.isUpperCase() || c.isDigit() || c.getCharacter() == '$') {
 			buffer.append(c.getCharacter());
 			c = input.next();
 		}

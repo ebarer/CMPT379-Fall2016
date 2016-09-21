@@ -53,8 +53,14 @@ public class LocatedChar {
 	public boolean isLowerCase() {
 		return Character.isLowerCase(character) || (character == '_');
 	}
+	public boolean isUpperCase() {
+		return Character.isUpperCase(character) || (character == '_');
+	}
 	public boolean isDigit() {
 		return Character.isDigit(character);
+	}
+	public boolean isSign() {
+		return (character == '+' || character == '-');
 	}
 	public boolean isWhitespace() {
 		return Character.isWhitespace(character);
