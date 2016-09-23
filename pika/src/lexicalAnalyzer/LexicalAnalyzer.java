@@ -39,7 +39,10 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		LocatedChar ch = nextNonWhitespaceChar();
 		
 		// How best to handle checking for a number when being
-		// forced to append a return call  
+		// forced to append a return call
+		if(ch.getCharacter() == '#') {
+			return scanComment(ch);
+		}
 		if(ch.isDigit()) {
 			return scanNumber(ch);
 		}
@@ -73,6 +76,22 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			ch = input.next();
 		}
 		return ch;
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////
+	// Comment lexical analysis
+	private Token scanComment(LocatedChar ch) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(ch.getCharacter());
+		
+		LocatedChar c = input.next();
+		while (c.getCharacter() != '#' && c.getCharacter() != '\n') {
+			buffer.append(c.getCharacter());
+			c = input.next();
+		}
+		
+		return findNextToken();
 	}
 	
 	

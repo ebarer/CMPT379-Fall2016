@@ -1,0 +1,5 @@
+exec {
+	const math	:= 5 + 4 * 3 / 2.
+
+	print math, _n_.
+}
