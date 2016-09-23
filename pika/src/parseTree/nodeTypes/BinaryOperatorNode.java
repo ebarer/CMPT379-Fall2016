@@ -5,12 +5,20 @@ import parseTree.ParseNodeVisitor;
 import lexicalAnalyzer.Lextant;
 import tokens.LextantToken;
 import tokens.Token;
+import semanticAnalyzer.signatures.FunctionSignature;
 
 public class BinaryOperatorNode extends ParseNode {
+	protected FunctionSignature signature;
 
 	public BinaryOperatorNode(Token token) {
 		super(token);
 		assert(token instanceof LextantToken);
+	}
+	public void setSignature(FunctionSignature signature) {
+		this.signature = signature;
+	}
+	public FunctionSignature getSignature() {
+		return signature;
 	}
 
 	public BinaryOperatorNode(ParseNode node) {

@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import asmCodeGenerator.codeStorage.ASMOpcode;
+import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
+import lexicalAnalyzer.Punctuator;
 
 
 public class FunctionSignatures extends ArrayList<FunctionSignature> {
@@ -59,6 +62,13 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 	}
 
 	
+	///////////////////////////////////////////////////////////////////
+	// Signatures for pika-0 operators
+	// this section will probably disappear in pika-1 (in favor of FunctionSignatures)
+	//private static FunctionSignature addSignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER);
+	//private static FunctionSignature multiplySignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER);
+	//private static FunctionSignature greaterSignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN);
+	
 	
 	/////////////////////////////////////////////////////////////////////////////////
 	// Put the signatures for operators in the following static block.
@@ -67,10 +77,11 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		// here's one example to get you started with FunctionSignatures: the signatures for addition.		
 		// for this to work, you should statically import PrimitiveType.*
 
-//		new FunctionSignatures(Punctuator.ADD,
-//		    new FunctionSignature(ASMOpcode.Add, INTEGER, INTEGER, INTEGER),
-//		    new FunctionSignature(ASMOpcode.FAdd, FLOAT, FLOAT, FLOAT)
-//		);
+		new FunctionSignatures(Punctuator.ADD,
+		    new FunctionSignature(ASMOpcode.Add, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
+		    new FunctionSignature(ASMOpcode.FAdd, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING)
+		);
+		
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.
 		// Then, we give that key two signatures: one an (INT x INT -> INT) and the other

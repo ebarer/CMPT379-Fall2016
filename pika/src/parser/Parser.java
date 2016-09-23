@@ -11,6 +11,7 @@ import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IntegerConstantNode;
+import parseTree.nodeTypes.FloatingConstantNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
@@ -267,7 +268,7 @@ public class Parser {
 	}
 	private boolean startsAdditiveExpression(Token token) {
 		return startsLiteral(token);
-	}	
+	}
 
 	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
 	private ParseNode parseMultiplicativeExpression() {
@@ -289,6 +290,10 @@ public class Parser {
 		return startsAtomicExpression(token);
 	}
 	
+	// SUBTRACTION
+	
+	// DIVISION
+	
 	// atomicExpression -> literal
 	private ParseNode parseAtomicExpression() {
 		if(!startsAtomicExpression(nowReading)) {
@@ -309,6 +314,9 @@ public class Parser {
 		if(startsIntNumber(nowReading)) {
 			return parseIntNumber();
 		}
+		if(startsFloatNumber(nowReading)) {
+			return parseFloatNumber();
+		}
 		if(startsIdentifier(nowReading)) {
 			return parseIdentifier();
 		}
@@ -319,7 +327,8 @@ public class Parser {
 		return syntaxErrorNode("literal");
 	}
 	private boolean startsLiteral(Token token) {
-		return startsIntNumber(token) || startsIdentifier(token) || startsBooleanConstant(token);
+		return  startsIntNumber(token) || startsFloatNumber(token) ||
+				startsIdentifier(token) || startsBooleanConstant(token);
 	}
 
 	// number (terminal)
@@ -331,7 +340,18 @@ public class Parser {
 		return new IntegerConstantNode(previouslyRead);
 	}
 	private boolean startsIntNumber(Token token) {
-		return token instanceof NumberToken;
+		return token instanceof IntegerToken;
+	}
+	
+	private ParseNode parseFloatNumber() {
+		if(!startsFloatNumber(nowReading)) {
+			return syntaxErrorNode("floating constant");
+		}
+		readToken();
+		return new FloatingConstantNode(previouslyRead);
+	}
+	private boolean startsFloatNumber(Token token) {
+		return token instanceof FloatingToken;
 	}
 
 	// identifier (terminal)

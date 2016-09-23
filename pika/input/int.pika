@@ -1,0 +1,10 @@
+exec {
+	const int0	:= +35.
+	const int1	:= -15.
+
+	const sum0	:= int0 + int1.
+	const sum1	:= -5 + +30.
+	const sum2	:= -30+ +10.
+
+	print sum0, _n_, sum1, _n_, sum2.
+}

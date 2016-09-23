@@ -1,10 +1,9 @@
 exec {
-	const a$Test	:= 5.0.
+	const myVariableIsMoreThan32CharactersLong := 3.
 	const float0	:= 5.0.
 	const float1	:= -0.5.
 
 	const sum	:= float0 + float1.
-	const math	:= 5 + 4 * 3 / 2.
 
 	print float0, _n_, sum, _n_.
 }

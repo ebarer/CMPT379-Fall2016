@@ -13,6 +13,7 @@ import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
+import parseTree.nodeTypes.FloatingConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
@@ -137,6 +138,9 @@ public class ASMCodeGenerator {
 		private void turnAddressIntoValue(ASMCodeFragment code, ParseNode node) {
 			if(node.getType() == PrimitiveType.INTEGER) {
 				code.add(LoadI);
+			}
+			else if(node.getType() == PrimitiveType.FLOATING) {
+				code.add(LoadF);
 			}	
 			else if(node.getType() == PrimitiveType.BOOLEAN) {
 				code.add(LoadC);
@@ -206,6 +210,9 @@ public class ASMCodeGenerator {
 			if(type == PrimitiveType.INTEGER) {
 				return StoreI;
 			}
+			if(type == PrimitiveType.FLOATING) {
+				return StoreF;
+			}
 			if(type == PrimitiveType.BOOLEAN) {
 				return StoreC;
 			}
@@ -269,8 +276,10 @@ public class ASMCodeGenerator {
 			code.append(arg1);
 			code.append(arg2);
 			
-			ASMOpcode opcode = opcodeForOperator(node.getOperator());
-			code.add(opcode);							// type-dependent! (opcode is different for floats and for ints)
+			//ASMOpcode opcode = opcodeForOperator(node.getOperator());
+			// type-dependent! (opcode is different for floats and for ints)
+			ASMOpcode opcode = (ASMOpcode) node.getSignature().getVariant();
+			code.add(opcode);
 		}
 		private ASMOpcode opcodeForOperator(Lextant lextant) {
 			assert(lextant instanceof Punctuator);
@@ -300,6 +309,11 @@ public class ASMCodeGenerator {
 			newValueCode(node);
 			
 			code.add(PushI, node.getValue());
+		}
+		public void visit(FloatingConstantNode node) {
+			newValueCode(node);
+			
+			code.add(PushF, node.getValue());
 		}
 	}
 

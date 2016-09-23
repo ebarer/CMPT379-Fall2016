@@ -1,8 +1,6 @@
-/parser/
-/semanticAnalyzer/
-/symbolTable/
-/tests/
 /tokens/
+/parseTree/
+/parser/
 /lexicalAnalyzer/
 /asmCodeGenerator/
-/inputHandler/
+/semanticAnalyzer/

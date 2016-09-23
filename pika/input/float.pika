@@ -1,0 +1,30 @@
+exec {
+	const int0	:= 10.
+	const float0	:= 5.0.
+
+	const float1	:= +5.0.
+	const float2	:= -5.0.
+
+	const float3	:= +0.5.
+	const float4	:= -0.5.
+
+	const float5	:= +.5.
+	const float6	:= -.5.
+
+	const float7	:= 5.0E2.
+	const float8	:= +5.0E+2.
+	const float9	:= 5.0E-2.
+
+	const float10	:= -.5E-2.
+
+	print float5, _n_, float10, _n_.
+
+	const sum0	:= float2 + float4.
+	print sum0, _n_.
+
+	const sum1	:= float6 + float8.
+	print sum1, _n_.
+
+	const sum2	:= float3 + float9.
+	print sum2, _n_.
+}

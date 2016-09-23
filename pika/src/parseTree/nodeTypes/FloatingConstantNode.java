@@ -2,27 +2,27 @@ package parseTree.nodeTypes;
 
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
-import tokens.IntegerToken;
+import tokens.FloatingToken;
 import tokens.Token;
 
-public class IntegerConstantNode extends ParseNode {
-	public IntegerConstantNode(Token token) {
+public class FloatingConstantNode extends ParseNode {
+	public FloatingConstantNode(Token token) {
 		super(token);
-		assert(token instanceof IntegerToken);
+		assert(token instanceof FloatingToken);
 	}
-	public IntegerConstantNode(ParseNode node) {
+	public FloatingConstantNode(ParseNode node) {
 		super(node);
 	}
 
 ////////////////////////////////////////////////////////////
 // attributes
 	
-	public int getValue() {
-		return integerToken().getValue();
+	public float getValue() {
+		return floatingToken().getValue();
 	}
 
-	public IntegerToken integerToken() {
-		return (IntegerToken)token;
+	public FloatingToken floatingToken() {
+		return (FloatingToken)token;
 	}	
 
 ///////////////////////////////////////////////////////////
