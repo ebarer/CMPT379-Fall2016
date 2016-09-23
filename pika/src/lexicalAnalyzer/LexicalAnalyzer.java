@@ -37,9 +37,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	@Override
 	protected Token findNextToken() {
 		LocatedChar ch = nextNonWhitespaceChar();
-		
-		// How best to handle checking for a number when being
-		// forced to append a return call
+
 		if(ch.getCharacter() == '#') {
 			return scanComment(ch);
 		}
@@ -47,12 +45,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			return scanNumber(ch);
 		}
 		else if(ch.isSign()) {
-			LocatedChar next = input.peek();
-			if(next.isDigit() || next.getCharacter() == '.') {
-				return scanNumber(ch);	
-			} else {
-				return PunctuatorScanner.scan(ch, input);
-			}
+			return scanSignedNumber(ch);
 		}
 		else if(ch.isLowerCase() || ch.isUpperCase()) {
 			return scanIdentifier(ch);
@@ -97,6 +90,15 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	
 	//////////////////////////////////////////////////////////////////////////////
 	// Integer lexical analysis	
+	
+	private Token scanSignedNumber(LocatedChar ch) {
+		LocatedChar next = input.peek();
+		if(next.isDigit() || next.getCharacter() == '.') {
+			return scanNumber(ch);	
+		} else {
+			return PunctuatorScanner.scan(ch, input);
+		}
+	}
 
 	private Token scanNumber(LocatedChar ch) {
 		StringBuffer buffer = new StringBuffer();
