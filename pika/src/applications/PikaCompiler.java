@@ -35,7 +35,6 @@ public class PikaCompiler extends PikaApplication {
 		Scanner scanner         = LexicalAnalyzer.make(filename);
 		ParseNode syntaxTree    = Parser.parse(scanner);
 		ParseNode decoratedTree = SemanticAnalyzer.analyze(syntaxTree);
-
 		generateCodeIfNoErrors(filename, decoratedTree);
 	}
 

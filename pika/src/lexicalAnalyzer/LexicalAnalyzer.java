@@ -11,6 +11,8 @@ import inputHandler.TextLocation;
 import tokens.IdentifierToken;
 import tokens.LextantToken;
 import tokens.NullToken;
+import tokens.CharacterToken;
+import tokens.StringToken;
 import tokens.IntegerToken;
 import tokens.FloatingToken;
 import tokens.Token;
@@ -40,6 +42,12 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 
 		if(ch.getCharacter() == '#') {
 			return scanComment(ch);
+		}
+		if(ch.getCharacter() == '^') {
+			return scanCharacter(ch);
+		}
+		if(ch.getCharacter() == '"') {
+			return scanString(ch);
 		}
 		if(ch.isDigit()) {
 			return scanNumber(ch);
@@ -85,6 +93,32 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		}
 		
 		return findNextToken();
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////
+	// Character and String lexical analysis
+	// TASK: Finish character and string lexical analysis
+	private Token scanCharacter(LocatedChar ch) {
+		LocatedChar aChar = input.next();
+		LocatedChar c = input.next();
+		while (c.getCharacter() != '^') {
+			c = input.next();
+		}
+
+		return CharacterToken.make(ch.getLocation(), aChar.getCharacter().toString());
+	}
+	
+	private Token scanString(LocatedChar ch) {
+		StringBuffer buffer = new StringBuffer();	
+		
+		LocatedChar c = input.next();
+		while (c.getCharacter() != '"') {
+			buffer.append(c.getCharacter());
+			c = input.next();
+		}
+		
+		return StringToken.make(ch.getLocation(), buffer.toString());
 	}
 	
 	
@@ -185,39 +219,6 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			c = input.next();
 		}
 		input.pushback(c);
-	}
-	
-	
-	//////////////////////////////////////////////////////////////////////////////
-	// Punctuator lexical analysis	
-	// old method left in to show a simple scanning method.
-	// current method is the algorithm object PunctuatorScanner.java
-
-	@SuppressWarnings("unused")
-	private Token oldScanPunctuator(LocatedChar ch) {
-		TextLocation location = ch.getLocation();
-		
-		switch(ch.getCharacter()) {
-		case '*':
-			return LextantToken.make(location, "*", Punctuator.MULTIPLY);
-		case '+':
-			return LextantToken.make(location, "+", Punctuator.ADD);
-		case '>':
-			return LextantToken.make(location, ">", Punctuator.GREATER);
-		case ':':
-			if(ch.getCharacter()=='=') {
-				return LextantToken.make(location, ":=", Punctuator.ASSIGN);
-			}
-			else {
-				throw new IllegalArgumentException("found : not followed by = in scanOperator");
-			}
-		case ',':
-			return LextantToken.make(location, ",", Punctuator.SEPARATOR);
-		case ';':
-			return LextantToken.make(location, ";", Punctuator.TERMINATOR);
-		default:
-			throw new IllegalArgumentException("bad LocatedChar " + ch + "in scanOperator");
-		}
 	}
 
 	

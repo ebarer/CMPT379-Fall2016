@@ -4,5 +4,5 @@ exec {
 	const float0 #test inside comment# := 5.0. #Sweet comment for float0
 
 	# Here we’re printing out the float value
-	print float0, _t_; _t_; float0, _n_.
+	print float0,_t_;_t_;float0,_n_.
 }

@@ -6,5 +6,5 @@ exec {
 	const sum1	:= -5 + +30.
 	const sum2	:= -30+ +10.
 
-	print sum0, _n_, sum1, _n_, sum2.
+	print sum0;_n_;sum1;_n_;sum2.
 }

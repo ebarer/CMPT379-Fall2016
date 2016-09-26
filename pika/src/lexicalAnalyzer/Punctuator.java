@@ -8,7 +8,7 @@ public enum Punctuator implements Lextant {
 	ASSIGN(":="),
 	SPACE(";"),
 	SEPARATOR(","),
-	TERMINATOR("."), 
+	TERMINATOR("."),
 	
 	ADD("+"),
 	SUBTRACT("-"),

@@ -17,14 +17,14 @@ exec {
 
 	const float10	:= -.5E-2.
 
-	print float5, _n_, float10, _n_.
+	print float5;_n_;float10;_n_.
 
 	const sum0	:= float2 + float4.
-	print sum0, _n_.
+	print sum0;_n_.
 
 	const sum1	:= float6 + float8.
-	print sum1, _n_.
+	print sum1;_n_.
 
 	const sum2	:= float3 + float9.
-	print sum2, _n_.
+	print sum2;_n_.
 }

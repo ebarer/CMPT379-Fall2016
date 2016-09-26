@@ -221,7 +221,7 @@ public class Parser {
 	// additiveExpression       -> multiplicativeExpression [+ multiplicativeExpression]*  (left-assoc)
 	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
 	// atomicExpression         -> literal
-	// literal                  -> intNumber | identifier | booleanConstant
+	// literal                  -> intNumber | floatNumber | booleanConstant | identifier 
 
 	// expr  -> comparisonExpression
 	private ParseNode parseExpression() {		
@@ -294,10 +294,6 @@ public class Parser {
 	private boolean startsMultiplicativeExpression(Token token) {
 		return startsAtomicExpression(token);
 	}
-	
-	// SUBTRACTION
-	
-	// DIVISION
 	
 	// atomicExpression -> literal
 	private ParseNode parseAtomicExpression() {
