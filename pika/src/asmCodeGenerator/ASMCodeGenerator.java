@@ -20,6 +20,7 @@ import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
+import parseTree.nodeTypes.TabNode;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -188,6 +189,11 @@ public class ASMCodeGenerator {
 			code.add(PushD, RunTime.NEWLINE_PRINT_FORMAT);
 			code.add(Printf);
 		}
+		public void visit(TabNode node) {
+			newVoidCode(node);
+			code.add(PushD, RunTime.TAB_PRINT_FORMAT);
+			code.add(Printf);
+		}
 		public void visit(SpaceNode node) {
 			newVoidCode(node);
 			code.add(PushD, RunTime.SPACE_PRINT_FORMAT);
@@ -290,7 +296,9 @@ public class ASMCodeGenerator {
 			Punctuator punctuator = (Punctuator)lextant;
 			switch(punctuator) {
 			case ADD: 	   		return Add;				// type-dependent!
+			case SUBTRACT: 	   	return Subtract;		// type-dependent!
 			case MULTIPLY: 		return Multiply;		// type-dependent!
+			case DIVISION: 		return Divide;			// type-dependent!
 			default:
 				assert false : "unimplemented operator in opcodeForOperator";
 			}

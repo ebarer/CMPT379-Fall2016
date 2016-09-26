@@ -16,6 +16,7 @@ import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
+import parseTree.nodeTypes.TabNode;
 import tokens.*;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
@@ -130,7 +131,6 @@ public class Parser {
 
 	// This adds the printExpressions it parses to the children of the given parent
 	// printExpressionList -> printExpression* bowtie (,|;)  (note that this is nullable)
-
 	private PrintStatementNode parsePrintExpressionList(PrintStatementNode parent) {
 		while(startsPrintExpression(nowReading) || startsPrintSeparator(nowReading)) {
 			parsePrintExpression(parent);
@@ -148,6 +148,11 @@ public class Parser {
 			ParseNode child = parseExpression();
 			parent.appendChild(child);
 		}
+		else if (nowReading.isLextant(Keyword.TAB)) {
+			readToken();
+			ParseNode child = new TabNode(previouslyRead);
+			parent.appendChild(child);
+		}
 		else if(nowReading.isLextant(Keyword.NEWLINE)) {
 			readToken();
 			ParseNode child = new NewlineNode(previouslyRead);
@@ -156,7 +161,7 @@ public class Parser {
 		// else we interpret the printExpression as epsilon, and do nothing
 	}
 	private boolean startsPrintExpression(Token token) {
-		return startsExpression(token) || token.isLextant(Keyword.NEWLINE) ;
+		return startsExpression(token) || token.isLextant(Keyword.TAB) || token.isLextant(Keyword.NEWLINE) ;
 	}
 	
 	
@@ -184,7 +189,7 @@ public class Parser {
 		}
 	}
 	private boolean startsPrintSeparator(Token token) {
-		return token.isLextant(Punctuator.SEPARATOR, Punctuator.SPACE) ;
+		return token.isLextant(Punctuator.SEPARATOR, Punctuator.SPACE);
 	}
 	
 	
@@ -257,7 +262,7 @@ public class Parser {
 		}
 		
 		ParseNode left = parseMultiplicativeExpression();
-		while(nowReading.isLextant(Punctuator.ADD)) {
+		while(nowReading.isLextant(Punctuator.ADD) || nowReading.isLextant(Punctuator.SUBTRACT)) {
 			Token additiveToken = nowReading;
 			readToken();
 			ParseNode right = parseMultiplicativeExpression();
@@ -277,7 +282,7 @@ public class Parser {
 		}
 		
 		ParseNode left = parseAtomicExpression();
-		while(nowReading.isLextant(Punctuator.MULTIPLY)) {
+		while(nowReading.isLextant(Punctuator.MULTIPLY) || nowReading.isLextant(Punctuator.DIVISION)) {
 			Token multiplicativeToken = nowReading;
 			readToken();
 			ParseNode right = parseAtomicExpression();

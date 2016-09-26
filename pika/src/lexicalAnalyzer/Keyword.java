@@ -1,5 +1,6 @@
 package lexicalAnalyzer;
 
+import javafx.scene.control.Tab;
 import tokens.LextantToken;
 import tokens.Token;
 
@@ -8,6 +9,7 @@ public enum Keyword implements Lextant {
 	CONST("const"),
 	PRINT("print"),
 	NEWLINE("_n_"),
+	TAB("_t_"),
 	TRUE("_true_"),
 	FALSE("_false_"),
 	EXEC("exec"),

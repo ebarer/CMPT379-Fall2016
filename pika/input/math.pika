@@ -1,5 +1,17 @@
 exec {
-	const math	:= 5 + 4 * 3 / 2.
+	const mathAdd := 3 + 3.
+	const mathSub := 3 - 3.
+	const mathMul := 3 * 3.
+	const mathDiv := 3 / 3.
 
-	print math, _n_.
+	print mathAdd; _t_; mathSub; _t_.
+	print mathMul; _t_; mathDiv; _n_.
+
+	const floatMathAdd := -3.0 + 25.2.
+	const floatMathSub := -3.0 - 25.2.
+	const floatMathMul := -3.0 * 25.2.
+	const floatMathDiv := -3.0 / 25.2.
+
+	print floatMathAdd; _t_; floatMathSub; _t_.
+	print floatMathMul; _t_; floatMathDiv; _n_.
 }

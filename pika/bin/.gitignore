@@ -1,6 +1,6 @@
-/tokens/
-/parseTree/
-/parser/
+/applications/
+/semanticAnalyzer/
 /lexicalAnalyzer/
 /asmCodeGenerator/
-/semanticAnalyzer/
+/parser/
+/parseTree/
