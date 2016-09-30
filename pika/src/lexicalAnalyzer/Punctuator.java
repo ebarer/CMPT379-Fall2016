@@ -5,7 +5,6 @@ import tokens.Token;
 
 
 public enum Punctuator implements Lextant {
-	ASSIGN(":="),
 	SPACE(";"),
 	SEPARATOR(","),
 	TERMINATOR("."),
@@ -15,10 +14,10 @@ public enum Punctuator implements Lextant {
 	MULTIPLY("*"),
 	DIVISION("/"),
 	
-	LESS("<"),
 	LESS_OR_EQUAL("<="),
+	LESS("<"),
 	EQUAL("=="),
-	NOTEQUAL("!="),
+	NOT_EQUAL("!="),
 	GREATER(">"),
 	GREATER_OR_EQUAL(">="),
 	
@@ -31,6 +30,7 @@ public enum Punctuator implements Lextant {
 	
 	PIPE("|"),
 	HASH("#"),
+	ASSIGN(":="),
 	
 	NULL_PUNCTUATOR("");
 
@@ -48,22 +48,24 @@ public enum Punctuator implements Lextant {
 		return prototype;
 	}
 	
-	public static Punctuator forLexeme(String lexeme) {
-		for(Punctuator punctuator: values()) {
-			if(punctuator.lexeme.equals(lexeme)) {
-				return punctuator;
-			}
-		}
-		return NULL_PUNCTUATOR;
-	}
-	
-/*
 	//   the following hashtable lookup can replace the implementation of forLexeme above. It is faster but less clear. 
 	private static LexemeMap<Punctuator> lexemeToPunctuator = new LexemeMap<Punctuator>(values(), NULL_PUNCTUATOR);
 	public static Punctuator forLexeme(String lexeme) {
 		   return lexemeToPunctuator.forLexeme(lexeme);
 	}
-*/
+	
+//	public Lextant[] getComparators() {
+//		return { LESS_OR_EQUAL, LESS, EQUAL, NOT_EQUAL, GREATER, GREATER_OR_EQUAL };
+//	}
+	
+//	public static Punctuator forLexeme(String lexeme) {
+//	for(Punctuator punctuator: values()) {
+//		if(punctuator.lexeme.equals(lexeme)) {
+//			return punctuator;
+//		}
+//	}
+//	return NULL_PUNCTUATOR;
+//}
 	
 }
 

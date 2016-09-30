@@ -130,7 +130,7 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		    new FunctionSignature(1, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.BOOLEAN)
 		);
 		
-		new FunctionSignatures(Punctuator.NOTEQUAL,
+		new FunctionSignatures(Punctuator.NOT_EQUAL,
 			new FunctionSignature(1, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN),
 			new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN),
 		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),

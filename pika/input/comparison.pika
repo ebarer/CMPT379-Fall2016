@@ -1,7 +1,24 @@
 exec {
-	const myBool := _true_.
-	const flt1 := 5.0.
+	const int1 := 1.
+	const int2 := 2.
+
+	const char1 := ^e^.
+	const char2 := ^a^.
+
+	const flt1 := 1.9.
 	const flt2 := 2.0.
 
-	const test := flt1 < flt2.
+	const bool1 := _true_.
+	const bool2 := _false_.
+
+	const less_equal := int1 <= int2.
+	const less := char2 < char1.
+	const equal := bool1 == bool2.
+	const not_equal := bool1 != bool2.
+	const greater := flt1 > flt2.
+	const greater_equal := flt1 >= flt2.
+
+	print less_equal; less, _n_.
+	print equal; not_equal, _n_.
+	print greater; greater_equal, _n_.
 }

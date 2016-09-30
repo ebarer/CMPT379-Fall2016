@@ -18,6 +18,7 @@ import parseTree.nodeTypes.FloatingConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
+import parseTree.nodeTypes.NumberConstantNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
@@ -245,19 +246,16 @@ public class ASMCodeGenerator {
 		public void visitLeave(BinaryOperatorNode node) {
 			Lextant operator = node.getOperator();
 
-			if(operator == Punctuator.LESS_OR_EQUAL || operator == Punctuator.LESS ||
-			   operator == Punctuator.EQUAL || operator == Punctuator.NOTEQUAL ||
-			   operator == Punctuator.GREATER || operator == Punctuator.GREATER_OR_EQUAL) {
+			if (node.isComparator()) {
 				visitComparisonOperatorNode(node, operator);
-			}
-			else {
+			} else {
 				visitNormalBinaryOperatorNode(node);
 			}
 		}
 		private void visitComparisonOperatorNode(BinaryOperatorNode node, Lextant operator) {
-
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
+			Type type = node.getSignature().paramType();
 			
 			Labeller labeller = new Labeller("compare");
 			
@@ -274,10 +272,38 @@ public class ASMCodeGenerator {
 			code.add(Label, arg2Label);
 			code.append(arg2);
 			code.add(Label, subLabel);
-			code.add(Subtract);
+
+			code.add((type == PrimitiveType.FLOATING) ? FSubtract : Subtract);
 			
-			code.add(JumpPos, trueLabel);
-			code.add(Jump, falseLabel);
+			Punctuator comparator = (Punctuator) operator;
+			switch(comparator) {
+			case LESS_OR_EQUAL:
+				code.add((type == PrimitiveType.FLOATING) ? JumpFPos : JumpPos, falseLabel);
+				code.add(Jump, trueLabel);	
+				break;
+			case LESS:
+				code.add((type == PrimitiveType.FLOATING) ? JumpFNeg : JumpNeg, trueLabel);
+				code.add(Jump, falseLabel);	
+				break;
+			case EQUAL:
+				code.add((type == PrimitiveType.FLOATING) ? JumpFZero : JumpFalse, trueLabel);
+				code.add(Jump, falseLabel);	
+				break;
+			case NOT_EQUAL:
+				code.add((type == PrimitiveType.FLOATING) ? JumpFZero : JumpFalse, falseLabel);
+				code.add(Jump, trueLabel);	
+				break;
+			case GREATER:
+				code.add((type == PrimitiveType.FLOATING) ? JumpFPos : JumpPos, trueLabel);
+				code.add(Jump, falseLabel);	
+				break;
+			case GREATER_OR_EQUAL:
+				code.add((type == PrimitiveType.FLOATING) ? JumpFNeg : JumpNeg, falseLabel);
+				code.add(Jump, trueLabel);	
+				break;
+			default:
+				break;
+			}
 
 			code.add(Label, trueLabel);
 			code.add(PushI, 1);
@@ -299,7 +325,16 @@ public class ASMCodeGenerator {
 			Object variant = node.getSignature().getVariant();
 			if (variant instanceof ASMOpcode) {
 				ASMOpcode opcode = (ASMOpcode) node.getSignature().getVariant();
-				code.add(opcode);
+				
+				// Check for division by 0, issue Runtime error
+				if (opcode == ASMOpcode.Divide || opcode == ASMOpcode.FDivide) {
+					if (node.child(1) instanceof NumberConstantNode &&
+						((NumberConstantNode)node.child(1)).getValue() == 0) {
+						code.add(PushD, RunTime.DIVIDE_BY_ZERO_RUNTIME_ERROR);
+					}					
+				} else {
+					code.add(opcode);
+				}
 			} else {
 				ASMOpcode opcode = opcodeForOperator(node.getOperator());
 				code.add(opcode);
@@ -307,8 +342,8 @@ public class ASMCodeGenerator {
 		}
 		private ASMOpcode opcodeForOperator(Lextant lextant) {
 			assert(lextant instanceof Punctuator);
-			Punctuator punctuator = (Punctuator)lextant;
-			switch(punctuator) {
+			Punctuator operator= (Punctuator)lextant;
+			switch(operator) {
 			case ADD: 	   		return Add;				// type-dependent!
 			case SUBTRACT: 	   	return Subtract;		// type-dependent!
 			case MULTIPLY: 		return Multiply;		// type-dependent!

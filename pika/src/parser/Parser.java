@@ -248,8 +248,9 @@ public class Parser {
 		}
 		
 		ParseNode left = parseAdditiveExpression();
+		// TASK: Create function getComparators() to return an array of these values
 		if(nowReading.isLextant(Punctuator.LESS_OR_EQUAL, Punctuator.LESS,
-								Punctuator.EQUAL, Punctuator.NOTEQUAL,
+								Punctuator.EQUAL, Punctuator.NOT_EQUAL,
 								Punctuator.GREATER, Punctuator.GREATER_OR_EQUAL)) {
 			Token compareToken = nowReading;
 			readToken();
@@ -271,7 +272,7 @@ public class Parser {
 		}
 		
 		ParseNode left = parseMultiplicativeExpression();
-		while(nowReading.isLextant(Punctuator.ADD) || nowReading.isLextant(Punctuator.SUBTRACT)) {
+		while(nowReading.isLextant(Punctuator.ADD, Punctuator.SUBTRACT)) {
 			Token additiveToken = nowReading;
 			readToken();
 			ParseNode right = parseMultiplicativeExpression();
@@ -291,7 +292,7 @@ public class Parser {
 		}
 		
 		ParseNode left = parseAtomicExpression();
-		while(nowReading.isLextant(Punctuator.MULTIPLY) || nowReading.isLextant(Punctuator.DIVISION)) {
+		while(nowReading.isLextant(Punctuator.MULTIPLY, Punctuator.DIVISION)) {
 			Token multiplicativeToken = nowReading;
 			readToken();
 			ParseNode right = parseAtomicExpression();

@@ -17,6 +17,10 @@
         DataC        37                        %% "%c"
         DataC        99                        
         DataC        0                         
+        DLabel       $print-format-string      
+        DataC        37                        %% "%s"
+        DataC        115                       
+        DataC        0                         
         DLabel       $print-format-newline     
         DataC        10                        %% "\n"
         DataC        0                         
@@ -63,21 +67,15 @@
         PushD        $errors-general-message   
         Printf                                 
         Halt                                   
-        DLabel       $errors-int-divide-by-zero 
-        DataC        105                       %% "integer divide by zero"
-        DataC        110                       
-        DataC        116                       
-        DataC        101                       
-        DataC        103                       
-        DataC        101                       
-        DataC        114                       
-        DataC        32                        
-        DataC        100                       
+        DLabel       $errors-divide-by-zero    
+        DataC        100                       %% "division by zero"
         DataC        105                       
         DataC        118                       
         DataC        105                       
-        DataC        100                       
-        DataC        101                       
+        DataC        115                       
+        DataC        105                       
+        DataC        111                       
+        DataC        110                       
         DataC        32                        
         DataC        98                        
         DataC        121                       
@@ -87,45 +85,25 @@
         DataC        114                       
         DataC        111                       
         DataC        0                         
-        Label        $$i-divide-by-zero        
-        PushD        $errors-int-divide-by-zero 
+        Label        $$divide-by-zero          
+        PushD        $errors-divide-by-zero    
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
         DataZ        4                         
         Label        $$main                    
-        DLabel       stringConst-myString      
-        DataC        72                        %% "Hello, world! This is Elliot."
-        DataC        101                       
-        DataC        108                       
-        DataC        108                       
-        DataC        111                       
-        DataC        44                        
-        DataC        32                        
-        DataC        119                       
-        DataC        111                       
-        DataC        114                       
-        DataC        108                       
-        DataC        100                       
-        DataC        33                        
-        DataC        32                        
-        DataC        84                        
-        DataC        104                       
-        DataC        105                       
-        DataC        115                       
-        DataC        32                        
-        DataC        105                       
-        DataC        115                       
-        DataC        32                        
-        DataC        69                        
-        DataC        108                       
-        DataC        108                       
-        DataC        105                       
-        DataC        111                       
-        DataC        116                       
-        DataC        46                        
-        DataC        0                         
-        PushD        stringConst-myString      
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% myFloat
+        PushI        7                         
+        PushI        0                         
+        PushD        $$divide-by-zero          
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% myFloat
+        LoadI                                  
+        PushD        $print-format-integer     
         Printf                                 
         PushD        $print-format-space       
         Printf                                 

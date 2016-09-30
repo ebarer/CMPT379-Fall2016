@@ -8,6 +8,7 @@ public class RunTime {
 	public static final String FLOATING_PRINT_FORMAT  = "$print-format-floating";
 	public static final String BOOLEAN_PRINT_FORMAT   = "$print-format-boolean";
 	public static final String CHARACTER_PRINT_FORMAT = "$print-format-character";
+	public static final String STRING_PRINT_FORMAT 	  = "$print-format-string";
 	public static final String NEWLINE_PRINT_FORMAT   = "$print-format-newline";
 	public static final String TAB_PRINT_FORMAT   	  = "$print-format-tab";
 	public static final String SPACE_PRINT_FORMAT     = "$print-format-space";
@@ -18,7 +19,7 @@ public class RunTime {
 	public static final String MAIN_PROGRAM_LABEL     = "$$main";
 	
 	public static final String GENERAL_RUNTIME_ERROR = "$$general-runtime-error";
-	public static final String INTEGER_DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$i-divide-by-zero";
+	public static final String DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$divide-by-zero";
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
@@ -47,6 +48,8 @@ public class RunTime {
 		frag.add(DataS, "%s");
 		frag.add(DLabel, CHARACTER_PRINT_FORMAT);
 		frag.add(DataS, "%c");
+		frag.add(DLabel, STRING_PRINT_FORMAT);
+		frag.add(DataS, "%s");
 		frag.add(DLabel, NEWLINE_PRINT_FORMAT);
 		frag.add(DataS, "\n");
 		frag.add(DLabel, TAB_PRINT_FORMAT);
@@ -65,7 +68,7 @@ public class RunTime {
 		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
 		
 		generalRuntimeError(frag);
-		integerDivideByZeroError(frag);
+		divideByZeroError(frag);
 		
 		return frag;
 	}
@@ -81,14 +84,14 @@ public class RunTime {
 		frag.add(Halt);
 		return frag;
 	}
-	private void integerDivideByZeroError(ASMCodeFragment frag) {
-		String intDivideByZeroMessage = "$errors-int-divide-by-zero";
+	private void divideByZeroError(ASMCodeFragment frag) {
+		String divideByZeroMessage = "$errors-divide-by-zero";
 		
-		frag.add(DLabel, intDivideByZeroMessage);
-		frag.add(DataS, "integer divide by zero");
+		frag.add(DLabel, divideByZeroMessage);
+		frag.add(DataS, "division by zero");
 		
-		frag.add(Label, INTEGER_DIVIDE_BY_ZERO_RUNTIME_ERROR);
-		frag.add(PushD, intDivideByZeroMessage);
+		frag.add(Label, DIVIDE_BY_ZERO_RUNTIME_ERROR);
+		frag.add(PushD, divideByZeroMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 	

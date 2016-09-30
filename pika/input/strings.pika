@@ -1,4 +1,6 @@
 exec {
+        const myString := "Hello, world! This is Elliot. ".
+
 	const anInt := 5.
 	print anInt;_n_.
 
@@ -8,7 +10,5 @@ exec {
 	#const myChar2 := ^ee^.
 	#print myChar2;_n_.
 
-	const myString := "Hello, world! This is Elliot.\n".
-	print myString;_n_.
+	print myChar, myString;_n_.
 }
-

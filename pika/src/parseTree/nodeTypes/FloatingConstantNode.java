@@ -5,7 +5,7 @@ import parseTree.ParseNodeVisitor;
 import tokens.FloatingToken;
 import tokens.Token;
 
-public class FloatingConstantNode extends ParseNode {
+public class FloatingConstantNode extends ParseNode implements NumberConstantNode {
 	public FloatingConstantNode(Token token) {
 		super(token);
 		assert(token instanceof FloatingToken);
