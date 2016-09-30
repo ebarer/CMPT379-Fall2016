@@ -1,0 +1,11 @@
+// Check for division by 0
+if ((operator == Punctuator.DIVISION) && ((IntegerConstantNode) right.getToken()).getValue() == 0) {
+			
+}
+
+
+if (opcode == ASMOpcode.Divide && arg2) {
+	ASMCodeFragment frag = ASMCodeFragment();
+	frag.
+	// TASK: Divide by 0 issue
+}

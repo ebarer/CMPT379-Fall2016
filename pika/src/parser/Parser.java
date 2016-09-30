@@ -10,6 +10,8 @@ import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.IdentifierNode;
+import parseTree.nodeTypes.CharacterNode;
+import parseTree.nodeTypes.StringNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.FloatingConstantNode;
 import parseTree.nodeTypes.NewlineNode;
@@ -204,6 +206,11 @@ public class Parser {
 		ParseNode identifier = parseIdentifier();
 		expect(Punctuator.ASSIGN);
 		ParseNode initializer = parseExpression();
+		
+		if (initializer instanceof StringNode) {
+			((StringNode) initializer).setIdentifier(identifier.getToken().getLexeme());
+		}
+		
 		expect(Punctuator.TERMINATOR);
 		
 		return DeclarationNode.withChildren(declarationToken, identifier, initializer);
@@ -241,7 +248,9 @@ public class Parser {
 		}
 		
 		ParseNode left = parseAdditiveExpression();
-		if(nowReading.isLextant(Punctuator.GREATER)) {
+		if(nowReading.isLextant(Punctuator.LESS_OR_EQUAL, Punctuator.LESS,
+								Punctuator.EQUAL, Punctuator.NOTEQUAL,
+								Punctuator.GREATER, Punctuator.GREATER_OR_EQUAL)) {
 			Token compareToken = nowReading;
 			readToken();
 			ParseNode right = parseAdditiveExpression();
@@ -272,7 +281,7 @@ public class Parser {
 		return left;
 	}
 	private boolean startsAdditiveExpression(Token token) {
-		return startsLiteral(token);
+		return startsMultiplicativeExpression(token);
 	}
 
 	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
@@ -311,12 +320,20 @@ public class Parser {
 		if(!startsLiteral(nowReading)) {
 			return syntaxErrorNode("literal");
 		}
-		
+//		if(startsParenthetical(nowReading)) {
+//			return parseParenthetical();
+//		}
 		if(startsIntNumber(nowReading)) {
 			return parseIntNumber();
 		}
 		if(startsFloatNumber(nowReading)) {
 			return parseFloatNumber();
+		}
+		if(startsCharacter(nowReading)) {
+			return parseCharacter();
+		}
+		if(startsString(nowReading)) {
+			return parseString();
 		}
 		if(startsIdentifier(nowReading)) {
 			return parseIdentifier();
@@ -329,8 +346,18 @@ public class Parser {
 	}
 	private boolean startsLiteral(Token token) {
 		return  startsIntNumber(token) || startsFloatNumber(token) ||
+				startsCharacter(token) || startsString(token) ||
 				startsIdentifier(token) || startsBooleanConstant(token);
 	}
+	
+	//parentheticals
+//	private ParseNode parseParenthetical() {
+//		
+//	}
+//	
+//	private boolean startsParenthetical(Token token) {
+//		return token instanceof IntegerToken;
+//	}
 
 	// number (terminal)
 	private ParseNode parseIntNumber() {
@@ -353,6 +380,29 @@ public class Parser {
 	}
 	private boolean startsFloatNumber(Token token) {
 		return token instanceof FloatingToken;
+	}
+	
+	// character/string (terminal)
+	private ParseNode parseCharacter() {
+		if(!startsCharacter(nowReading)) {
+			return syntaxErrorNode("character");
+		}
+		readToken();
+		return new CharacterNode(previouslyRead);
+	}
+	private boolean startsCharacter(Token token) {
+		return token instanceof CharacterToken;
+	}
+	
+	private ParseNode parseString() {
+		if(!startsString(nowReading)) {
+			return syntaxErrorNode("string");
+		}
+		readToken();
+		return new StringNode(previouslyRead);
+	}
+	private boolean startsString(Token token) {
+		return token instanceof StringToken;
 	}
 
 	// identifier (terminal)

@@ -1,7 +1,5 @@
 exec {
-	const myChar := ^e^.
-	print myChar;_n_.
-
-	const myString := "Hello, world! This is Elliot.\n".
+	const myString := "Hello, world! This is Elliot.".
 	print myString;_n_.
 }
+

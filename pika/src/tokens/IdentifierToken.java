@@ -11,6 +11,10 @@ public class IdentifierToken extends TokenImp {
 		IdentifierToken result = new IdentifierToken(location, lexeme);
 		return result;
 	}
+	
+	public String getValue() {
+		return getLexeme();
+	}
 
 
 	@Override

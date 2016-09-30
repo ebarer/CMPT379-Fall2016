@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import lexicalAnalyzer.Lextant;
+import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
+import parseTree.nodeTypes.CharacterNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
@@ -19,6 +21,7 @@ import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
+import parseTree.nodeTypes.StringNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.PrimitiveType;
@@ -127,6 +130,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visit(FloatingConstantNode node) {
 		node.setType(PrimitiveType.FLOATING);
+	}
+	@Override
+	public void visit(CharacterNode node) {
+		node.setType(PrimitiveType.CHARACTER);
+	}
+	@Override
+	public void visit(StringNode node) {
+		node.setType(PrimitiveType.STRING);
 	}
 	@Override
 	public void visit(NewlineNode node) {

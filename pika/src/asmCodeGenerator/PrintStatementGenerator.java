@@ -15,7 +15,6 @@ import semanticAnalyzer.types.Type;
 import asmCodeGenerator.ASMCodeGenerator.CodeVisitor;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.runtime.RunTime;
-import javafx.scene.control.Tab;
 
 public class PrintStatementGenerator {
 	ASMCodeFragment code;
@@ -41,12 +40,16 @@ public class PrintStatementGenerator {
 	}
 
 	private void appendPrintCode(ParseNode node) {
-		String format = printFormat(node.getType());
-
-		code.append(visitor.removeValueCode(node));
-		convertToStringIfBoolean(node);
-		code.add(PushD, format);
-		code.add(Printf);
+		if (node.getType() == PrimitiveType.STRING) {
+			code.add(PushD, "stringConst-"+node.getToken().getLexeme());
+			code.add(Printf);
+		} else {
+			String format = printFormat(node.getType());
+			code.append(visitor.removeValueCode(node));
+			convertToStringIfBoolean(node);
+			code.add(PushD, format);
+			code.add(Printf);
+		}
 	}
 	private void convertToStringIfBoolean(ParseNode node) {
 		if(node.getType() != PrimitiveType.BOOLEAN) {
@@ -73,6 +76,7 @@ public class PrintStatementGenerator {
 		case INTEGER:	return RunTime.INTEGER_PRINT_FORMAT;
 		case FLOATING:	return RunTime.FLOATING_PRINT_FORMAT;
 		case BOOLEAN:	return RunTime.BOOLEAN_PRINT_FORMAT;
+		case CHARACTER:	return RunTime.CHARACTER_PRINT_FORMAT;
 		default:		
 			assert false : "Type " + type + " unimplemented in PrintStatementGenerator.printFormat()";
 			return "";

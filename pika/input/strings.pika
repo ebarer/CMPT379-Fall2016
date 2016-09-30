@@ -1,0 +1,14 @@
+exec {
+	const anInt := 5.
+	print anInt;_n_.
+
+	const myChar := ^e^.
+	print myChar;_n_.
+
+	#const myChar2 := ^ee^.
+	#print myChar2;_n_.
+
+	const myString := "Hello, world! This is Elliot.\n".
+	print myString;_n_.
+}
+

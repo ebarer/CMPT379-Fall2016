@@ -102,8 +102,9 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	private Token scanCharacter(LocatedChar ch) {
 		LocatedChar aChar = input.next();
 		LocatedChar c = input.next();
-		while (c.getCharacter() != '^') {
-			c = input.next();
+		if (!aChar.isASCII() || c.getCharacter() != '^') {
+			lexicalError(c);
+			return findNextToken();
 		}
 
 		return CharacterToken.make(ch.getLocation(), aChar.getCharacter().toString());
@@ -114,6 +115,11 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		
 		LocatedChar c = input.next();
 		while (c.getCharacter() != '"') {
+			if (c.getCharacter() == '\n') {
+				lexicalError(c);
+				return findNextToken();
+			}
+			
 			buffer.append(c.getCharacter());
 			c = input.next();
 		}

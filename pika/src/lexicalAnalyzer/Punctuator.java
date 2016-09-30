@@ -48,7 +48,6 @@ public enum Punctuator implements Lextant {
 		return prototype;
 	}
 	
-	
 	public static Punctuator forLexeme(String lexeme) {
 		for(Punctuator punctuator: values()) {
 			if(punctuator.lexeme.equals(lexeme)) {

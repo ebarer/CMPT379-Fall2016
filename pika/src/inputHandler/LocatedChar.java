@@ -65,4 +65,8 @@ public class LocatedChar {
 	public boolean isWhitespace() {
 		return Character.isWhitespace(character);
 	}
+	public boolean isASCII() {
+		int n = character;
+		return ((n >= 32) && (n <= 126));
+	}
 }

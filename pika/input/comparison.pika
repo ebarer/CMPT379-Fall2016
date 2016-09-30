@@ -1,0 +1,7 @@
+exec {
+	const myBool := _true_.
+	const flt1 := 5.0.
+	const flt2 := 2.0.
+
+	const test := flt1 < flt2.
+}

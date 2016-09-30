@@ -1,6 +1,5 @@
 package lexicalAnalyzer;
 
-import javafx.scene.control.Tab;
 import tokens.LextantToken;
 import tokens.Token;
 
