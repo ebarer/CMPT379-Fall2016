@@ -42,13 +42,13 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		if(ch.getCharacter() == '#') {
 			return scanComment(ch);
 		}
-		if(ch.getCharacter() == '^') {
+		else if(ch.getCharacter() == '^') {
 			return scanCharacter(ch);
 		}
-		if(ch.getCharacter() == '"') {
+		else if(ch.getCharacter() == '"') {
 			return scanString(ch);
 		}
-		if(ch.isDigit()) {
+		else if(ch.isDigit()) {
 			return scanNumber(ch);
 		}
 		else if(ch.isSign()) {

@@ -90,18 +90,69 @@
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        4                         
+        DataZ        24                        
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% myFloat
-        PushI        7                         
-        PushI        0                         
-        PushD        $$divide-by-zero          
+        Add                                    %% int1
+        PushI        10                        
         StoreI                                 
         PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% int2
+        PushI        3                         
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% int3
+        PushI        5                         
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        12                        
+        Add                                    %% int4
+        PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% myFloat
+        Add                                    %% int1
+        LoadI                                  
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% int2
+        LoadI                                  
+        Subtract                               
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% int5
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% int1
+        LoadI                                  
+        PushI        2                         
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% int3
+        LoadI                                  
+        Multiply                               
+        Subtract                               
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        20                        
+        Add                                    %% div
+        PushD        $global-memory-block      
+        PushI        12                        
+        Add                                    %% int4
+        LoadI                                  
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% int5
+        LoadI                                  
+        Duplicate                              
+        JumpFalse    $$divide-by-zero          
+        Divide                                 
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        20                        
+        Add                                    %% div
         LoadI                                  
         PushD        $print-format-integer     
         Printf                                 

@@ -1,4 +1,11 @@
 exec {
-	const myFloat := 7 / 0.
-	print myFloat;_n_.
+	const int1 := 10.
+	const int2 := 3.
+	const int3 := 5.
+
+	const int4 := int1 - int2.
+	const int5 := int1 - 2*int3.
+	
+	const div := int4 / int5.
+	print div;_n_.
 }

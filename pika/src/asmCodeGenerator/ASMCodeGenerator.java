@@ -18,7 +18,6 @@ import parseTree.nodeTypes.FloatingConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
-import parseTree.nodeTypes.NumberConstantNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
@@ -318,6 +317,7 @@ public class ASMCodeGenerator {
 			newValueCode(node);
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
+			Type type = node.getSignature().paramType();
 			
 			code.append(arg1);
 			code.append(arg2);
@@ -327,14 +327,16 @@ public class ASMCodeGenerator {
 				ASMOpcode opcode = (ASMOpcode) node.getSignature().getVariant();
 				
 				// Check for division by 0, issue Runtime error
+				// ASM:	- duplicate denumerator
+				// Check if 0, if true -> jump to error,
+				//				  else -> continue
 				if (opcode == ASMOpcode.Divide || opcode == ASMOpcode.FDivide) {
-					if (node.child(1) instanceof NumberConstantNode &&
-						((NumberConstantNode)node.child(1)).getValue() == 0) {
-						code.add(PushD, RunTime.DIVIDE_BY_ZERO_RUNTIME_ERROR);
-					}					
-				} else {
-					code.add(opcode);
+					code.add(Duplicate);
+					code.add((type == PrimitiveType.FLOATING) ? JumpFZero : JumpFalse,
+												RunTime.DIVIDE_BY_ZERO_RUNTIME_ERROR);
 				}
+				
+				code.add(opcode);
 			} else {
 				ASMOpcode opcode = opcodeForOperator(node.getOperator());
 				code.add(opcode);
