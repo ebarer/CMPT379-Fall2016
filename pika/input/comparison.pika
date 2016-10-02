@@ -21,4 +21,7 @@ exec {
 	print less_equal; less, _n_.
 	print equal; not_equal, _n_.
 	print greater; greater_equal, _n_.
+
+	const cmp1 := char1 == char1.
+	const cmp2 := char1 == char2.
 }

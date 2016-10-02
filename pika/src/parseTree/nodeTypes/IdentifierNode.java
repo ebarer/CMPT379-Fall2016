@@ -21,9 +21,8 @@ public class IdentifierNode extends ParseNode {
 		super(node);
 		
 		if(node instanceof IdentifierNode) {
-			this.binding = ((IdentifierNode)node).binding;
-		}
-		else {
+			this.binding = ((IdentifierNode) node).binding;
+		} else {
 			this.binding = null;
 		}
 	}
@@ -40,6 +39,19 @@ public class IdentifierNode extends ParseNode {
 	}
 	public Binding getBinding() {
 		return binding;
+	}
+
+	public void setPointer(Integer pointer) {
+		if (binding != null) {
+			binding.setPointer(pointer);
+		}
+	}
+	public Integer getPointer() {
+		return (binding != null) ? binding.getPointer() : null;
+	}
+	
+	public Boolean isMutable() {
+		return (binding != null) ? binding.isMutable() : false;
 	}
 	
 ////////////////////////////////////////////////////////////

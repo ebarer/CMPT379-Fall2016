@@ -6,9 +6,7 @@ import symbolTable.Binding;
 import tokens.StringToken;
 import tokens.Token;
 
-public class StringNode extends ParseNode {
-	private String identifier;
-	
+public class StringNode extends ParseNode {	
 	public StringNode(Token token) {
 		super(token);
 		assert(token instanceof StringToken);
@@ -26,13 +24,6 @@ public class StringNode extends ParseNode {
 
 	public StringToken stringToken() {
 		return (StringToken)token;
-	}
-	
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
-	public String getIdentifier() {
-		return identifier;
 	}
 
 ///////////////////////////////////////////////////////////

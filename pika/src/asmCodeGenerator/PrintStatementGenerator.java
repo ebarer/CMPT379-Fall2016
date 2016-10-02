@@ -6,6 +6,7 @@ import static asmCodeGenerator.codeStorage.ASMOpcode.Label;
 import static asmCodeGenerator.codeStorage.ASMOpcode.Printf;
 import static asmCodeGenerator.codeStorage.ASMOpcode.PushD;
 import parseTree.ParseNode;
+import parseTree.nodeTypes.IdentifierNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.SpaceNode;
@@ -41,7 +42,8 @@ public class PrintStatementGenerator {
 
 	private void appendPrintCode(ParseNode node) {
 		if (node.getType() == PrimitiveType.STRING) {
-			code.add(PushD, "stringConst-"+node.getToken().getLexeme());
+			Integer stringAddress = ((IdentifierNode)node).getPointer();
+			code.add(PushD, "stringConst-" + stringAddress);
 			code.add(Printf);
 		} else {
 			String format = printFormat(node.getType());

@@ -27,4 +27,6 @@ exec {
 
 	const sum2	:= float3 + float9.
 	print sum2;_n_.
+
+	const float12	:= -.5E-.
 }

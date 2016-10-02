@@ -4,18 +4,20 @@ import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
+import lexicalAnalyzer.Punctuator;
 import tokens.LextantToken;
 import tokens.Token;
 
-public class DeclarationNode extends ParseNode {
-
-	public DeclarationNode(Token token) {
+public class AssignmentNode extends ParseNode {
+	
+	public AssignmentNode(Token token) {
 		super(token);
-		assert(token.isLextant(Keyword.CONST, Keyword.VAR));
+		assert(token.isLextant(Punctuator.ASSIGN));
 	}
-
-	public DeclarationNode(ParseNode node) {
+	
+	public AssignmentNode(ParseNode node) {
 		super(node);
+		initChildren();
 	}
 	
 	
@@ -33,10 +35,10 @@ public class DeclarationNode extends ParseNode {
 	////////////////////////////////////////////////////////////
 	// convenience factory
 	
-	public static DeclarationNode withChildren(Token token, ParseNode declaredName, ParseNode initializer) {
-		DeclarationNode node = new DeclarationNode(token);
-		node.appendChild(declaredName);
-		node.appendChild(initializer);
+	public static AssignmentNode withChildren(Token token, ParseNode target, ParseNode expression) {
+		AssignmentNode node = new AssignmentNode(token);
+		node.appendChild(target);
+		node.appendChild(expression);
 		return node;
 	}
 	

@@ -7,6 +7,8 @@ import semanticAnalyzer.types.Type;
 
 public class Binding {
 	private Type type;
+	private Integer pointer = null;
+	private Boolean mutable = false;
 	private TextLocation textLocation;
 	private MemoryLocation memoryLocation;
 	private String lexeme;
@@ -40,6 +42,20 @@ public class Binding {
 	}
 	public void generateAddress(ASMCodeFragment code) {
 		memoryLocation.generateAddress(code, "%% " + lexeme);
+	}
+	
+	public void setPointer(int pointer) {
+		this.pointer = pointer;
+	}
+	public Integer getPointer() {
+		return pointer;
+	}
+	
+	public void setMutability(Boolean mutable) {
+		this.mutable = mutable;
+	}
+	public Boolean isMutable() {
+		return mutable;
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////////

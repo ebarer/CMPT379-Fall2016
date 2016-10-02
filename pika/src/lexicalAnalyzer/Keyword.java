@@ -5,18 +5,27 @@ import tokens.Token;
 
 
 public enum Keyword implements Lextant {
+	EXEC("exec"),
+
 	CONST("const"),
+	VAR("var"),
+	
+	BOOL("bool"),
+	TRUE("_true_"),
+	FALSE("_false_"),
+	CHAR("char"),
+	STRING("string"),
+	INT("int"),
+	FLOAT("float"),
+	
 	PRINT("print"),
 	NEWLINE("_n_"),
 	TAB("_t_"),
-	TRUE("_true_"),
-	FALSE("_false_"),
-	EXEC("exec"),
+	
 	NULL_KEYWORD("");
 
 	private String lexeme;
 	private Token prototype;
-	
 	
 	private Keyword(String lexeme) {
 		this.lexeme = lexeme;

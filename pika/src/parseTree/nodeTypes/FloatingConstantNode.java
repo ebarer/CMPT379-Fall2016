@@ -17,7 +17,7 @@ public class FloatingConstantNode extends ParseNode {
 ////////////////////////////////////////////////////////////
 // attributes
 	
-	public float getValue() {
+	public double getValue() {
 		return floatingToken().getValue();
 	}
 

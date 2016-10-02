@@ -3,11 +3,13 @@ package semanticAnalyzer;
 import java.util.Arrays;
 import java.util.List;
 
+import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CharacterNode;
@@ -69,20 +71,50 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
-	// statements and declarations
+	// statements, declarations, and assignments
 	@Override
 	public void visitLeave(PrintStatementNode node) {
 	}
 	@Override
 	public void visitLeave(DeclarationNode node) {
-		IdentifierNode identifier = (IdentifierNode) node.child(0);
-		ParseNode initializer = node.child(1);
-		
-		Type declarationType = initializer.getType();
-		node.setType(declarationType);
-		
-		identifier.setType(declarationType);
-		addBinding(identifier, declarationType);
+		if (node.child(0) instanceof IdentifierNode) {
+			IdentifierNode identifier = (IdentifierNode) node.child(0);
+			ParseNode initializer = node.child(1);
+			
+			Type declarationType = initializer.getType();
+			node.setType(declarationType);
+			identifier.setType(declarationType);
+			
+			Boolean mutable = node.getToken().isLextant(Keyword.VAR);
+			
+			addBinding(identifier, declarationType, mutable);			
+		}
+	}
+	@Override
+	public void visitLeave(AssignmentNode node) {
+		if (node.child(0) instanceof IdentifierNode) {
+			IdentifierNode target = (IdentifierNode) node.child(0);
+			target.setBinding(target.findVariableBinding());
+			target.setType(target.getBinding().getType());
+			Type targetType = target.getBinding().getType();
+			
+			// Check for immutability
+			if (!target.isMutable()) {
+				String targetName = target.getToken().getLexeme();
+				logError("Cannot assign to value: '" + targetName + "' is a 'const' constant.");
+				return;
+			}
+			
+			ParseNode expression = node.child(1);
+			Type expressionType = expression.getType();
+			
+			// Check for type-match
+			if (targetType != expressionType) {
+				logError("Cannot assign value of type '" + expressionType + "' to type '" + targetType + "'");
+			}
+			
+			node.setType(targetType);			
+		}
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -101,8 +133,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		if(signature.accepts(childTypes)) {
 			node.setSignature(signature);
 			node.setType(signature.resultType());
-		}
-		else {
+		} else {
 			typeCheckError(node, childTypes);
 			node.setType(PrimitiveType.ERROR);
 		}
@@ -149,9 +180,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	// IdentifierNodes, with helper methods
 	@Override
 	public void visit(IdentifierNode node) {
-		if(!isBeingDeclared(node)) {		
+		if(!isBeingDeclared(node) && !isBeingAssigned(node)) {		
 			Binding binding = node.findVariableBinding();
-			
 			node.setType(binding.getType());
 			node.setBinding(binding);
 		}
@@ -161,9 +191,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		ParseNode parent = node.getParent();
 		return (parent instanceof DeclarationNode) && (node == parent.child(0));
 	}
-	private void addBinding(IdentifierNode identifierNode, Type type) {
+	private boolean isBeingAssigned(IdentifierNode node) {
+		ParseNode parent = node.getParent();
+		return (parent instanceof AssignmentNode) && (node == parent.child(0));
+	}
+	private void addBinding(IdentifierNode identifierNode, Type type, Boolean mutable) {
 		Scope scope = identifierNode.getLocalScope();
 		Binding binding = scope.createBinding(identifierNode, type);
+		binding.setMutability(mutable);
 		identifierNode.setBinding(binding);
 	}
 	

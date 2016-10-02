@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import logging.PikaLogger;
 import parseTree.*;
+import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.MainBlockNode;
@@ -104,15 +105,63 @@ public class Parser {
 		if(startsDeclaration(nowReading)) {
 			return parseDeclaration();
 		}
+		if(startsAssignment(nowReading)) {
+			return parseAssignment();
+		}
 		if(startsPrintStatement(nowReading)) {
 			return parsePrintStatement();
 		}
 		return syntaxErrorNode("statement");
 	}
 	private boolean startsStatement(Token token) {
-		return startsPrintStatement(token) ||
-			   startsDeclaration(token);
+		return startsDeclaration(token) ||
+			   startsAssignment(token) ||
+			   startsPrintStatement(token);
 	}
+	
+	// declaration -> CONST identifier := expression .
+	private ParseNode parseDeclaration() {
+		if(!startsDeclaration(nowReading)) {
+			return syntaxErrorNode("declaration");
+		}
+		Token declarationToken = nowReading;
+		readToken();
+		
+		// If declared as VAR, define identifier as mutable
+		ParseNode identifier = parseIdentifier();
+		
+		expect(Punctuator.ASSIGN);
+		
+		ParseNode initializer = parseExpression();
+		
+		expect(Punctuator.TERMINATOR);
+		
+		return DeclarationNode.withChildren(declarationToken, identifier, initializer);
+	}
+	private boolean startsDeclaration(Token token) {		
+		return token.isLextant(Keyword.CONST, Keyword.VAR);
+	}
+	
+	
+	// declaration -> CONST identifier := expression .
+	private ParseNode parseAssignment() {
+		if(!startsAssignment(nowReading)) {
+			return syntaxErrorNode("assignment");
+		}
+		
+		ParseNode target = parseIdentifier();		
+		expect(Punctuator.ASSIGN);
+		Token assignmentToken = Punctuator.ASSIGN.prototype();
+		ParseNode expression = parseExpression();
+		
+		expect(Punctuator.TERMINATOR);
+		
+		return AssignmentNode.withChildren(assignmentToken, target, expression);
+	}
+	private boolean startsAssignment(Token token) {
+		return token instanceof IdentifierToken;
+	}
+	
 	
 	// printStmt -> PRINT printExpressionList .
 	private ParseNode parsePrintStatement() {
@@ -192,31 +241,6 @@ public class Parser {
 	}
 	private boolean startsPrintSeparator(Token token) {
 		return token.isLextant(Punctuator.SEPARATOR, Punctuator.SPACE);
-	}
-	
-	
-	// declaration -> CONST identifier := expression .
-	private ParseNode parseDeclaration() {
-		if(!startsDeclaration(nowReading)) {
-			return syntaxErrorNode("declaration");
-		}
-		Token declarationToken = nowReading;
-		readToken();
-		
-		ParseNode identifier = parseIdentifier();
-		expect(Punctuator.ASSIGN);
-		ParseNode initializer = parseExpression();
-		
-		if (initializer instanceof StringNode) {
-			((StringNode) initializer).setIdentifier(identifier.getToken().getLexeme());
-		}
-		
-		expect(Punctuator.TERMINATOR);
-		
-		return DeclarationNode.withChildren(declarationToken, identifier, initializer);
-	}
-	private boolean startsDeclaration(Token token) {
-		return token.isLextant(Keyword.CONST);
 	}
 
 

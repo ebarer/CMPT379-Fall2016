@@ -128,7 +128,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	
 	
 	//////////////////////////////////////////////////////////////////////////////
-	// Integer lexical analysis	
+	// Integer and Floating lexical analysis	
 	
 	private Token scanSignedNumber(LocatedChar ch) {
 		LocatedChar next = input.peek();
@@ -150,7 +150,11 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		LocatedChar c = input.next();
 		if (c.getCharacter() != '.' || !(input.peek().isDigit())) {
 			input.pushback(c);
-			return IntegerToken.make(ch.getLocation(), buffer.toString());
+			if (ch.isDigit()) {
+				return IntegerToken.make(ch.getLocation(), buffer.toString());
+			} else {
+				return PunctuatorScanner.scan(ch, input);
+			}
 		}
 		buffer.append(c.getCharacter());
 		
@@ -164,11 +168,12 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		
 		if (c.getCharacter() == 'E') {
 			LocatedChar c2 = input.next();
-			if (c2.isSign() || c2.isDigit()) {
+			if (c2.isDigit() || c2.isSign() && input.peek().isDigit()) {
 				buffer.append(c.getCharacter());
 				buffer.append(c2.getCharacter());
 				appendSubsequentDigits(buffer);
 			} else {
+				lexicalError(c2);
 				input.pushback(c2);
 				input.pushback(c);
 			}

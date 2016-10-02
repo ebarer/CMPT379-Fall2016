@@ -9,6 +9,7 @@ import asmCodeGenerator.runtime.RunTime;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
 import parseTree.*;
+import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CharacterNode;
@@ -23,6 +24,7 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringNode;
 import parseTree.nodeTypes.TabNode;
+import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -33,6 +35,7 @@ import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 // do not call the code generator if any errors have occurred during analysis.
 public class ASMCodeGenerator {
 	ParseNode root;
+	private static int stringNumber = 0;
 
 	public static ASMCodeFragment generate(ParseNode syntaxTree) {
 		ASMCodeGenerator codeGenerator = new ASMCodeGenerator(syntaxTree);
@@ -222,6 +225,23 @@ public class ASMCodeGenerator {
 				code.append(value);
 			}
 		}
+		public void visitLeave(AssignmentNode node) {
+			newVoidCode(node);
+			
+			Type type = node.getType();
+			if (type != PrimitiveType.STRING) {
+				ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
+				ASMCodeFragment rvalue = removeValueCode(node.child(1));
+				
+				code.append(lvalue);
+				code.append(rvalue);
+				
+				code.add(opcodeForStore(type));
+			} else {
+				ASMCodeFragment value = removeAddressCode(node.child(1));
+				code.append(value);
+			}
+		}
 		private ASMOpcode opcodeForStore(Type type) {
 			if(type == PrimitiveType.INTEGER) {
 				return StoreI;
@@ -381,8 +401,11 @@ public class ASMCodeGenerator {
 		}
 		public void visit(StringNode node) {
 			newAddressCode(node);
-			code.add(DLabel, "stringConst-"+node.getIdentifier());
+			code.add(DLabel, "stringConst-"+stringNumber);
 			code.add(DataS, node.getValue());
+
+			node.getIdentifier().setPointer(stringNumber);
+			stringNumber++;
 		}
 	}
 
