@@ -90,167 +90,22 @@
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        28                        
+        DataZ        4                         
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% int0
-        PushI        10                        
-        StoreI                                 
-        PushD        $global-memory-block      
+        Add                                    %% sum3
         PushI        4                         
-        Add                                    %% int1
-        PushI        9                         
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        0                         
-        Add                                    %% int0
-        LoadI                                  
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $global-memory-block      
         PushI        4                         
-        Add                                    %% int1
-        LoadI                                  
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% int1
-        PushI        2                         
+        PushI        3                         
+        Add                                    
+        Multiply                               
         StoreI                                 
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% int0
+        Add                                    %% sum3
         LoadI                                  
         PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% int1
-        LoadI                                  
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% float0
-        PushF        5.000000                  
-        StoreF                                 
-        PushD        $global-memory-block      
-        PushI        16                        
-        Add                                    %% float1
-        PushF        4.900000                  
-        StoreF                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% float0
-        LoadF                                  
-        PushD        $print-format-floating    
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        16                        
-        Add                                    %% float1
-        LoadF                                  
-        PushD        $print-format-floating    
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        16                        
-        Add                                    %% float1
-        PushF        3.500000                  
-        StoreF                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% float0
-        LoadF                                  
-        PushD        $print-format-floating    
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        16                        
-        Add                                    %% float1
-        LoadF                                  
-        PushD        $print-format-floating    
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        DLabel       stringConst-0             
-        DataC        69                        %% "Elliot is the best."
-        DataC        108                       
-        DataC        108                       
-        DataC        105                       
-        DataC        111                       
-        DataC        116                       
-        DataC        32                        
-        DataC        105                       
-        DataC        115                       
-        DataC        32                        
-        DataC        116                       
-        DataC        104                       
-        DataC        101                       
-        DataC        32                        
-        DataC        98                        
-        DataC        101                       
-        DataC        115                       
-        DataC        116                       
-        DataC        46                        
-        DataC        0                         
-        PushD        stringConst-0             
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        DLabel       stringConst-1             
-        DataC        69                        %% "Elliot is better than Farzin."
-        DataC        108                       
-        DataC        108                       
-        DataC        105                       
-        DataC        111                       
-        DataC        116                       
-        DataC        32                        
-        DataC        105                       
-        DataC        115                       
-        DataC        32                        
-        DataC        98                        
-        DataC        101                       
-        DataC        116                       
-        DataC        116                       
-        DataC        101                       
-        DataC        114                       
-        DataC        32                        
-        DataC        116                       
-        DataC        104                       
-        DataC        97                        
-        DataC        110                       
-        DataC        32                        
-        DataC        70                        
-        DataC        97                        
-        DataC        114                       
-        DataC        122                       
-        DataC        105                       
-        DataC        110                       
-        DataC        46                        
-        DataC        0                         
-        PushD        stringConst-1             
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 

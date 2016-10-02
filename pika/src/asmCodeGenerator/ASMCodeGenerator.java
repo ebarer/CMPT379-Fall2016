@@ -344,7 +344,7 @@ public class ASMCodeGenerator {
 
 			Object variant = node.getSignature().getVariant();
 			if (variant instanceof ASMOpcode) {
-				ASMOpcode opcode = (ASMOpcode) node.getSignature().getVariant();
+				ASMOpcode opcode = (ASMOpcode) variant;
 				
 				// Check for division by 0, issue Runtime error
 				// ASM:	- duplicate denumerator

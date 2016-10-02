@@ -1,21 +1,13 @@
 exec {
-	const int0 := 10.
-	var int1 := 9.
-	print int0; int1; _n_.
+	#var sum1 := 2 * (3 + 4).
+	#print sum1, _n_.
 
-	int1 := 2.	
-	print int0; int1; _n_.
+	#var sum2 := (4.0 - 5.0) * (3.0 - 9.0) / 5.0.
+	#print sum2, _n_.
 
-	const float0 := 5.0.
-	var float1 := 4.9.
-	print float0; float1; _n_.
+	var sum3 := 4 * [4 + 3 | int].
+	print sum3, _n_.
 
-	float1 := 3.5.
-	print float0; float1; _n_.
-
-	var myStr := "Elliot is the best.".
-	print myStr, _n_.
-
-	myStr := "Elliot is better than Farzin.".
-	print myStr, _n_.
+	#const int0 := 4.
+	#var float1 := 3.9.
 }

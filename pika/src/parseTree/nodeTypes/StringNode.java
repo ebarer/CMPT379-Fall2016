@@ -2,7 +2,6 @@ package parseTree.nodeTypes;
 
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
-import symbolTable.Binding;
 import tokens.StringToken;
 import tokens.Token;
 
@@ -24,6 +23,10 @@ public class StringNode extends ParseNode {
 
 	public StringToken stringToken() {
 		return (StringToken)token;
+	}
+	
+	public IdentifierNode getIdentifier() {
+		return (IdentifierNode) this.getParent().child(0);
 	}
 
 ///////////////////////////////////////////////////////////

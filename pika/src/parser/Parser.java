@@ -83,15 +83,46 @@ public class Parser {
 		expect(Punctuator.OPEN_BRACE);
 		
 		while(startsStatement(nowReading)) {
-			ParseNode statement = parseStatement();
-			mainBlock.appendChild(statement);
+			if (startsBlockStatement(nowReading)) {
+				ParseNode blockStatement = parseBlockStatement();
+				mainBlock.appendChild(blockStatement);
+			} else {
+				ParseNode statement = parseStatement();
+				mainBlock.appendChild(statement);
+			}
 		}
+		
 		expect(Punctuator.CLOSE_BRACE);
 		return mainBlock;
 	}
 	private boolean startsMainBlock(Token token) {
 		return token.isLextant(Punctuator.OPEN_BRACE);
 	}
+	
+	///////////////////////////////////////////////////////////
+	// blockStatement
+	
+	// mainBlock -> { statement* }
+	private ParseNode parseBlockStatement() {
+		if(!startsBlockStatement(nowReading)) {
+			return syntaxErrorNode("blockStatement");
+		}
+		ParseNode blockStatement = new MainBlockNode(nowReading);
+		expect(Punctuator.OPEN_BRACE);
+		
+		while(startsStatement(nowReading)) {
+			ParseNode statement = parseStatement();
+			blockStatement.appendChild(statement);
+		}
+		
+		expect(Punctuator.CLOSE_BRACE);
+		return blockStatement;
+	}
+	private boolean startsBlockStatement(Token token) {
+		return token.isLextant(Punctuator.OPEN_BRACE);
+	}
+	
+	
 	
 	
 	///////////////////////////////////////////////////////////
@@ -334,20 +365,40 @@ public class Parser {
 		if(!startsAtomicExpression(nowReading)) {
 			return syntaxErrorNode("atomic expression");
 		}
-		return parseLiteral();
+		
+		if (startsCast(nowReading)){
+			expect(Punctuator.OPEN_BRACKET);
+			
+			ParseNode left = parseExpression();
+			
+			expect(Punctuator.PIPE);
+			
+			// Perform cast
+			Token type = nowReading;
+			
+			readToken();
+			
+			expect(Punctuator.CLOSE_BRACKET);
+			return left;
+		} else if (startsParenthetical(nowReading)) {
+			expect(Punctuator.OPEN_PARENTHESIS);
+			ParseNode left = parseExpression();
+			expect(Punctuator.CLOSE_PARENTHESIS);
+			return left;
+		} else {
+			return parseLiteral();
+		}
 	}
 	private boolean startsAtomicExpression(Token token) {
-		return startsLiteral(token);
+		if (startsParenthetical(token) || startsCast(token)) {
+			return true;
+		} else {
+			return startsLiteral(token);
+		}
 	}
 	
 	// literal -> number | identifier | booleanConstant
 	private ParseNode parseLiteral() {
-		if(!startsLiteral(nowReading)) {
-			return syntaxErrorNode("literal");
-		}
-//		if(startsParenthetical(nowReading)) {
-//			return parseParenthetical();
-//		}
 		if(startsIntNumber(nowReading)) {
 			return parseIntNumber();
 		}
@@ -374,16 +425,15 @@ public class Parser {
 				startsCharacter(token) || startsString(token) ||
 				startsIdentifier(token) || startsBooleanConstant(token);
 	}
-	
-	//parentheticals
-//	private ParseNode parseParenthetical() {
-//		
-//	}
-//	
-//	private boolean startsParenthetical(Token token) {
-//		return token instanceof IntegerToken;
-//	}
 
+	// casting and parenthetical
+	private boolean startsCast(Token token) {
+		return token.isLextant(Punctuator.OPEN_BRACKET);
+	}
+	private boolean startsParenthetical(Token token) {
+		return token.isLextant(Punctuator.OPEN_PARENTHESIS); 
+	}
+	
 	// number (terminal)
 	private ParseNode parseIntNumber() {
 		if(!startsIntNumber(nowReading)) {
