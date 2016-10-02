@@ -1,5 +1,7 @@
 package lexicalAnalyzer;
 
+import java.util.Arrays;
+import java.util.List;
 import tokens.LextantToken;
 import tokens.Token;
 
@@ -54,9 +56,10 @@ public enum Punctuator implements Lextant {
 		   return lexemeToPunctuator.forLexeme(lexeme);
 	}
 	
-//	public Lextant[] getComparators() {
-//		return { LESS_OR_EQUAL, LESS, EQUAL, NOT_EQUAL, GREATER, GREATER_OR_EQUAL };
-//	}
+	public static Lextant[] getComparators() {
+		Lextant[] comparators = { LESS_OR_EQUAL, LESS, EQUAL, NOT_EQUAL, GREATER, GREATER_OR_EQUAL };
+		return comparators;
+	}
 	
 //	public static Punctuator forLexeme(String lexeme) {
 //	for(Punctuator punctuator: values()) {

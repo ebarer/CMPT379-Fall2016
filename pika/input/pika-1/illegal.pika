@@ -1,4 +1,6 @@
 exec {
 	const $aTest	:= 5.0.
 	const myVariableIsMoreThan32CharactersLong := 3.
+
+	const float12	:= -.5E-.
 }

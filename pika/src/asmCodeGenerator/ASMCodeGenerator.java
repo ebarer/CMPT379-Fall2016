@@ -13,6 +13,7 @@ import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BlockNode;
 import parseTree.nodeTypes.BooleanConstantNode;
+import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
@@ -270,9 +271,8 @@ public class ASMCodeGenerator {
 		///////////////////////////////////////////////////////////////////////////
 		// expressions
 		public void visitLeave(BinaryOperatorNode node) {
-			Lextant operator = node.getOperator();
-
 			if (node.isComparator()) {
+				Lextant operator = node.getOperator();
 				visitComparisonOperatorNode(node, operator);
 			} else {
 				visitNormalBinaryOperatorNode(node);
@@ -339,7 +339,6 @@ public class ASMCodeGenerator {
 			code.add(Jump, joinLabel);
 			code.add(Label, joinLabel);
 		}
-		
 		private void visitNormalBinaryOperatorNode(BinaryOperatorNode node) {
 			newValueCode(node);
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
@@ -382,6 +381,19 @@ public class ASMCodeGenerator {
 			}
 			return null;
 		}
+		
+		public void visitLeave(CastNode node) {
+			newValueCode(node);
+
+			ASMCodeFragment arg1 = removeValueCode(node.child(0));
+			code.append(arg1);
+			
+			Object variant = node.getSignature().getVariant();
+			if (variant instanceof ASMOpcode) {
+				ASMOpcode opcode = (ASMOpcode) variant;
+				code.add(opcode);
+			}
+		}
 
 		///////////////////////////////////////////////////////////////////////////
 		// leaf nodes (ErrorNode not necessary)
@@ -408,10 +420,12 @@ public class ASMCodeGenerator {
 		}
 		public void visit(StringNode node) {
 			newAddressCode(node);
-			code.add(DLabel, "stringConst-"+stringNumber);
+			IdentifierNode identifier = node.getIdentifier();
+			identifier.setPointer(stringNumber);
+
+			code.add(DLabel, "stringConst-"+stringNumber, "%% " + identifier.getToken().getLexeme());
 			code.add(DataS, node.getValue());
 
-			node.getIdentifier().setPointer(stringNumber);
 			stringNumber++;
 		}
 	}

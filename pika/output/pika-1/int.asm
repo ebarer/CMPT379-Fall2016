@@ -5,12 +5,27 @@
         DataC        37                        %% "%d"
         DataC        100                       
         DataC        0                         
+        DLabel       $print-format-floating    
+        DataC        37                        %% "%g"
+        DataC        103                       
+        DataC        0                         
         DLabel       $print-format-boolean     
+        DataC        37                        %% "%s"
+        DataC        115                       
+        DataC        0                         
+        DLabel       $print-format-character   
+        DataC        37                        %% "%c"
+        DataC        99                        
+        DataC        0                         
+        DLabel       $print-format-string      
         DataC        37                        %% "%s"
         DataC        115                       
         DataC        0                         
         DLabel       $print-format-newline     
         DataC        10                        %% "\n"
+        DataC        0                         
+        DLabel       $print-format-tab         
+        DataC        9                         %% "\t"
         DataC        0                         
         DLabel       $print-format-space       
         DataC        32                        %% " "
@@ -52,21 +67,15 @@
         PushD        $errors-general-message   
         Printf                                 
         Halt                                   
-        DLabel       $errors-int-divide-by-zero 
-        DataC        105                       %% "integer divide by zero"
-        DataC        110                       
-        DataC        116                       
-        DataC        101                       
-        DataC        103                       
-        DataC        101                       
-        DataC        114                       
-        DataC        32                        
-        DataC        100                       
+        DLabel       $errors-divide-by-zero    
+        DataC        100                       %% "division by zero"
         DataC        105                       
         DataC        118                       
         DataC        105                       
-        DataC        100                       
-        DataC        101                       
+        DataC        115                       
+        DataC        105                       
+        DataC        111                       
+        DataC        110                       
         DataC        32                        
         DataC        98                        
         DataC        121                       
@@ -76,8 +85,8 @@
         DataC        114                       
         DataC        111                       
         DataC        0                         
-        Label        $$i-divide-by-zero        
-        PushD        $errors-int-divide-by-zero 
+        Label        $$divide-by-zero          
+        PushD        $errors-divide-by-zero    
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
@@ -116,8 +125,8 @@
         PushD        $global-memory-block      
         PushI        16                        
         Add                                    %% sum2
-        PushI        -10                       
-        PushI        30                        
+        PushI        -30                       
+        PushI        10                        
         Add                                    
         StoreI                                 
         PushD        $global-memory-block      
@@ -126,7 +135,11 @@
         LoadI                                  
         PushD        $print-format-integer     
         Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
         PushD        $print-format-newline     
+        Printf                                 
+        PushD        $print-format-space       
         Printf                                 
         PushD        $global-memory-block      
         PushI        12                        
@@ -134,7 +147,11 @@
         LoadI                                  
         PushD        $print-format-integer     
         Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
         PushD        $print-format-newline     
+        Printf                                 
+        PushD        $print-format-space       
         Printf                                 
         PushD        $global-memory-block      
         PushI        16                        

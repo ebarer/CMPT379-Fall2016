@@ -8,6 +8,7 @@ import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BlockNode;
 import parseTree.nodeTypes.BooleanConstantNode;
+import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
@@ -21,6 +22,7 @@ import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.TabNode;
+import semanticAnalyzer.types.PrimitiveType;
 import tokens.*;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
@@ -306,9 +308,7 @@ public class Parser {
 		
 		ParseNode left = parseAdditiveExpression();
 		// TASK: Create function getComparators() to return an array of these values
-		if(nowReading.isLextant(Punctuator.LESS_OR_EQUAL, Punctuator.LESS,
-								Punctuator.EQUAL, Punctuator.NOT_EQUAL,
-								Punctuator.GREATER, Punctuator.GREATER_OR_EQUAL)) {
+		if(nowReading.isLextant(Punctuator.getComparators())) {
 			Token compareToken = nowReading;
 			readToken();
 			ParseNode right = parseAdditiveExpression();
@@ -374,14 +374,13 @@ public class Parser {
 			ParseNode left = parseExpression();
 			
 			expect(Punctuator.PIPE);
+			Token castToken = previouslyRead;
 			
 			// Perform cast
-			Token type = nowReading;
-			
-			readToken();
+			PrimitiveType castType = parseCastType();
 			
 			expect(Punctuator.CLOSE_BRACKET);
-			return left;
+			return CastNode.withChildren(castToken, left, castType);
 		} else if (startsParenthetical(nowReading)) {
 			expect(Punctuator.OPEN_PARENTHESIS);
 			ParseNode left = parseExpression();
@@ -389,6 +388,23 @@ public class Parser {
 			return left;
 		} else {
 			return parseLiteral();
+		}
+	}
+	private PrimitiveType parseCastType() {
+		readToken();
+		switch(previouslyRead.getLexeme()) {
+		case "bool":
+			return PrimitiveType.BOOLEAN;
+		case "char":
+			return PrimitiveType.CHARACTER;
+		case "string":
+			return PrimitiveType.STRING;
+		case "int":
+			return PrimitiveType.INTEGER;
+		case "float":
+			return PrimitiveType.FLOATING;
+		default:
+			return PrimitiveType.ERROR;
 		}
 	}
 	private boolean startsAtomicExpression(Token token) {

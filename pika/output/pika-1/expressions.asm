@@ -67,21 +67,15 @@
         PushD        $errors-general-message   
         Printf                                 
         Halt                                   
-        DLabel       $errors-int-divide-by-zero 
-        DataC        105                       %% "integer divide by zero"
-        DataC        110                       
-        DataC        116                       
-        DataC        101                       
-        DataC        103                       
-        DataC        101                       
-        DataC        114                       
-        DataC        32                        
-        DataC        100                       
+        DLabel       $errors-divide-by-zero    
+        DataC        100                       %% "division by zero"
         DataC        105                       
         DataC        118                       
         DataC        105                       
-        DataC        100                       
-        DataC        101                       
+        DataC        115                       
+        DataC        105                       
+        DataC        111                       
+        DataC        110                       
         DataC        32                        
         DataC        98                        
         DataC        121                       
@@ -91,54 +85,57 @@
         DataC        114                       
         DataC        111                       
         DataC        0                         
-        Label        $$i-divide-by-zero        
-        PushD        $errors-int-divide-by-zero 
+        Label        $$divide-by-zero          
+        PushD        $errors-divide-by-zero    
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        9                         
+        DataZ        8                         
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% myString
-        DLabel       stringConst-1             
-        DataC        72                        %% "Hello, world! This is Elliot.\n"
-        DataC        101                       
-        DataC        108                       
-        DataC        108                       
-        DataC        111                       
-        DataC        44                        
-        DataC        32                        
-        DataC        119                       
-        DataC        111                       
-        DataC        114                       
-        DataC        108                       
-        DataC        100                       
-        DataC        33                        
-        DataC        32                        
-        DataC        84                        
-        DataC        104                       
-        DataC        105                       
-        DataC        115                       
-        DataC        32                        
-        DataC        105                       
-        DataC        115                       
-        DataC        32                        
-        DataC        69                        
-        DataC        108                       
-        DataC        108                       
-        DataC        105                       
-        DataC        111                       
-        DataC        116                       
-        DataC        46                        
-        DataC        0                                                    
+        Add                                    %% arithmeticOperators
+        PushI        5                         
+        PushI        4                         
+        PushI        3                         
+        Multiply                               
+        PushI        2                         
+        Duplicate                              
+        JumpFalse    $$divide-by-zero          
+        Divide                                 
+        Add                                    
+        StoreI                                 
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% myString
-        PushD	     stringConst-1
-	Printf                                  
+        Add                                    %% arithmeticOperators
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-tab         
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% punctuationOperators
+        PushI        5                         
+        PushI        4                         
+        Add                                    
+        PushI        3                         
+        Multiply                               
+        PushI        2                         
+        Duplicate                              
+        JumpFalse    $$divide-by-zero          
+        Divide                                 
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% punctuationOperators
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
         PushD        $print-format-space       
         Printf                                 
         PushD        $print-format-newline     
-        Printf                                
+        Printf                                 
         Halt                                   

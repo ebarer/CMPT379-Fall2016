@@ -4,6 +4,7 @@ import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BlockNode;
 import parseTree.nodeTypes.BooleanConstantNode;
+import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
@@ -22,8 +23,11 @@ import parseTree.nodeTypes.SpaceNode;
 public interface ParseNodeVisitor {
 	
 	// non-leaf nodes: visitEnter and visitLeave
-	void visitEnter(BinaryOperatorNode node);
-	void visitLeave(BinaryOperatorNode node);
+	void visitEnter(ParseNode node);
+	void visitLeave(ParseNode node);
+	
+	void visitEnter(ProgramNode node);
+	void visitLeave(ProgramNode node);
 	
 	void visitEnter(MainBlockNode node);
 	void visitLeave(MainBlockNode node);
@@ -37,14 +41,14 @@ public interface ParseNodeVisitor {
 	void visitEnter(AssignmentNode node);
 	void visitLeave(AssignmentNode node);
 	
-	void visitEnter(ParseNode node);
-	void visitLeave(ParseNode node);
+	void visitEnter(BinaryOperatorNode node);
+	void visitLeave(BinaryOperatorNode node);
+	
+	void visitEnter(CastNode node);
+	void visitLeave(CastNode node);
 	
 	void visitEnter(PrintStatementNode node);
 	void visitLeave(PrintStatementNode node);
-	
-	void visitEnter(ProgramNode node);
-	void visitLeave(ProgramNode node);
 
 
 	// leaf nodes: visitLeaf only
@@ -72,22 +76,18 @@ public interface ParseNodeVisitor {
 		public void defaultVisitForLeaf(ParseNode node) {
 			defaultVisit(node);
 		}
-		public void visitEnter(BinaryOperatorNode node) {
+		public void visitEnter(ParseNode node) {
 			defaultVisitEnter(node);
 		}
-		public void visitLeave(BinaryOperatorNode node) {
+		public void visitLeave(ParseNode node) {
 			defaultVisitLeave(node);
 		}
-		public void visitEnter(DeclarationNode node) {
+		
+		
+		public void visitEnter(ProgramNode node) {
 			defaultVisitEnter(node);
 		}
-		public void visitLeave(DeclarationNode node) {
-			defaultVisitLeave(node);
-		}
-		public void visitEnter(AssignmentNode node) {
-			defaultVisitEnter(node);
-		}
-		public void visitLeave(AssignmentNode node) {
+		public void visitLeave(ProgramNode node) {
 			defaultVisitLeave(node);
 		}
 		public void visitEnter(MainBlockNode node) {
@@ -102,22 +102,36 @@ public interface ParseNodeVisitor {
 		public void visitLeave(BlockNode node) {
 			defaultVisitLeave(node);
 		}
-		public void visitEnter(ParseNode node) {
+		
+		
+		public void visitEnter(DeclarationNode node) {
 			defaultVisitEnter(node);
 		}
-		public void visitLeave(ParseNode node) {
+		public void visitLeave(DeclarationNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(AssignmentNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(AssignmentNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(BinaryOperatorNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(BinaryOperatorNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(CastNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(CastNode node) {
 			defaultVisitLeave(node);
 		}
 		public void visitEnter(PrintStatementNode node) {
 			defaultVisitEnter(node);
 		}
 		public void visitLeave(PrintStatementNode node) {
-			defaultVisitLeave(node);
-		}
-		public void visitEnter(ProgramNode node) {
-			defaultVisitEnter(node);
-		}
-		public void visitLeave(ProgramNode node) {
 			defaultVisitLeave(node);
 		}
 		

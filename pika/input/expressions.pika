@@ -1,7 +1,0 @@
-exec {
-	const arithmeticOperators	:= 5 + 4 * 3 / 2.
-	print arithmeticOperators;_t_.
-
-	#const punctuationOperators	:= (5 + 4) * 3 / 2.
-	#print punctuationOperators;_n_.
-}

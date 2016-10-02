@@ -47,6 +47,9 @@ public class PikaLogger {
 	public void severe(String message) {
 		log(Level.SEVERE, message);
 	}
+	public static void resetCounter() {
+		numMessages = 0;
+	}
 	private void incrementNumMessages() {
 		numMessages++;
 		if(numMessages >= maxMessagesBeforeQuit) {

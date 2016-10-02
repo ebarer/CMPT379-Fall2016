@@ -7,16 +7,19 @@ import lexicalAnalyzer.Punctuator;
 import tokens.LextantToken;
 import tokens.Token;
 import semanticAnalyzer.signatures.FunctionSignature;
+import semanticAnalyzer.types.PrimitiveType;
+import semanticAnalyzer.types.Type;
 
-public class BinaryOperatorNode extends ParseNode {
+public class CastNode extends ParseNode {
+	protected PrimitiveType castType;
 	protected FunctionSignature signature;
 
-	public BinaryOperatorNode(Token token) {
+	public CastNode(Token token) {
 		super(token);
-		assert(token instanceof LextantToken);
+		assert(token.isLextant(Punctuator.PIPE));
 	}
 
-	public BinaryOperatorNode(ParseNode node) {
+	public CastNode(ParseNode node) {
 		super(node);
 	}
 	
@@ -30,7 +33,7 @@ public class BinaryOperatorNode extends ParseNode {
 	public LextantToken lextantToken() {
 		return (LextantToken)token;
 	}
-
+	
 	public void setSignature(FunctionSignature signature) {
 		this.signature = signature;
 	}
@@ -42,21 +45,22 @@ public class BinaryOperatorNode extends ParseNode {
 	////////////////////////////////////////////////////////////
 	// convenience factory
 	
-	public static BinaryOperatorNode withChildren(Token token, ParseNode left, ParseNode right) {
-		BinaryOperatorNode node = new BinaryOperatorNode(token);
+	public static CastNode withChildren(Token token, ParseNode left, PrimitiveType right) {
+		CastNode node = new CastNode(token);
 		node.appendChild(left);
-		node.appendChild(right);
+		node.castType = right;
+		//node.signature = FunctionSignatures.signature(token.getLexeme(), left.getType(), right.getLexeme());
 		return node;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////
 	//delegates
 	
-	public boolean isComparator() {
-		Lextant operator = getOperator();
-		return (operator == Punctuator.LESS_OR_EQUAL || operator == Punctuator.LESS ||
-				operator == Punctuator.EQUAL || operator == Punctuator.NOT_EQUAL ||
-				operator == Punctuator.GREATER || operator == Punctuator.GREATER_OR_EQUAL);
+	public Type getExpressionType() {
+		return this.child(0).getType();
+	}
+	public Type getCastType() {
+		return this.castType;
 	}
 	
 	

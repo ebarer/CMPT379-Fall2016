@@ -9,6 +9,5 @@ exec {
     			 pennies.
     print value, _n_.
     
-
-    const bad :=  _false_ > 3*4+2*1.
+    const bad := _false_ > 3*4 + 2*1.
 }

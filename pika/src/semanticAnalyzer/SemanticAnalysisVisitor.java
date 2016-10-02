@@ -5,6 +5,7 @@ import java.util.List;
 
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
+import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
@@ -12,6 +13,7 @@ import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
 import parseTree.nodeTypes.BlockNode;
 import parseTree.nodeTypes.BooleanConstantNode;
+import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.CharacterNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
@@ -152,6 +154,21 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private Lextant operatorFor(BinaryOperatorNode node) {
 		LextantToken token = (LextantToken) node.getToken();
 		return token.getLextant();
+	}
+	@Override
+	public void visitLeave(CastNode node) {
+		assert node.nChildren() == 1;
+		List<Type> childTypes = Arrays.asList(node.getExpressionType(), node.getCastType());
+
+		FunctionSignature signature = FunctionSignatures.signature(Punctuator.PIPE, childTypes);
+		
+		if(signature.accepts(childTypes)) {
+			node.setSignature(signature);
+			node.setType(signature.resultType());
+		} else {
+			logError("cannot cast type '" + childTypes.get(0) + "' to type '" + childTypes.get(1) + "'");
+			node.setType(PrimitiveType.ERROR);
+		}
 	}
 
 

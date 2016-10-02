@@ -211,9 +211,7 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 			String lexeme = buffer.toString();
 			// If identifier exceeds 32 characters,  
 			if(lexeme.length() > 32) {
-				// Custom lexical error for more-useful message
-				PikaLogger log = PikaLogger.getLogger("compiler.lexicalAnalyzer");
-				log.log(Level.WARNING, "Lexical error: variable name greater than 32 characters " + firstChar);
+				lexicalErrorWithIdentifier(lexeme);
 				return findNextToken();
 			}
 			
@@ -259,6 +257,9 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		PikaLogger log = PikaLogger.getLogger("compiler.lexicalAnalyzer");
 		log.severe("Lexical error: invalid character " + ch);
 	}
-
+	private void lexicalErrorWithIdentifier(String lexeme) {
+		PikaLogger log = PikaLogger.getLogger("compiler.lexicalAnalyzer");
+		log.severe("Lexical error: variable name '" + lexeme + "' is greater than 32 characters.");
+	}
 	
 }

@@ -137,6 +137,23 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		    new FunctionSignature(1, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.BOOLEAN)
 		);
 		
+		// Casting Operators
+		new FunctionSignatures(Punctuator.PIPE,
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER),
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN),
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
+			
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN),
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER),
+		    new FunctionSignature(ASMOpcode.ConvertF, PrimitiveType.INTEGER, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
+		    
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
+		    new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.FLOATING, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
+		    
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
+		);
+		
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.
 		// Then, we give that key two signatures: one an (INT x INT -> INT) and the other
