@@ -8,7 +8,7 @@ import semanticAnalyzer.types.Type;
 public class Binding {
 	private Type type;
 	private Integer pointer = null;
-	private Boolean mutable = false;
+	private Boolean mutable = null;
 	private TextLocation textLocation;
 	private MemoryLocation memoryLocation;
 	private String lexeme;

@@ -5,12 +5,12 @@ import java.util.List;
 
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
-import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
+import parseTree.nodeTypes.BlockNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.CharacterNode;
 import parseTree.nodeTypes.MainBlockNode;
@@ -48,9 +48,17 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visitLeave(ProgramNode node) {
 		leaveScope(node);
 	}
+	
 	public void visitEnter(MainBlockNode node) {
 	}
 	public void visitLeave(MainBlockNode node) {
+	}
+	
+	public void visitEnter(BlockNode node) {
+		enterSubscope(node);
+	}
+	public void visitLeave(BlockNode node) {
+		leaveScope(node);
 	}
 	
 	
@@ -59,8 +67,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private void enterProgramScope(ParseNode node) {
 		Scope scope = Scope.createProgramScope();
 		node.setScope(scope);
-	}	
-	@SuppressWarnings("unused")
+	}
 	private void enterSubscope(ParseNode node) {
 		Scope baseScope = node.getLocalScope();
 		Scope scope = baseScope.createSubscope();
@@ -97,6 +104,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			target.setBinding(target.findVariableBinding());
 			target.setType(target.getBinding().getType());
 			Type targetType = target.getBinding().getType();
+			
+			if (target.isMutable() == null) {
+				return;
+			}
 			
 			// Check for immutability
 			if (!target.isMutable()) {

@@ -142,6 +142,10 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	private Token scanNumber(LocatedChar ch) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(ch.getCharacter());
+
+		if (!ch.isDigit()) {
+			ch = input.peek();
+		}
 		
 		appendSubsequentDigits(buffer);
 		
@@ -185,10 +189,12 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	}
 	private void appendSubsequentDigits(StringBuffer buffer) {
 		LocatedChar c = input.next();
+		
 		while(c.isDigit()) {
 			buffer.append(c.getCharacter());
 			c = input.next();
 		}
+		
 		input.pushback(c);
 	}
 	

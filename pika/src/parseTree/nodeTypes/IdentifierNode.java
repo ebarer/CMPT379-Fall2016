@@ -51,7 +51,7 @@ public class IdentifierNode extends ParseNode {
 	}
 	
 	public Boolean isMutable() {
-		return (binding != null) ? binding.isMutable() : false;
+		return (binding != null) ? binding.isMutable() : null;
 	}
 	
 ////////////////////////////////////////////////////////////

@@ -1,7 +1,6 @@
 package tokens;
 
 import lexicalAnalyzer.Lextant;
-import lexicalAnalyzer.Punctuator;
 import inputHandler.TextLocation;
 
 public final class LextantToken extends TokenImp {

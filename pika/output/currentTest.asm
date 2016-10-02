@@ -90,22 +90,57 @@
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        4                         
+        DataZ        12                        
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% sum3
+        Add                                    %% int1
+        PushI        2                         
+        StoreI                                 
+        PushD        $global-memory-block      
         PushI        4                         
+        Add                                    %% float1
+        PushF        9.200000                  
+        StoreF                                 
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% int1
         PushI        4                         
-        PushI        3                         
-        Add                                    
-        Multiply                               
         StoreI                                 
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% sum3
+        Add                                    %% int1
         LoadI                                  
         PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% float1
+        LoadF                                  
+        PushD        $print-format-floating    
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% float1
+        PushF        2.900000                  
+        StoreF                                 
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% int1
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% float1
+        LoadF                                  
+        PushD        $print-format-floating    
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 

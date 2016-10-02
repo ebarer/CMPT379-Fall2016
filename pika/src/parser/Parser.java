@@ -6,6 +6,7 @@ import logging.PikaLogger;
 import parseTree.*;
 import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.BinaryOperatorNode;
+import parseTree.nodeTypes.BlockNode;
 import parseTree.nodeTypes.BooleanConstantNode;
 import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
@@ -102,12 +103,12 @@ public class Parser {
 	///////////////////////////////////////////////////////////
 	// blockStatement
 	
-	// mainBlock -> { statement* }
+	// blockStatement -> { statement* }
 	private ParseNode parseBlockStatement() {
 		if(!startsBlockStatement(nowReading)) {
 			return syntaxErrorNode("blockStatement");
 		}
-		ParseNode blockStatement = new MainBlockNode(nowReading);
+		ParseNode blockStatement = new BlockNode(nowReading);
 		expect(Punctuator.OPEN_BRACE);
 		
 		while(startsStatement(nowReading)) {
@@ -147,7 +148,8 @@ public class Parser {
 	private boolean startsStatement(Token token) {
 		return startsDeclaration(token) ||
 			   startsAssignment(token) ||
-			   startsPrintStatement(token);
+			   startsPrintStatement(token) ||
+			   startsBlockStatement(token);
 	}
 	
 	// declaration -> CONST identifier := expression .
