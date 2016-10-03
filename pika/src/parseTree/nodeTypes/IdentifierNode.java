@@ -41,12 +41,12 @@ public class IdentifierNode extends ParseNode {
 		return binding;
 	}
 
-	public void setPointer(Integer pointer) {
+	public void setPointer(String pointer) {
 		if (binding != null) {
 			binding.setPointer(pointer);
 		}
 	}
-	public Integer getPointer() {
+	public String getPointer() {
 		return (binding != null) ? binding.getPointer() : null;
 	}
 	

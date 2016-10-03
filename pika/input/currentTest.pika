@@ -1,6 +1,47 @@
 exec {
-	const int1 := 1.
-	const int2 := 2.
+	var sum1 := -2 * [4.3 + 3.6 | int].
+	var sum2 := -2 * [4.3 + 3.7 | int].
+	print sum1; sum2; _n_.
+
+	var sum3 := sum1 * sum2.
+	var sum4 := sum1 * sum2 + ([4.3 + 3.6 | int] / [4.3 + 3.7 | int]).
+	print sum3; sum4; _n_.
+
+	{
+		var myVar1 := 97.
+		var myVar2 := [myVar1 | char].
+		print myVar1; myVar2, _n_.
+
+		myVar1 := myVar1 + 4.
+		myVar2 := [myVar1 | char].
+		print myVar1; myVar2, _n_.
+
+		var val1 := 1.
+		var test1 := [val1 | bool].
+		var val2 := [0 | char].
+		var test2 := [val2 | bool].
+		print val1; test1; _n_, val2; test2; _n_.
+	}
+
+	var val3 := ^e^.
+	var test3 := [val3 | bool].
+	var val4 := ^0^.
+	var test4 := [val4 | bool].
+	print val3; test3; _n_, val4; test4; _n_.
+
+	var int0 := 10.
+	var int1 := 9.
+	print int0; int1; _n_.
+
+	int1 := 2.	
+	print int0; int1; _n_.
+
+	const float0 := 5.0.
+	var float1 := 4.9.
+	print float0; float1; _n_.
+
+	float1 := 3.5.
+	print float0; float1; _n_.
 
 	const char1 := ^e^.
 	const char2 := ^a^.
@@ -11,7 +52,7 @@ exec {
 	const bool1 := _true_.
 	const bool2 := _false_.
 
-	const less_equal := int1 <= int2.
+	const less_equal := int0 <= int1.
 	const less := char2 < char1.
 	const equal := bool1 == bool2.
 	const not_equal := bool1 != bool2.
@@ -24,4 +65,10 @@ exec {
 
 	const cmp1 := char1 == char1.
 	const cmp2 := char1 == char2.
+
+	var myStr := "Elliot is the best.".
+	print myStr, _n_.
+
+	myStr := "Elliot is better than Farzin.".
+	print myStr, _n_.
 }

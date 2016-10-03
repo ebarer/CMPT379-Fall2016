@@ -90,165 +90,469 @@
         Jump         $$general-runtime-error   
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        36                        
+        DataZ        76                        
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% int1
-        PushI        1                         
+        Add                                    %% sum1
+        PushI        -2                        
+        PushF        4.300000                  
+        PushF        3.600000                  
+        FAdd                                   
+        ConvertI                               
+        Multiply                               
         StoreI                                 
         PushD        $global-memory-block      
         PushI        4                         
-        Add                                    %% int2
-        PushI        2                         
+        Add                                    %% sum2
+        PushI        -2                        
+        PushF        4.300000                  
+        PushF        3.700000                  
+        FAdd                                   
+        ConvertI                               
+        Multiply                               
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% sum1
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% sum2
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% sum3
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% sum1
+        LoadI                                  
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% sum2
+        LoadI                                  
+        Multiply                               
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        12                        
+        Add                                    %% sum4
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% sum1
+        LoadI                                  
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% sum2
+        LoadI                                  
+        Multiply                               
+        PushF        4.300000                  
+        PushF        3.600000                  
+        FAdd                                   
+        ConvertI                               
+        PushF        4.300000                  
+        PushF        3.700000                  
+        FAdd                                   
+        ConvertI                               
+        Duplicate                              
+        JumpFalse    $$divide-by-zero          
+        Divide                                 
+        Add                                    
         StoreI                                 
         PushD        $global-memory-block      
         PushI        8                         
+        Add                                    %% sum3
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        12                        
+        Add                                    %% sum4
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% myVar1
+        PushI        97                        
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        20                        
+        Add                                    %% myVar2
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% myVar1
+        LoadI                                  
+        Nop                                    
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% myVar1
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        20                        
+        Add                                    %% myVar2
+        LoadC                                  
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% myVar1
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% myVar1
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        20                        
+        Add                                    %% myVar2
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% myVar1
+        LoadI                                  
+        Nop                                    
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% myVar1
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        20                        
+        Add                                    %% myVar2
+        LoadC                                  
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        21                        
+        Add                                    %% val1
+        PushI        1                         
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        25                        
+        Add                                    %% test1
+        PushD        $global-memory-block      
+        PushI        21                        
+        Add                                    %% val1
+        LoadI                                  
+        Nop                                    
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        26                        
+        Add                                    %% val2
+        PushI        0                         
+        Nop                                    
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        27                        
+        Add                                    %% test2
+        PushD        $global-memory-block      
+        PushI        26                        
+        Add                                    %% val2
+        LoadC                                  
+        Nop                                    
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        21                        
+        Add                                    %% val1
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        25                        
+        Add                                    %% test1
+        LoadC                                  
+        JumpTrue     -print-boolean-1-true     
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-1-join     
+        Label        -print-boolean-1-true     
+        PushD        $boolean-true-string      
+        Label        -print-boolean-1-join     
+        PushD        $print-format-boolean     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        26                        
+        Add                                    %% val2
+        LoadC                                  
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        27                        
+        Add                                    %% test2
+        LoadC                                  
+        JumpTrue     -print-boolean-2-true     
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-2-join     
+        Label        -print-boolean-2-true     
+        PushD        $boolean-true-string      
+        Label        -print-boolean-2-join     
+        PushD        $print-format-boolean     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% val3
+        PushI        101                       
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        17                        
+        Add                                    %% test3
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% val3
+        LoadC                                  
+        Nop                                    
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        18                        
+        Add                                    %% val4
+        PushI        48                        
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        19                        
+        Add                                    %% test4
+        PushD        $global-memory-block      
+        PushI        18                        
+        Add                                    %% val4
+        LoadC                                  
+        Nop                                    
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        16                        
+        Add                                    %% val3
+        LoadC                                  
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        17                        
+        Add                                    %% test3
+        LoadC                                  
+        JumpTrue     -print-boolean-3-true     
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-3-join     
+        Label        -print-boolean-3-true     
+        PushD        $boolean-true-string      
+        Label        -print-boolean-3-join     
+        PushD        $print-format-boolean     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        18                        
+        Add                                    %% val4
+        LoadC                                  
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        19                        
+        Add                                    %% test4
+        LoadC                                  
+        JumpTrue     -print-boolean-4-true     
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-4-join     
+        Label        -print-boolean-4-true     
+        PushD        $boolean-true-string      
+        Label        -print-boolean-4-join     
+        PushD        $print-format-boolean     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        20                        
+        Add                                    %% int0
+        PushI        10                        
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        24                        
+        Add                                    %% int1
+        PushI        9                         
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        20                        
+        Add                                    %% int0
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        24                        
+        Add                                    %% int1
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        24                        
+        Add                                    %% int1
+        PushI        2                         
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        20                        
+        Add                                    %% int0
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        24                        
+        Add                                    %% int1
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        28                        
+        Add                                    %% float0
+        PushF        5.000000                  
+        StoreF                                 
+        PushD        $global-memory-block      
+        PushI        36                        
+        Add                                    %% float1
+        PushF        4.900000                  
+        StoreF                                 
+        PushD        $global-memory-block      
+        PushI        28                        
+        Add                                    %% float0
+        LoadF                                  
+        PushD        $print-format-floating    
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        36                        
+        Add                                    %% float1
+        LoadF                                  
+        PushD        $print-format-floating    
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        36                        
+        Add                                    %% float1
+        PushF        3.500000                  
+        StoreF                                 
+        PushD        $global-memory-block      
+        PushI        28                        
+        Add                                    %% float0
+        LoadF                                  
+        PushD        $print-format-floating    
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        36                        
+        Add                                    %% float1
+        LoadF                                  
+        PushD        $print-format-floating    
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        44                        
         Add                                    %% char1
         PushI        101                       
         StoreC                                 
         PushD        $global-memory-block      
-        PushI        9                         
+        PushI        45                        
         Add                                    %% char2
         PushI        97                        
         StoreC                                 
         PushD        $global-memory-block      
-        PushI        10                        
+        PushI        46                        
         Add                                    %% flt1
         PushF        1.900000                  
         StoreF                                 
         PushD        $global-memory-block      
-        PushI        18                        
+        PushI        54                        
         Add                                    %% flt2
         PushF        2.000000                  
         StoreF                                 
         PushD        $global-memory-block      
-        PushI        26                        
+        PushI        62                        
         Add                                    %% bool1
         PushI        1                         
         StoreC                                 
         PushD        $global-memory-block      
-        PushI        27                        
+        PushI        63                        
         Add                                    %% bool2
         PushI        0                         
         StoreC                                 
         PushD        $global-memory-block      
-        PushI        28                        
+        PushI        64                        
         Add                                    %% less_equal
-        Label        -compare-1-arg1           
-        PushD        $global-memory-block      
-        PushI        0                         
-        Add                                    %% int1
-        LoadI                                  
-        Label        -compare-1-arg2           
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% int2
-        LoadI                                  
-        Label        -compare-1-sub            
-        Subtract                               
-        JumpPos      -compare-1-false          
-        Jump         -compare-1-true           
-        Label        -compare-1-true           
-        PushI        1                         
-        Jump         -compare-1-join           
-        Label        -compare-1-false          
-        PushI        0                         
-        Jump         -compare-1-join           
-        Label        -compare-1-join           
-        StoreC                                 
-        PushD        $global-memory-block      
-        PushI        29                        
-        Add                                    %% less
-        Label        -compare-2-arg1           
-        PushD        $global-memory-block      
-        PushI        9                         
-        Add                                    %% char2
-        LoadC                                  
-        Label        -compare-2-arg2           
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% char1
-        LoadC                                  
-        Label        -compare-2-sub            
-        Subtract                               
-        JumpNeg      -compare-2-true           
-        Jump         -compare-2-false          
-        Label        -compare-2-true           
-        PushI        1                         
-        Jump         -compare-2-join           
-        Label        -compare-2-false          
-        PushI        0                         
-        Jump         -compare-2-join           
-        Label        -compare-2-join           
-        StoreC                                 
-        PushD        $global-memory-block      
-        PushI        30                        
-        Add                                    %% equal
-        Label        -compare-3-arg1           
-        PushD        $global-memory-block      
-        PushI        26                        
-        Add                                    %% bool1
-        LoadC                                  
-        Label        -compare-3-arg2           
-        PushD        $global-memory-block      
-        PushI        27                        
-        Add                                    %% bool2
-        LoadC                                  
-        Label        -compare-3-sub            
-        Subtract                               
-        JumpFalse    -compare-3-true           
-        Jump         -compare-3-false          
-        Label        -compare-3-true           
-        PushI        1                         
-        Jump         -compare-3-join           
-        Label        -compare-3-false          
-        PushI        0                         
-        Jump         -compare-3-join           
-        Label        -compare-3-join           
-        StoreC                                 
-        PushD        $global-memory-block      
-        PushI        31                        
-        Add                                    %% not_equal
-        Label        -compare-4-arg1           
-        PushD        $global-memory-block      
-        PushI        26                        
-        Add                                    %% bool1
-        LoadC                                  
-        Label        -compare-4-arg2           
-        PushD        $global-memory-block      
-        PushI        27                        
-        Add                                    %% bool2
-        LoadC                                  
-        Label        -compare-4-sub            
-        Subtract                               
-        JumpFalse    -compare-4-false          
-        Jump         -compare-4-true           
-        Label        -compare-4-true           
-        PushI        1                         
-        Jump         -compare-4-join           
-        Label        -compare-4-false          
-        PushI        0                         
-        Jump         -compare-4-join           
-        Label        -compare-4-join           
-        StoreC                                 
-        PushD        $global-memory-block      
-        PushI        32                        
-        Add                                    %% greater
         Label        -compare-5-arg1           
         PushD        $global-memory-block      
-        PushI        10                        
-        Add                                    %% flt1
-        LoadF                                  
+        PushI        20                        
+        Add                                    %% int0
+        LoadI                                  
         Label        -compare-5-arg2           
         PushD        $global-memory-block      
-        PushI        18                        
-        Add                                    %% flt2
-        LoadF                                  
+        PushI        24                        
+        Add                                    %% int1
+        LoadI                                  
         Label        -compare-5-sub            
-        FSubtract                              
-        JumpFPos     -compare-5-true           
-        Jump         -compare-5-false          
+        Subtract                               
+        JumpPos      -compare-5-false          
+        Jump         -compare-5-true           
         Label        -compare-5-true           
         PushI        1                         
         Jump         -compare-5-join           
@@ -258,22 +562,22 @@
         Label        -compare-5-join           
         StoreC                                 
         PushD        $global-memory-block      
-        PushI        33                        
-        Add                                    %% greater_equal
+        PushI        65                        
+        Add                                    %% less
         Label        -compare-6-arg1           
         PushD        $global-memory-block      
-        PushI        10                        
-        Add                                    %% flt1
-        LoadF                                  
+        PushI        45                        
+        Add                                    %% char2
+        LoadC                                  
         Label        -compare-6-arg2           
         PushD        $global-memory-block      
-        PushI        18                        
-        Add                                    %% flt2
-        LoadF                                  
+        PushI        44                        
+        Add                                    %% char1
+        LoadC                                  
         Label        -compare-6-sub            
-        FSubtract                              
-        JumpFNeg     -compare-6-false          
-        Jump         -compare-6-true           
+        Subtract                               
+        JumpNeg      -compare-6-true           
+        Jump         -compare-6-false          
         Label        -compare-6-true           
         PushI        1                         
         Jump         -compare-6-join           
@@ -283,64 +587,108 @@
         Label        -compare-6-join           
         StoreC                                 
         PushD        $global-memory-block      
-        PushI        28                        
-        Add                                    %% less_equal
-        LoadC                                  
-        JumpTrue     -print-boolean-7-true     
-        PushD        $boolean-false-string     
-        Jump         -print-boolean-7-join     
-        Label        -print-boolean-7-true     
-        PushD        $boolean-true-string      
-        Label        -print-boolean-7-join     
-        PushD        $print-format-boolean     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        29                        
-        Add                                    %% less
-        LoadC                                  
-        JumpTrue     -print-boolean-8-true     
-        PushD        $boolean-false-string     
-        Jump         -print-boolean-8-join     
-        Label        -print-boolean-8-true     
-        PushD        $boolean-true-string      
-        Label        -print-boolean-8-join     
-        PushD        $print-format-boolean     
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        30                        
+        PushI        66                        
         Add                                    %% equal
-        LoadC                                  
-        JumpTrue     -print-boolean-9-true     
-        PushD        $boolean-false-string     
-        Jump         -print-boolean-9-join     
-        Label        -print-boolean-9-true     
-        PushD        $boolean-true-string      
-        Label        -print-boolean-9-join     
-        PushD        $print-format-boolean     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
+        Label        -compare-7-arg1           
         PushD        $global-memory-block      
-        PushI        31                        
+        PushI        62                        
+        Add                                    %% bool1
+        LoadC                                  
+        Label        -compare-7-arg2           
+        PushD        $global-memory-block      
+        PushI        63                        
+        Add                                    %% bool2
+        LoadC                                  
+        Label        -compare-7-sub            
+        Subtract                               
+        JumpFalse    -compare-7-true           
+        Jump         -compare-7-false          
+        Label        -compare-7-true           
+        PushI        1                         
+        Jump         -compare-7-join           
+        Label        -compare-7-false          
+        PushI        0                         
+        Jump         -compare-7-join           
+        Label        -compare-7-join           
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        67                        
         Add                                    %% not_equal
-        LoadC                                  
-        JumpTrue     -print-boolean-10-true    
-        PushD        $boolean-false-string     
-        Jump         -print-boolean-10-join    
-        Label        -print-boolean-10-true    
-        PushD        $boolean-true-string      
-        Label        -print-boolean-10-join    
-        PushD        $print-format-boolean     
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
+        Label        -compare-8-arg1           
         PushD        $global-memory-block      
-        PushI        32                        
+        PushI        62                        
+        Add                                    %% bool1
+        LoadC                                  
+        Label        -compare-8-arg2           
+        PushD        $global-memory-block      
+        PushI        63                        
+        Add                                    %% bool2
+        LoadC                                  
+        Label        -compare-8-sub            
+        Subtract                               
+        JumpFalse    -compare-8-false          
+        Jump         -compare-8-true           
+        Label        -compare-8-true           
+        PushI        1                         
+        Jump         -compare-8-join           
+        Label        -compare-8-false          
+        PushI        0                         
+        Jump         -compare-8-join           
+        Label        -compare-8-join           
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        68                        
         Add                                    %% greater
+        Label        -compare-9-arg1           
+        PushD        $global-memory-block      
+        PushI        46                        
+        Add                                    %% flt1
+        LoadF                                  
+        Label        -compare-9-arg2           
+        PushD        $global-memory-block      
+        PushI        54                        
+        Add                                    %% flt2
+        LoadF                                  
+        Label        -compare-9-sub            
+        FSubtract                              
+        JumpFPos     -compare-9-true           
+        Jump         -compare-9-false          
+        Label        -compare-9-true           
+        PushI        1                         
+        Jump         -compare-9-join           
+        Label        -compare-9-false          
+        PushI        0                         
+        Jump         -compare-9-join           
+        Label        -compare-9-join           
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        69                        
+        Add                                    %% greater_equal
+        Label        -compare-10-arg1          
+        PushD        $global-memory-block      
+        PushI        46                        
+        Add                                    %% flt1
+        LoadF                                  
+        Label        -compare-10-arg2          
+        PushD        $global-memory-block      
+        PushI        54                        
+        Add                                    %% flt2
+        LoadF                                  
+        Label        -compare-10-sub           
+        FSubtract                              
+        JumpFNeg     -compare-10-false         
+        Jump         -compare-10-true          
+        Label        -compare-10-true          
+        PushI        1                         
+        Jump         -compare-10-join          
+        Label        -compare-10-false         
+        PushI        0                         
+        Jump         -compare-10-join          
+        Label        -compare-10-join          
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        64                        
+        Add                                    %% less_equal
         LoadC                                  
         JumpTrue     -print-boolean-11-true    
         PushD        $boolean-false-string     
@@ -353,8 +701,8 @@
         PushD        $print-format-space       
         Printf                                 
         PushD        $global-memory-block      
-        PushI        33                        
-        Add                                    %% greater_equal
+        PushI        65                        
+        Add                                    %% less
         LoadC                                  
         JumpTrue     -print-boolean-12-true    
         PushD        $boolean-false-string     
@@ -367,53 +715,169 @@
         PushD        $print-format-newline     
         Printf                                 
         PushD        $global-memory-block      
-        PushI        34                        
+        PushI        66                        
+        Add                                    %% equal
+        LoadC                                  
+        JumpTrue     -print-boolean-13-true    
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-13-join    
+        Label        -print-boolean-13-true    
+        PushD        $boolean-true-string      
+        Label        -print-boolean-13-join    
+        PushD        $print-format-boolean     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        67                        
+        Add                                    %% not_equal
+        LoadC                                  
+        JumpTrue     -print-boolean-14-true    
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-14-join    
+        Label        -print-boolean-14-true    
+        PushD        $boolean-true-string      
+        Label        -print-boolean-14-join    
+        PushD        $print-format-boolean     
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        68                        
+        Add                                    %% greater
+        LoadC                                  
+        JumpTrue     -print-boolean-15-true    
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-15-join    
+        Label        -print-boolean-15-true    
+        PushD        $boolean-true-string      
+        Label        -print-boolean-15-join    
+        PushD        $print-format-boolean     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        69                        
+        Add                                    %% greater_equal
+        LoadC                                  
+        JumpTrue     -print-boolean-16-true    
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-16-join    
+        Label        -print-boolean-16-true    
+        PushD        $boolean-true-string      
+        Label        -print-boolean-16-join    
+        PushD        $print-format-boolean     
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        70                        
         Add                                    %% cmp1
-        Label        -compare-13-arg1          
+        Label        -compare-17-arg1          
         PushD        $global-memory-block      
-        PushI        8                         
+        PushI        44                        
         Add                                    %% char1
         LoadC                                  
-        Label        -compare-13-arg2          
+        Label        -compare-17-arg2          
         PushD        $global-memory-block      
-        PushI        8                         
+        PushI        44                        
         Add                                    %% char1
         LoadC                                  
-        Label        -compare-13-sub           
+        Label        -compare-17-sub           
         Subtract                               
-        JumpFalse    -compare-13-true          
-        Jump         -compare-13-false         
-        Label        -compare-13-true          
+        JumpFalse    -compare-17-true          
+        Jump         -compare-17-false         
+        Label        -compare-17-true          
         PushI        1                         
-        Jump         -compare-13-join          
-        Label        -compare-13-false         
+        Jump         -compare-17-join          
+        Label        -compare-17-false         
         PushI        0                         
-        Jump         -compare-13-join          
-        Label        -compare-13-join          
+        Jump         -compare-17-join          
+        Label        -compare-17-join          
         StoreC                                 
         PushD        $global-memory-block      
-        PushI        35                        
+        PushI        71                        
         Add                                    %% cmp2
-        Label        -compare-14-arg1          
+        Label        -compare-18-arg1          
         PushD        $global-memory-block      
-        PushI        8                         
+        PushI        44                        
         Add                                    %% char1
         LoadC                                  
-        Label        -compare-14-arg2          
+        Label        -compare-18-arg2          
         PushD        $global-memory-block      
-        PushI        9                         
+        PushI        45                        
         Add                                    %% char2
         LoadC                                  
-        Label        -compare-14-sub           
+        Label        -compare-18-sub           
         Subtract                               
-        JumpFalse    -compare-14-true          
-        Jump         -compare-14-false         
-        Label        -compare-14-true          
+        JumpFalse    -compare-18-true          
+        Jump         -compare-18-false         
+        Label        -compare-18-true          
         PushI        1                         
-        Jump         -compare-14-join          
-        Label        -compare-14-false         
+        Jump         -compare-18-join          
+        Label        -compare-18-false         
         PushI        0                         
-        Jump         -compare-14-join          
-        Label        -compare-14-join          
+        Jump         -compare-18-join          
+        Label        -compare-18-join          
         StoreC                                 
+        DLabel       -stringConstant-19-myStr  
+        DataC        69                        %% "Elliot is the best."
+        DataC        108                       
+        DataC        108                       
+        DataC        105                       
+        DataC        111                       
+        DataC        116                       
+        DataC        32                        
+        DataC        105                       
+        DataC        115                       
+        DataC        32                        
+        DataC        116                       
+        DataC        104                       
+        DataC        101                       
+        DataC        32                        
+        DataC        98                        
+        DataC        101                       
+        DataC        115                       
+        DataC        116                       
+        DataC        46                        
+        DataC        0                         
+        PushD        -stringConstant-19-myStr  %% myStr
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        DLabel       -stringConstant-20-myStr  
+        DataC        69                        %% "Elliot is better than Farzin."
+        DataC        108                       
+        DataC        108                       
+        DataC        105                       
+        DataC        111                       
+        DataC        116                       
+        DataC        32                        
+        DataC        105                       
+        DataC        115                       
+        DataC        32                        
+        DataC        98                        
+        DataC        101                       
+        DataC        116                       
+        DataC        116                       
+        DataC        101                       
+        DataC        114                       
+        DataC        32                        
+        DataC        116                       
+        DataC        104                       
+        DataC        97                        
+        DataC        110                       
+        DataC        32                        
+        DataC        70                        
+        DataC        97                        
+        DataC        114                       
+        DataC        122                       
+        DataC        105                       
+        DataC        110                       
+        DataC        46                        
+        DataC        0                         
+        PushD        -stringConstant-20-myStr  %% myStr
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
         Halt                                   

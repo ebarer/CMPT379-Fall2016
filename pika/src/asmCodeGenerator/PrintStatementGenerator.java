@@ -42,8 +42,8 @@ public class PrintStatementGenerator {
 
 	private void appendPrintCode(ParseNode node) {
 		if (node.getType() == PrimitiveType.STRING) {
-			Integer stringAddress = ((IdentifierNode)node).getPointer();
-			code.add(PushD, "stringConst-" + stringAddress, "%% " + node.getToken().getLexeme());
+			String stringLabel = ((IdentifierNode)node).getPointer();
+			code.add(PushD, stringLabel, "%% " + node.getToken().getLexeme());
 			code.add(Printf);
 		} else {
 			String format = printFormat(node.getType());

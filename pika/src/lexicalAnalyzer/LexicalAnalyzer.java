@@ -18,8 +18,6 @@ import tokens.Token;
 
 import static lexicalAnalyzer.PunctuatorScanningAids.*;
 
-import java.util.logging.Level;
-
 public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	public static LexicalAnalyzer make(String filename) {
 		InputHandler handler = InputHandler.fromFilename(filename);
