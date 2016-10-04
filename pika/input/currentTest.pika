@@ -1,9 +1,75 @@
 exec {
-    var sum0 := -2 + 3.
-    var sum1 := 3.0 + -4.2E+5.
-	var sum2 := -2 / [4.3 + 3.6 | int].
-    print sum0; sum1; sum2, _n_.
+	var sum1 := -2 * [4.3 + 3.6 | int].
+	var sum2 := -2 * [4.3 + 3.7 | int].
+	print sum1, _t_, sum2, _n_.
 
-    var sum3 := 2 / 0.
-    print sum3.
+	var sum3 := sum1 * sum2.
+	var sum4 := sum1 * sum2 + ([4.3 + 3.6 | int] / [4.3 + 3.7 | int]).
+	print sum3, _t_, sum4, _n_.
+
+	{
+		var myVar1 := 97.
+		var myVar2 := [myVar1 | char].
+		print myVar1, _t_, myVar2, _n_.
+
+		myVar1 := myVar1 + 4.
+		myVar2 := [myVar1 | char].
+		print myVar1, _t_, myVar2, _n_.
+
+		var val1 := 1.
+		var test1 := [val1 | bool].
+		var val2 := [0 | char].
+		var test2 := [val2 | bool].
+		print val1, _t_, test1; _n_, val2, _t_, test2, _n_.
+	}
+
+	var val3 := ^e^.
+	var test3 := [val3 | bool].
+	var val4 := ^0^.
+	var test4 := [val4 | bool].
+	print val3, _t_, test3, _n_, val4, _t_, test4, _n_.
+
+	var int0 := 10.
+	var int1 := 9.
+	print int0, _t_, int1, _n_.
+
+	int1 := 2.	
+	print int0, _t_, int1, _n_.
+
+	const float0 := 5.0.
+	var float1 := 4.9.
+	print float0, _t_, float1, _n_.
+
+	float1 := 3.5.
+	print float0, _t_, float1, _n_.
+
+	const char1 := ^e^.
+	const char2 := ^a^.
+
+	const flt1 := 1.9.
+	const flt2 := 2.0.
+
+	const bool1 := _true_.
+	const bool2 := _false_.
+
+	const less_equal := int0 <= int1.
+	const less := char2 < char1.
+	const equal := bool1 == bool2.
+	const not_equal := bool1 != bool2.
+	const greater := flt1 > flt2.
+	const greater_equal := flt1 >= flt2.
+
+	print less_equal, _t_, less, _n_.
+	print equal, _t_, not_equal, _n_.
+	print greater, _t_, greater_equal, _n_.
+
+	const cmp1 := char1 == char1.
+	const cmp2 := char1 == char2.
+
+	var myStr := "Hello world!".
+	print myStr, _n_.
+
+	myStr := "CMPT 379: Assignment 1 Complete!".
+	var otherString := "Hello world!".
+	print myStr, _n_.
 }

@@ -1,4 +1,3 @@
-        Jump         $$main                    
         DLabel       $eat-location-zero        
         DataZ        8                         
         DLabel       $print-format-integer     
@@ -133,6 +132,7 @@
         DataC        101                       
         DataC        33                        
         DataC        0                         
+        Jump         $$main                    
         Label        $$general-runtime-error   
         PushD        $errors-general-message   
         Printf                                 

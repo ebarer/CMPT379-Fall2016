@@ -34,8 +34,8 @@ public class PikaStandaloneOptimizer extends PikaApplication {
 
 	private static void writeCodeIfNoErrors(String filename, ASMCodeFragment fragment)
 			throws FileNotFoundException {
-		//String outfile = filename + "o";		// foo.asm -> foo.asmo
-		String outfile = filename;		// foo.asm -> foo.asmo
+		String outfile = filename + "o";		// foo.asm -> foo.asmo
+		//String outfile = filename;		// foo.asm -> foo.asmo
 		
 		if(thereAreErrors()) {
 			stopProcessing(outfile);
