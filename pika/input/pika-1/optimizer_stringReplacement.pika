@@ -1,0 +1,17 @@
+exec {
+    var myStr := "Hello world, modified!".
+
+	var char1 := ^e^.
+    var float1 := 4.5.
+	const bool1 := _true_.
+
+	var sum1 := -2 * [4.3 + 3.6 | int].
+
+	const less_equal := 4 <= 5.
+
+	var myDupeStr := "Hello world!".
+	print myStr, _n_, myDupeStr, _n_.
+
+	myDupeStr := "Hello world, modified!".
+	print myStr, _n_, myDupeStr, _n_.
+}

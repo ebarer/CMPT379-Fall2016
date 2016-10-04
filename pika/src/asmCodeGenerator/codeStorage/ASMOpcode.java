@@ -170,11 +170,21 @@ public enum ASMOpcode {
 /////////////////////////////////////////////////////////////////////////
 //Optimizer helper functions
 	
+	public boolean isArithmetic() {
+		return (this == ASMOpcode.Add || this == ASMOpcode.FAdd ||
+				this == ASMOpcode.Subtract || this == ASMOpcode.FSubtract ||
+				this == ASMOpcode.Multiply || this == ASMOpcode.FMultiply ||
+				this == ASMOpcode.Divide || this == ASMOpcode.FDivide
+			   );
+				
+	}
+	
 	public boolean isDataDirective() {
 		return (this == ASMOpcode.DLabel || this == DataC ||
 				this == ASMOpcode.DataI || this == DataF ||
 				this == ASMOpcode.DataS || this == DataZ ||
-				this == ASMOpcode.DataD);
+				this == ASMOpcode.DataD
+			   );
 	}
 	
 }

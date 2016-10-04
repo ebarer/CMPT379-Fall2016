@@ -83,59 +83,7 @@
         DataC        0                         
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        19                        
-        DLabel       -stringConstant-2-myStr   
-        DataC        69                        %% "Elliot is the best."
-        DataC        108                       
-        DataC        108                       
-        DataC        105                       
-        DataC        111                       
-        DataC        116                       
-        DataC        32                        
-        DataC        105                       
-        DataC        115                       
-        DataC        32                        
-        DataC        116                       
-        DataC        104                       
-        DataC        101                       
-        DataC        32                        
-        DataC        98                        
-        DataC        101                       
-        DataC        115                       
-        DataC        116                       
-        DataC        46                        
-        DataC        0                         
-        DLabel       -stringConstant-3-myStr   
-        DataC        69                        %% "Elliot is better than Farzin."
-        DataC        108                       
-        DataC        108                       
-        DataC        105                       
-        DataC        111                       
-        DataC        116                       
-        DataC        32                        
-        DataC        105                       
-        DataC        115                       
-        DataC        32                        
-        DataC        98                        
-        DataC        101                       
-        DataC        116                       
-        DataC        116                       
-        DataC        101                       
-        DataC        114                       
-        DataC        32                        
-        DataC        116                       
-        DataC        104                       
-        DataC        97                        
-        DataC        110                       
-        DataC        32                        
-        DataC        70                        
-        DataC        97                        
-        DataC        114                       
-        DataC        122                       
-        DataC        105                       
-        DataC        110                       
-        DataC        46                        
-        DataC        0                         
+        DataZ        20                        
         Label        $$general-runtime-error   
         PushD        $errors-general-message   
         Printf                                 
@@ -146,72 +94,51 @@
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% char1
-        PushI        101                       
-        StoreC                                 
-        PushD        $global-memory-block      
+        Add                                    %% sum0
         PushI        1                         
-        Add                                    %% float1
-        PushF        4.500000                  
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% sum1
+        PushF        -419997.000000            
         StoreF                                 
         PushD        $global-memory-block      
-        PushI        9                         
-        Add                                    %% bool1
-        PushI        1                         
-        StoreC                                 
-        PushD        $global-memory-block      
-        PushI        10                        
-        Add                                    %% sum1
-        PushI        -2                        
-        PushF        4.300000                  
-        PushF        3.600000                  
-        FAdd                                   
-        ConvertI                               
-        Multiply                               
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        14                        
-        Add                                    %% less_equal
-        Label        -compare-1-arg1           
-        PushI        4                         
-        Label        -compare-1-arg2           
-        PushI        5                         
-        Label        -compare-1-sub            
-        Subtract                               
-        JumpPos      -compare-1-false          
-        Jump         -compare-1-true           
-        Label        -compare-1-true           
-        PushI        1                         
-        Jump         -compare-1-join           
-        Label        -compare-1-false          
+        PushI        12                        
+        Add                                    %% sum2
         PushI        0                         
-        Jump         -compare-1-join           
-        Label        -compare-1-join           
-        StoreC                                 
-        PushD        $global-memory-block      
-        PushI        15                        
-        Add                                    %% myStr
-        PushD        -stringConstant-2-myStr   
         StoreI                                 
         PushD        $global-memory-block      
-        PushI        15                        
-        Add                                    %% myStr
+        PushI        0                         
+        Add                                    %% sum0
         LoadI                                  
-        PushD        $print-format-string      
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% sum1
+        LoadF                                  
+        PushD        $print-format-floating    
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        12                        
+        Add                                    %% sum2
+        LoadI                                  
+        PushD        $print-format-integer     
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 
         PushD        $global-memory-block      
-        PushI        15                        
-        Add                                    %% myStr
-        PushD        -stringConstant-3-myStr   
-        StoreI                                 
+        PushI        16                        
+        Add                                    %% sum3
+        Jump         $$divide-by-zero          
         PushD        $global-memory-block      
-        PushI        15                        
-        Add                                    %% myStr
+        PushI        16                        
+        Add                                    %% sum3
         LoadI                                  
-        PushD        $print-format-string      
-        Printf                                 
-        PushD        $print-format-newline     
+        PushD        $print-format-integer     
         Printf                                 
         Halt                                   

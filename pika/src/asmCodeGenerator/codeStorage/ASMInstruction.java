@@ -51,6 +51,11 @@ public class ASMInstruction {
 /////////////////////////////////////////////////////////////////////////
 // Optimizer helper functions
 	
+	public ASMInstruction(ASMOpcode opcode, Object argument) {
+		this.opcode = opcode;
+		this.argument = argument;
+		this.comment = "";
+	}
 	public ASMInstruction(ASMOpcode opcode, Object argument, String comment) {
 		this.opcode = opcode;
 		this.argument = argument;
@@ -64,6 +69,12 @@ public class ASMInstruction {
 	}
 	public String getComment() {
 		return comment;
+	}
+	public boolean isString() {	
+		return (opcode == ASMOpcode.DLabel &&
+				argument instanceof String &&
+				((String)argument).contains("stringConstant")
+			   );
 	}
 
 	
