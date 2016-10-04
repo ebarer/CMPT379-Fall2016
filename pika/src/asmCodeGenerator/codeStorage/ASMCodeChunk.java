@@ -30,6 +30,10 @@ public class ASMCodeChunk {
 		ASMInstruction instruction = new ASMInstruction(opcode, operand, comment);
 		instructions.add(instruction);
 	}
+	public void add(ASMOpcode opcode, Object operand, String comment) {
+		ASMInstruction instruction = new ASMInstruction(opcode, operand, comment);
+		instructions.add(instruction);
+	}
 	public void add(ASMOpcode opcode, String operand) {
 		ASMInstruction instruction = new ASMInstruction(opcode, operand);
 		instructions.add(instruction);
@@ -37,6 +41,10 @@ public class ASMCodeChunk {
 	public void add(ASMOpcode opcode) {
 		ASMInstruction instruction = new ASMInstruction(opcode);
 		instructions.add(instruction);
+	}
+	
+	public List<ASMInstruction> getInstructions() {
+		return instructions;
 	}
 	
 	static private String terminator = System.getProperty("line.separator");

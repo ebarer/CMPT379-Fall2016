@@ -79,6 +79,7 @@ public class PikaCompiler extends PikaApplication {
 		PrintStream out = new PrintStream(file);
 		out.print(code);
 		out.close();
+		System.out.println("Program compiled successfully: " + filename);
 	}
 
 	private static boolean thereAreErrors() {

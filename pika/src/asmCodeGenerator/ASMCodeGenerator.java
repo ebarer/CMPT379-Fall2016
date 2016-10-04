@@ -154,6 +154,9 @@ public class ASMCodeGenerator {
 			else if(node.getType() == PrimitiveType.CHARACTER) {
 				code.add(LoadC);
 			}
+			else if(node.getType() == PrimitiveType.STRING) {
+				code.add(LoadI);
+			}
 			else {
 				assert false : "node " + node;
 			}
@@ -219,35 +222,25 @@ public class ASMCodeGenerator {
 			newVoidCode(node);
 			
 			Type type = node.getType();
-			if (type != PrimitiveType.STRING) {
-				ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
-				ASMCodeFragment rvalue = removeValueCode(node.child(1));
-				
-				code.append(lvalue);
-				code.append(rvalue);
-				
-				code.add(opcodeForStore(type));
-			} else {
-				ASMCodeFragment value = removeAddressCode(node.child(1));
-				code.append(value);
-			}
+			ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
+			ASMCodeFragment rvalue = removeValueCode(node.child(1));
+			
+			code.append(lvalue);
+			code.append(rvalue);
+			
+			code.add(opcodeForStore(type));
 		}
 		public void visitLeave(AssignmentNode node) {
 			newVoidCode(node);
 			
 			Type type = node.getType();
-			if (type != PrimitiveType.STRING) {
-				ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
-				ASMCodeFragment rvalue = removeValueCode(node.child(1));
-				
-				code.append(lvalue);
-				code.append(rvalue);
-				
-				code.add(opcodeForStore(type));
-			} else {
-				ASMCodeFragment value = removeAddressCode(node.child(1));
-				code.append(value);
-			}
+			ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
+			ASMCodeFragment rvalue = removeValueCode(node.child(1));
+			
+			code.append(lvalue);
+			code.append(rvalue);
+			
+			code.add(opcodeForStore(type));
 		}
 		private ASMOpcode opcodeForStore(Type type) {
 			if(type == PrimitiveType.INTEGER) {
@@ -261,6 +254,9 @@ public class ASMCodeGenerator {
 			}
 			if(type == PrimitiveType.CHARACTER) {
 				return StoreC;
+			}
+			if(type == PrimitiveType.STRING) {
+				return StoreI;
 			}
 			assert false: "Type " + type + " unimplemented in opcodeForStore()";
 			return null;
@@ -418,16 +414,16 @@ public class ASMCodeGenerator {
 			code.add(PushI, node.getValue());
 		}
 		public void visit(StringNode node) {
-			newAddressCode(node);
+			newValueCode(node);
 			IdentifierNode identifier = node.getIdentifier();
 			
 			Labeller labeller = new Labeller("stringConstant");
 			String varName = identifier.getToken().getLexeme();
 			String stringLabel = labeller.newLabel(varName);
-			
-			identifier.setPointer(stringLabel);
+
 			code.add(DLabel, stringLabel);
 			code.add(DataS, node.getValue());
+			code.add(PushD, stringLabel);
 		}
 	}
 

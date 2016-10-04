@@ -166,4 +166,15 @@ public enum ASMOpcode {
 	private boolean labelJumpOrCall() {
 		return this == Label || this == Call || (this.name().indexOf("Jump") == 0 && this != JumpV);
 	}
+	
+/////////////////////////////////////////////////////////////////////////
+//Optimizer helper functions
+	
+	public boolean isDataDirective() {
+		return (this == ASMOpcode.DLabel || this == DataC ||
+				this == ASMOpcode.DataI || this == DataF ||
+				this == ASMOpcode.DataS || this == DataZ ||
+				this == ASMOpcode.DataD);
+	}
+	
 }

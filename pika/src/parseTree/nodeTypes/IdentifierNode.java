@@ -40,15 +40,6 @@ public class IdentifierNode extends ParseNode {
 	public Binding getBinding() {
 		return binding;
 	}
-
-	public void setPointer(String pointer) {
-		if (binding != null) {
-			binding.setPointer(pointer);
-		}
-	}
-	public String getPointer() {
-		return (binding != null) ? binding.getPointer() : null;
-	}
 	
 	public Boolean isMutable() {
 		return (binding != null) ? binding.isMutable() : null;

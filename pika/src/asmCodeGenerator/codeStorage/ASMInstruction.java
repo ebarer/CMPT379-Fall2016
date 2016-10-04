@@ -46,6 +46,25 @@ public class ASMInstruction {
 		this.argument = null;
 		this.comment = "";
 	}
+	
+	
+/////////////////////////////////////////////////////////////////////////
+// Optimizer helper functions
+	
+	public ASMInstruction(ASMOpcode opcode, Object argument, String comment) {
+		this.opcode = opcode;
+		this.argument = argument;
+		this.comment = comment;
+	}
+	public ASMOpcode getOpcode() {
+		return opcode;
+	}
+	public Object getArgument() {
+		return argument;
+	}
+	public String getComment() {
+		return comment;
+	}
 
 	
 /////////////////////////////////////////////////////////////////////////
