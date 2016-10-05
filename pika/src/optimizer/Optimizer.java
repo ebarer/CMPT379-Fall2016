@@ -110,8 +110,13 @@ public class Optimizer {
 					// Remove DLabel and DataS instructions
 					instructions.remove(++loc);
 					ASMOpcode opcode = dataS.getOpcode();
-					if (opcode == ASMOpcode.DataS ) {
+					if (opcode == ASMOpcode.DataS) {
 						instructions.remove(loc);
+					} else if (opcode == ASMOpcode.DataC) {
+						while (loc < instructions.size() - 1 && opcode == ASMOpcode.DataC) {
+							instructions.remove(loc++);
+							opcode = instructions.get(loc).getOpcode();
+						}
 					}
 				} else {
 					stringLegend.put(argument, loc);				

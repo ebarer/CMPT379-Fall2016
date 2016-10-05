@@ -63,6 +63,10 @@
         DataC        115                       
         DataC        10                        
         DataC        0                         
+        Label        $$general-runtime-error   
+        PushD        $errors-general-message   
+        Printf                                 
+        Halt                                   
         DLabel       $errors-divide-by-zero    
         DataC        100                       %% "division by zero"
         DataC        105                       
@@ -81,75 +85,32 @@
         DataC        114                       
         DataC        111                       
         DataC        0                         
-        DLabel       $usable-memory-start      
-        DLabel       $global-memory-block      
-        DataZ        80                        
-        DLabel       -stringConstant-19-myStr  
-        DLabel       -stringConstant-21-otherString 
-        DataC        72                        %% "Hello world!"
-        DataC        101                       
-        DataC        108                       
-        DataC        108                       
-        DataC        111                       
-        DataC        32                        
-        DataC        119                       
-        DataC        111                       
-        DataC        114                       
-        DataC        108                       
-        DataC        100                       
-        DataC        33                        
-        DataC        0                         
-        DLabel       -stringConstant-20-myStr  
-        DataC        67                        %% "CMPT 379: Assignment 1 Complete!"
-        DataC        77                        
-        DataC        80                        
-        DataC        84                        
-        DataC        32                        
-        DataC        51                        
-        DataC        55                        
-        DataC        57                        
-        DataC        58                        
-        DataC        32                        
-        DataC        65                        
-        DataC        115                       
-        DataC        115                       
-        DataC        105                       
-        DataC        103                       
-        DataC        110                       
-        DataC        109                       
-        DataC        101                       
-        DataC        110                       
-        DataC        116                       
-        DataC        32                        
-        DataC        49                        
-        DataC        32                        
-        DataC        67                        
-        DataC        111                       
-        DataC        109                       
-        DataC        112                       
-        DataC        108                       
-        DataC        101                       
-        DataC        116                       
-        DataC        101                       
-        DataC        33                        
-        DataC        0                         
-        Label        $$general-runtime-error   
-        PushD        $errors-general-message   
-        Printf                                 
-        Halt                                   
         Label        $$divide-by-zero          
         PushD        $errors-divide-by-zero    
         Jump         $$general-runtime-error   
+        DLabel       $usable-memory-start      
+        DLabel       $global-memory-block      
+        DataZ        80                        
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
         Add                                    %% sum1
-        PushI        -14                       
+        PushI        -2                        
+        PushF        4.300000                  
+        PushF        3.600000                  
+        FAdd                                   
+        ConvertI                               
+        Multiply                               
         StoreI                                 
         PushD        $global-memory-block      
         PushI        4                         
         Add                                    %% sum2
-        PushI        -16                       
+        PushI        -2                        
+        PushF        4.300000                  
+        PushF        3.700000                  
+        FAdd                                   
+        ConvertI                               
+        Multiply                               
         StoreI                                 
         PushD        $global-memory-block      
         PushI        0                         
@@ -192,7 +153,17 @@
         Add                                    %% sum2
         LoadI                                  
         Multiply                               
-        PushI        0                         
+        PushF        4.300000                  
+        PushF        3.600000                  
+        FAdd                                   
+        ConvertI                               
+        PushF        4.300000                  
+        PushF        3.700000                  
+        FAdd                                   
+        ConvertI                               
+        Duplicate                              
+        JumpFalse    $$divide-by-zero          
+        Divide                                 
         Add                                    
         StoreI                                 
         PushD        $global-memory-block      
@@ -223,6 +194,7 @@
         PushI        16                        
         Add                                    %% myVar1
         LoadI                                  
+        Nop                                    
         StoreC                                 
         PushD        $global-memory-block      
         PushI        16                        
@@ -257,6 +229,7 @@
         PushI        16                        
         Add                                    %% myVar1
         LoadI                                  
+        Nop                                    
         StoreC                                 
         PushD        $global-memory-block      
         PushI        16                        
@@ -286,11 +259,13 @@
         PushI        21                        
         Add                                    %% val1
         LoadI                                  
+        Nop                                    
         StoreC                                 
         PushD        $global-memory-block      
         PushI        26                        
         Add                                    %% val2
         PushI        0                         
+        Nop                                    
         StoreC                                 
         PushD        $global-memory-block      
         PushI        27                        
@@ -299,6 +274,7 @@
         PushI        26                        
         Add                                    %% val2
         LoadC                                  
+        Nop                                    
         StoreC                                 
         PushD        $global-memory-block      
         PushI        21                        
@@ -358,6 +334,7 @@
         PushI        16                        
         Add                                    %% val3
         LoadC                                  
+        Nop                                    
         StoreC                                 
         PushD        $global-memory-block      
         PushI        18                        
@@ -371,6 +348,7 @@
         PushI        18                        
         Add                                    %% val4
         LoadC                                  
+        Nop                                    
         StoreC                                 
         PushD        $global-memory-block      
         PushI        16                        
@@ -827,6 +805,20 @@
         PushD        $global-memory-block      
         PushI        72                        
         Add                                    %% myStr
+        DLabel       -stringConstant-19-myStr  
+        DataC        72                        %% "Hello world!"
+        DataC        101                       
+        DataC        108                       
+        DataC        108                       
+        DataC        111                       
+        DataC        32                        
+        DataC        119                       
+        DataC        111                       
+        DataC        114                       
+        DataC        108                       
+        DataC        100                       
+        DataC        33                        
+        DataC        0                         
         PushD        -stringConstant-19-myStr  
         StoreI                                 
         PushD        $global-memory-block      
@@ -840,11 +832,59 @@
         PushD        $global-memory-block      
         PushI        72                        
         Add                                    %% myStr
+        DLabel       -stringConstant-20-myStr  
+        DataC        67                        %% "CMPT 379: Assignment 1 Complete!"
+        DataC        77                        
+        DataC        80                        
+        DataC        84                        
+        DataC        32                        
+        DataC        51                        
+        DataC        55                        
+        DataC        57                        
+        DataC        58                        
+        DataC        32                        
+        DataC        65                        
+        DataC        115                       
+        DataC        115                       
+        DataC        105                       
+        DataC        103                       
+        DataC        110                       
+        DataC        109                       
+        DataC        101                       
+        DataC        110                       
+        DataC        116                       
+        DataC        32                        
+        DataC        49                        
+        DataC        32                        
+        DataC        67                        
+        DataC        111                       
+        DataC        109                       
+        DataC        112                       
+        DataC        108                       
+        DataC        101                       
+        DataC        116                       
+        DataC        101                       
+        DataC        33                        
+        DataC        0                         
         PushD        -stringConstant-20-myStr  
         StoreI                                 
         PushD        $global-memory-block      
         PushI        76                        
         Add                                    %% otherString
+        DLabel       -stringConstant-21-otherString 
+        DataC        72                        %% "Hello world!"
+        DataC        101                       
+        DataC        108                       
+        DataC        108                       
+        DataC        111                       
+        DataC        32                        
+        DataC        119                       
+        DataC        111                       
+        DataC        114                       
+        DataC        108                       
+        DataC        100                       
+        DataC        33                        
+        DataC        0                         
         PushD        -stringConstant-21-otherString 
         StoreI                                 
         PushD        $global-memory-block      

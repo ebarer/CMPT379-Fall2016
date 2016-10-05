@@ -132,6 +132,13 @@
         DataC        101                       
         DataC        33                        
         DataC        0                         
+        DataC        101                       
+        DataC        108                       
+        DataC        32                        
+        DataC        111                       
+        DataC        108                       
+        DataC        33                        
+        DataC        0                         
         Jump         $$main                    
         Label        $$general-runtime-error   
         PushD        $errors-general-message   
