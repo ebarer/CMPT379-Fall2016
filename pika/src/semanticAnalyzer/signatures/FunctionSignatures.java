@@ -98,6 +98,7 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		    new FunctionSignature(ASMOpcode.FDivide, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING)
 		);
 		
+		
 		// Comparison Operators
 		new FunctionSignatures(Punctuator.LESS_OR_EQUAL,
 			new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN),
@@ -136,6 +137,21 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),
 		    new FunctionSignature(1, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.BOOLEAN)
 		);
+		
+		
+		// Boolean Operators
+		new FunctionSignatures(Punctuator.AND,
+		    new FunctionSignature(ASMOpcode.And, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
+		);
+		
+		new FunctionSignatures(Punctuator.OR,
+				new FunctionSignature(ASMOpcode.Or, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
+		);
+		
+		new FunctionSignatures(Punctuator.NOT,
+			new FunctionSignature(ASMOpcode.BNegate, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
+		);
+		
 		
 		// Casting Operators
 		new FunctionSignatures(Punctuator.PIPE,

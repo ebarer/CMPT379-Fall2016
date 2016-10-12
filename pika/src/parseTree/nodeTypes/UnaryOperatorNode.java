@@ -8,15 +8,15 @@ import tokens.LextantToken;
 import tokens.Token;
 import semanticAnalyzer.signatures.FunctionSignature;
 
-public class BinaryOperatorNode extends ParseNode {
+public class UnaryOperatorNode extends ParseNode {
 	protected FunctionSignature signature;
 
-	public BinaryOperatorNode(Token token) {
+	public UnaryOperatorNode(Token token) {
 		super(token);
 		assert(token instanceof LextantToken);
 	}
 
-	public BinaryOperatorNode(ParseNode node) {
+	public UnaryOperatorNode(ParseNode node) {
 		super(node);
 	}
 	
@@ -42,10 +42,9 @@ public class BinaryOperatorNode extends ParseNode {
 	////////////////////////////////////////////////////////////
 	// convenience factory
 	
-	public static BinaryOperatorNode withChildren(Token token, ParseNode left, ParseNode right) {
-		BinaryOperatorNode node = new BinaryOperatorNode(token);
-		node.appendChild(left);
-		node.appendChild(right);
+	public static UnaryOperatorNode withChild(Token token, ParseNode child) {
+		UnaryOperatorNode node = new UnaryOperatorNode(token);
+		node.appendChild(child);
 		return node;
 	}
 	

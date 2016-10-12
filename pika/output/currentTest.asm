@@ -83,7 +83,7 @@
         DataC        0                         
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        12                        
+        DataZ        1                         
         Label        $$general-runtime-error   
         PushD        $errors-general-message   
         Printf                                 
@@ -94,53 +94,77 @@
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% int1
-        PushI        2                         
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% float1
-        PushF        9.200000                  
-        StoreF                                 
+        Add                                    %% test1
+        PushI        1                         
+        StoreC                                 
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% int1
-        PushI        4                         
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        0                         
-        Add                                    %% int1
-        LoadI                                  
-        PushD        $print-format-integer     
+        Add                                    %% test1
+        LoadC                                  
+        JumpTrue     -print-boolean-1-true     
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-1-join     
+        Label        -print-boolean-1-true     
+        PushD        $boolean-true-string      
+        Label        -print-boolean-1-join     
+        PushD        $print-format-boolean     
         Printf                                 
         PushD        $print-format-space       
         Printf                                 
         PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% float1
-        LoadF                                  
-        PushD        $print-format-floating    
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% float1
-        PushF        2.900000                  
-        StoreF                                 
+        PushI        0                         
+        Add                                    %% test1
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% int1
-        LoadI                                  
-        PushD        $print-format-integer     
+        Add                                    %% test1
+        LoadC                                  
+        BNegate                                
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% test1
+        LoadC                                  
+        JumpTrue     -print-boolean-2-true     
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-2-join     
+        Label        -print-boolean-2-true     
+        PushD        $boolean-true-string      
+        Label        -print-boolean-2-join     
+        PushD        $print-format-boolean     
         Printf                                 
         PushD        $print-format-space       
         Printf                                 
         PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% test1
+        Label        -compare-3-arg1           
         PushI        4                         
-        Add                                    %% float1
-        LoadF                                  
-        PushD        $print-format-floating    
+        Label        -compare-3-arg2           
+        PushI        5                         
+        Label        -compare-3-sub            
+        Subtract                               
+        JumpNeg      -compare-3-false          
+        Jump         -compare-3-true           
+        Label        -compare-3-true           
+        PushI        1                         
+        Jump         -compare-3-join           
+        Label        -compare-3-false          
+        PushI        0                         
+        Jump         -compare-3-join           
+        Label        -compare-3-join           
+        BNegate                                
+        StoreC                                 
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% test1
+        LoadC                                  
+        JumpTrue     -print-boolean-4-true     
+        PushD        $boolean-false-string     
+        Jump         -print-boolean-4-join     
+        Label        -print-boolean-4-true     
+        PushD        $boolean-true-string      
+        Label        -print-boolean-4-join     
+        PushD        $print-format-boolean     
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 

@@ -26,6 +26,7 @@ import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringNode;
+import parseTree.nodeTypes.UnaryOperatorNode;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.signatures.FunctionSignatures;
 import semanticAnalyzer.types.PrimitiveType;
@@ -152,6 +153,28 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 	private Lextant operatorFor(BinaryOperatorNode node) {
+		LextantToken token = (LextantToken) node.getToken();
+		return token.getLextant();
+	}
+	@Override
+	public void visitLeave(UnaryOperatorNode node) {
+		assert node.nChildren() == 1;
+		ParseNode left  = node.child(0);
+		List<Type> childTypes = Arrays.asList(left.getType());
+		
+		Lextant operator = operatorFor(node);
+
+		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
+		
+		if(signature.accepts(childTypes)) {
+			node.setSignature(signature);
+			node.setType(signature.resultType());
+		} else {
+			typeCheckError(node, childTypes);
+			node.setType(PrimitiveType.ERROR);
+		}
+	}
+	private Lextant operatorFor(UnaryOperatorNode node) {
 		LextantToken token = (LextantToken) node.getToken();
 		return token.getLextant();
 	}

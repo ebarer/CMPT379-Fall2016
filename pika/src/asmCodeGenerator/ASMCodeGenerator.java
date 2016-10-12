@@ -26,6 +26,7 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringNode;
 import parseTree.nodeTypes.TabNode;
+import parseTree.nodeTypes.UnaryOperatorNode;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -265,12 +266,49 @@ public class ASMCodeGenerator {
 
 		///////////////////////////////////////////////////////////////////////////
 		// expressions
+		public void visitEnter(BinaryOperatorNode node) {
+			if (node.isBooleanOperator() && !(node.getParent() instanceof BinaryOperatorNode)) {
+				new Labeller("boolean");
+			}
+		}
 		public void visitLeave(BinaryOperatorNode node) {
-			if (node.isComparator()) {
+			if (node.isBooleanOperator()) {
+				Lextant operator = node.getOperator();
+				visitBooleanOperatorNode(node, operator);
+			} else if (node.isComparator()) {
 				Lextant operator = node.getOperator();
 				visitComparisonOperatorNode(node, operator);
 			} else {
 				visitNormalBinaryOperatorNode(node);
+			}
+		}
+		private void visitBooleanOperatorNode(BinaryOperatorNode node, Lextant operator) {
+			Object variant = node.getSignature().getVariant();
+			if (variant instanceof ASMOpcode) {
+				ASMOpcode opcode = (ASMOpcode) variant;
+			
+				Labeller labeller = new Labeller("boolean", false);
+				String joinLabel  = labeller.newLabel("join");
+
+				newValueCode(node);
+				ASMCodeFragment arg1 = removeValueCode(node.child(0));
+				ASMCodeFragment arg2 = removeValueCode(node.child(1));
+
+				code.append(arg1);
+				code.add(Duplicate);
+				
+				if (opcode == And) {
+					code.add(JumpFalse, joinLabel);
+				} else if (opcode == Or) {
+					code.add(JumpTrue, joinLabel);
+				}
+
+				code.append(arg2);
+				code.add(opcode);
+				
+				if (!(node.getParent() instanceof BinaryOperatorNode)) {
+					code.add(Label, joinLabel);
+				}
 			}
 		}
 		private void visitComparisonOperatorNode(BinaryOperatorNode node, Lextant operator) {
@@ -375,6 +413,19 @@ public class ASMCodeGenerator {
 				assert false : "unimplemented operator in opcodeForOperator";
 			}
 			return null;
+		}
+		
+		public void visitLeave(UnaryOperatorNode node) {
+			newValueCode(node);
+
+			ASMCodeFragment arg1 = removeValueCode(node.child(0));
+			code.append(arg1);
+			
+			Object variant = node.getSignature().getVariant();
+			if (variant instanceof ASMOpcode) {
+				ASMOpcode opcode = (ASMOpcode) variant;
+				code.add(opcode);
+			}
 		}
 		
 		public void visitLeave(CastNode node) {

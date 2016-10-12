@@ -1,0 +1,12 @@
+exec {
+	var test1 := (3 < 5) || (2 > 9). #return true w/ sc
+	var test2 := (3 > 5) && (2 < 9). #return false w/ sc
+	var test3 := (3 < 5) && (2 > 9). #return false w/o sc
+	var test4 := (3 > 5) || (2 < 9). #return true w/o sc
+
+	print test1; test2; test3; test4, _n_.
+
+	test1 := (3 * 2 < 5) || (2 > 9). #return false w/o sc
+
+	print test1, _n_.
+}

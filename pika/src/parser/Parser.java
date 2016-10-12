@@ -1,6 +1,7 @@
 package parser;
 
 import java.util.Arrays;
+import java.util.function.UnaryOperator;
 
 import logging.PikaLogger;
 import parseTree.*;
@@ -22,6 +23,7 @@ import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.TabNode;
+import parseTree.nodeTypes.UnaryOperatorNode;
 import semanticAnalyzer.types.PrimitiveType;
 import tokens.*;
 import lexicalAnalyzer.Keyword;
@@ -282,11 +284,13 @@ public class Parser {
 	
 	///////////////////////////////////////////////////////////
 	// expressions
-	// expr                     -> comparisonExpression
+	// expr                     -> booleanExpression
+	// booleanExpression        -> comparisonExpression
 	// comparisonExpression     -> additiveExpression [> additiveExpression]?
 	// additiveExpression       -> multiplicativeExpression [+ multiplicativeExpression]*  (left-assoc)
 	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
-	// atomicExpression         -> literal
+	// atomicExpression         -> unaryExpression
+	// unaryExpression			-> literal
 	// literal                  -> intNumber | floatNumber | booleanConstant | identifier 
 
 	// expr  -> comparisonExpression
@@ -294,9 +298,30 @@ public class Parser {
 		if(!startsExpression(nowReading)) {
 			return syntaxErrorNode("expression");
 		}
-		return parseComparisonExpression();
+		return parseBooleanExpression();
 	}
 	private boolean startsExpression(Token token) {
+		return startsBooleanExpression(token);
+	}
+	
+	// booleanExpression -> comparisonExpression
+	private ParseNode parseBooleanExpression() {
+		if(!startsBooleanExpression(nowReading)) {
+			return syntaxErrorNode("boolean expression");
+		}
+		
+		// ned to be left recursive??
+		ParseNode left = parseComparisonExpression();
+		while(nowReading.isLextant(Punctuator.getBooleanOperators())) {
+			Token booleanToken = nowReading;
+			readToken();
+			ParseNode right = parseComparisonExpression();
+			
+			left = BinaryOperatorNode.withChildren(booleanToken, left, right);
+		}
+		return left;
+	}
+	private boolean startsBooleanExpression(Token token) {
 		return startsComparisonExpression(token);
 	}
 
@@ -307,7 +332,6 @@ public class Parser {
 		}
 		
 		ParseNode left = parseAdditiveExpression();
-		// TASK: Create function getComparators() to return an array of these values
 		if(nowReading.isLextant(Punctuator.getComparators())) {
 			Token compareToken = nowReading;
 			readToken();
@@ -321,6 +345,8 @@ public class Parser {
 	private boolean startsComparisonExpression(Token token) {
 		return startsAdditiveExpression(token);
 	}
+	
+	
 
 	// additiveExpression -> multiplicativeExpression [+ multiplicativeExpression]*  (left-assoc)
 	private ParseNode parseAdditiveExpression() {
@@ -370,21 +396,22 @@ public class Parser {
 		
 		if (startsCast(nowReading)){
 			expect(Punctuator.OPEN_BRACKET);
-			
 			ParseNode left = parseExpression();
-			
 			expect(Punctuator.PIPE);
 			Token castToken = previouslyRead;
-			
-			// Perform cast
 			PrimitiveType castType = parseCastType();
-			
 			expect(Punctuator.CLOSE_BRACKET);
 			return CastNode.withChildren(castToken, left, castType);
 		} else if (startsParenthetical(nowReading)) {
 			expect(Punctuator.OPEN_PARENTHESIS);
 			ParseNode left = parseExpression();
 			expect(Punctuator.CLOSE_PARENTHESIS);
+			return left;
+		} else if (startsNegation(nowReading)) {
+			expect(Punctuator.NOT);
+			Token negationToken = previouslyRead;
+			ParseNode right = parseExpression();
+			ParseNode left = UnaryOperatorNode.withChild(negationToken, right); 
 			return left;
 		} else {
 			return parseLiteral();
@@ -408,7 +435,7 @@ public class Parser {
 		}
 	}
 	private boolean startsAtomicExpression(Token token) {
-		if (startsParenthetical(token) || startsCast(token)) {
+		if (startsParenthetical(token) || startsCast(token) || startsNegation(token)) {
 			return true;
 		} else {
 			return startsLiteral(token);
@@ -450,6 +477,9 @@ public class Parser {
 	}
 	private boolean startsParenthetical(Token token) {
 		return token.isLextant(Punctuator.OPEN_PARENTHESIS); 
+	}
+	private boolean startsNegation(Token token) {
+		return token.isLextant(Punctuator.NOT); 
 	}
 	
 	// number (terminal)

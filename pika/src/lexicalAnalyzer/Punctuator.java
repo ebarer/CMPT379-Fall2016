@@ -14,6 +14,11 @@ public enum Punctuator implements Lextant {
 	MULTIPLY("*"),
 	DIVISION("/"),
 	
+	AND("&&"),
+	OR("||"),
+	
+	NOT("!"),
+	
 	LESS_OR_EQUAL("<="),
 	LESS("<"),
 	EQUAL("=="),
@@ -56,6 +61,11 @@ public enum Punctuator implements Lextant {
 	
 	public static Lextant[] getComparators() {
 		Lextant[] comparators = { LESS_OR_EQUAL, LESS, EQUAL, NOT_EQUAL, GREATER, GREATER_OR_EQUAL };
+		return comparators;
+	}
+	
+	public static Lextant[] getBooleanOperators() {
+		Lextant[] comparators = { AND, OR };
 		return comparators;
 	}
 	
