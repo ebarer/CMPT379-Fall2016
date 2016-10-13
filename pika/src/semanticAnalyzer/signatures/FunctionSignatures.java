@@ -8,6 +8,7 @@ import java.util.Map;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
+import semanticAnalyzer.types.TypeLiteral;
 import lexicalAnalyzer.Punctuator;
 
 
@@ -155,19 +156,19 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		
 		// Casting Operators
 		new FunctionSignatures(Punctuator.PIPE,
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER),
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN),
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.CHARACTER, PrimitiveType.CHARACTER),
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
 			
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER),
-		    new FunctionSignature(ASMOpcode.ConvertF, PrimitiveType.INTEGER, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, TypeLiteral.CHARACTER, PrimitiveType.CHARACTER),
+		    new FunctionSignature(ASMOpcode.ConvertF, PrimitiveType.INTEGER, TypeLiteral.FLOATING, PrimitiveType.FLOATING),
 		    
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
-		    new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.FLOATING, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.FLOATING, TypeLiteral.FLOATING, PrimitiveType.FLOATING),
+		    new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.FLOATING, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
 		    
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.BOOLEAN, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN)
 		);
 		
 		

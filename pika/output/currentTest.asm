@@ -83,10 +83,7 @@
         DataC        0                         
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        8                         
-        DLabel       -stringConstant-3-i       
-        DataC        45                        %% "-"
-        DataC        0                         
+        DataZ        12                        
         Label        $$general-runtime-error   
         PushD        $errors-general-message   
         Printf                                 
@@ -97,97 +94,32 @@
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% i
+        Add                                    %% test
+        PushF        5.100000                  
+        StoreF                                 
+        PushD        $global-memory-block      
         PushI        0                         
+        Add                                    %% test
+        LoadF                                  
+        PushD        $print-format-floating    
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% test1
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% test
+        LoadF                                  
+        ConvertI                               
         StoreI                                 
-        Label        -while-stmt-5-loop        
-        Label        -compare-1-arg1           
         PushD        $global-memory-block      
-        PushI        0                         
-        Add                                    %% i
-        LoadI                                  
-        Label        -compare-1-arg2           
-        PushI        5                         
-        Label        -compare-1-sub            
-        Subtract                               
-        JumpPos      -compare-1-true           
-        Jump         -compare-1-false          
-        Label        -compare-1-true           
-        PushI        1                         
-        Jump         -compare-1-join           
-        Label        -compare-1-false          
-        PushI        0                         
-        Jump         -compare-1-join           
-        Label        -compare-1-join           
-        JumpFalse    -while-stmt-5-join        
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% j
-        PushI        0                         
-        StoreI                                 
-        Label        -while-stmt-4-loop        
-        Label        -compare-2-arg1           
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% j
-        LoadI                                  
-        Label        -compare-2-arg2           
-        PushI        3                         
-        Label        -compare-2-sub            
-        Subtract                               
-        JumpNeg      -compare-2-true           
-        Jump         -compare-2-false          
-        Label        -compare-2-true           
-        PushI        1                         
-        Jump         -compare-2-join           
-        Label        -compare-2-false          
-        PushI        0                         
-        Jump         -compare-2-join           
-        Label        -compare-2-join           
-        JumpFalse    -while-stmt-4-join        
-        PushD        $global-memory-block      
-        PushI        0                         
-        Add                                    %% i
-        LoadI                                  
-        PushD        $print-format-integer     
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        -stringConstant-3-i       
-        PushD        $print-format-string      
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% j
+        PushI        8                         
+        Add                                    %% test1
         LoadI                                  
         PushD        $print-format-integer     
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% j
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% j
-        LoadI                                  
-        PushI        1                         
-        Add                                    
-        StoreI                                 
-        Jump         -while-stmt-4-loop        
-        Label        -while-stmt-4-join        
-        PushD        $global-memory-block      
-        PushI        0                         
-        Add                                    %% i
-        PushD        $global-memory-block      
-        PushI        0                         
-        Add                                    %% i
-        LoadI                                  
-        PushI        1                         
-        Add                                    
-        StoreI                                 
-        Jump         -while-stmt-5-loop        
-        Label        -while-stmt-5-join        
         Halt                                   

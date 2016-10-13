@@ -1,12 +1,7 @@
 exec {
-	var i := 0.
-	while (i > 5) {		
-		var j := 0.
-		while (j < 3) {
-			print i; "-"; j, _n_.
-			j := j + 1.
-		}
+	var test := 5.1.
+	print test, _n_.
 
-		i := i + 1.
-	}
+	var test1 := [test | int].
+	print test1, _n_.
 }

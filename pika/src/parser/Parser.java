@@ -27,6 +27,7 @@ import parseTree.nodeTypes.TabNode;
 import parseTree.nodeTypes.UnaryOperatorNode;
 import parseTree.nodeTypes.WhileNode;
 import semanticAnalyzer.types.PrimitiveType;
+import semanticAnalyzer.types.TypeLiteral;
 import tokens.*;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
@@ -456,42 +457,34 @@ public class Parser {
 		
 		if (startsCast(nowReading)){
 			expect(Punctuator.OPEN_BRACKET);
+			
 			ParseNode left = parseExpression();
+			
 			expect(Punctuator.PIPE);
 			Token castToken = previouslyRead;
-			PrimitiveType castType = parseCastType();
+			
+			TypeLiteral castType = TypeLiteral.withToken(nowReading);
+			readToken();
+			
 			expect(Punctuator.CLOSE_BRACKET);
+			
 			return CastNode.withChildren(castToken, left, castType);
 		} else if (startsParenthetical(nowReading)) {
 			expect(Punctuator.OPEN_PARENTHESIS);
 			ParseNode left = parseExpression();
 			expect(Punctuator.CLOSE_PARENTHESIS);
+			
 			return left;
 		} else if (startsNegation(nowReading)) {
 			expect(Punctuator.NOT);
 			Token negationToken = previouslyRead;
+			
 			ParseNode right = parseExpression();
 			ParseNode left = UnaryOperatorNode.withChild(negationToken, right); 
+			
 			return left;
 		} else {
 			return parseLiteral();
-		}
-	}
-	private PrimitiveType parseCastType() {
-		readToken();
-		switch(previouslyRead.getLexeme()) {
-		case "bool":
-			return PrimitiveType.BOOLEAN;
-		case "char":
-			return PrimitiveType.CHARACTER;
-		case "string":
-			return PrimitiveType.STRING;
-		case "int":
-			return PrimitiveType.INTEGER;
-		case "float":
-			return PrimitiveType.FLOATING;
-		default:
-			return PrimitiveType.ERROR;
 		}
 	}
 	private boolean startsAtomicExpression(Token token) {

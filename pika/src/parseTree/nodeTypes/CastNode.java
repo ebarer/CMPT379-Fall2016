@@ -7,11 +7,11 @@ import lexicalAnalyzer.Punctuator;
 import tokens.LextantToken;
 import tokens.Token;
 import semanticAnalyzer.signatures.FunctionSignature;
-import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
+import semanticAnalyzer.types.TypeLiteral;
 
 public class CastNode extends ParseNode {
-	protected PrimitiveType castType;
+	protected TypeLiteral castType;
 	protected FunctionSignature signature;
 
 	public CastNode(Token token) {
@@ -45,7 +45,7 @@ public class CastNode extends ParseNode {
 	////////////////////////////////////////////////////////////
 	// convenience factory
 	
-	public static CastNode withChildren(Token token, ParseNode left, PrimitiveType right) {
+	public static CastNode withChildren(Token token, ParseNode left, TypeLiteral right) {
 		CastNode node = new CastNode(token);
 		node.appendChild(left);
 		node.castType = right;
