@@ -25,6 +25,7 @@ import parseTree.nodeTypes.ProgramNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.TabNode;
 import parseTree.nodeTypes.UnaryOperatorNode;
+import parseTree.nodeTypes.WhileNode;
 import semanticAnalyzer.types.PrimitiveType;
 import tokens.*;
 import lexicalAnalyzer.Keyword;
@@ -145,6 +146,9 @@ public class Parser {
 		if(startsIfStatement(nowReading)) {
 			return parseIfStatement();
 		}
+		if(startsWhileStatement(nowReading)) {
+			return parseWhileStatement();
+		}
 		if(startsAssignment(nowReading)) {
 			return parseAssignment();
 		}
@@ -157,7 +161,7 @@ public class Parser {
 		return startsDeclaration(token) ||
 			   startsAssignment(token) ||
 			   startsIfStatement(token) ||
-			   //startsWhileStatement(token) ||
+			   startsWhileStatement(token) ||
 			   startsPrintStatement(token) ||
 			   startsBlockStatement(token);
 	}
@@ -233,6 +237,26 @@ public class Parser {
 	}
 	private boolean startsElseStatement(Token token) {
 		return token.isLextant(Keyword.ELSE);
+	}
+	
+	
+	// while (expression) blockStatement
+	private ParseNode parseWhileStatement() {
+		if(!startsWhileStatement(nowReading)) {
+			return syntaxErrorNode("while-statement");
+		}
+		
+		expect(Keyword.WHILE);
+
+		Token whileToken = previouslyRead;
+		ParseNode condition = parseExpression();
+		ParseNode blockStatement = parseBlockStatement();
+		
+		ParseNode whileNode = new WhileNode(whileToken, condition, blockStatement);	
+		return whileNode;
+	}
+	private boolean startsWhileStatement(Token token) {
+		return token.isLextant(Keyword.WHILE);
 	}
 	
 	

@@ -1,6 +1,6 @@
 exec {
 	var i := 0.
-	while (i > 5) {		
+	while (i <= 5) {		
 		var j := 0.
 		while (j < 3) {
 			print i; "-"; j, _n_.

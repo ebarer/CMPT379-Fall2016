@@ -28,6 +28,7 @@ import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringNode;
 import parseTree.nodeTypes.TabNode;
 import parseTree.nodeTypes.UnaryOperatorNode;
+import parseTree.nodeTypes.WhileNode;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import symbolTable.Binding;
@@ -289,6 +290,30 @@ public class ASMCodeGenerator {
 				ASMCodeFragment elseCode = removeVoidCode(node.child(2));
 				code.append(elseCode);				
 			}
+			code.add(Label, joinLabel);
+		}
+		
+		
+		///////////////////////////////////////////////////////////////////////////
+		// while statements
+		public void visitLeave(WhileNode node) {
+			newVoidCode(node);
+			
+			Labeller labeller = new Labeller("while-stmt");
+			String loopLabel  = labeller.newLabel("loop");
+			String joinLabel  = labeller.newLabel("join");
+			
+			code.add(Label, loopLabel);
+			
+			ASMCodeFragment conditionCode = removeValueCode(node.child(0));
+			code.append(conditionCode);
+			code.add(JumpFalse, joinLabel);
+
+			ASMCodeFragment blockCode = removeVoidCode(node.child(1));
+			code.append(blockCode);
+
+			code.add(Jump, loopLabel);
+
 			code.add(Label, joinLabel);
 		}
 

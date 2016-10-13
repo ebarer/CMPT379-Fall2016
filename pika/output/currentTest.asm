@@ -83,57 +83,9 @@
         DataC        0                         
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        4                         
-        DLabel       -stringConstant-2-        
-        DataC        116                       %% "true statement"
-        DataC        114                       
-        DataC        117                       
-        DataC        101                       
-        DataC        32                        
-        DataC        115                       
-        DataC        116                       
-        DataC        97                        
-        DataC        116                       
-        DataC        101                       
-        DataC        109                       
-        DataC        101                       
-        DataC        110                       
-        DataC        116                       
-        DataC        0                         
-        DLabel       -stringConstant-4-        
-        DataC        101                       %% "elseif statement"
-        DataC        108                       
-        DataC        115                       
-        DataC        101                       
-        DataC        105                       
-        DataC        102                       
-        DataC        32                        
-        DataC        115                       
-        DataC        116                       
-        DataC        97                        
-        DataC        116                       
-        DataC        101                       
-        DataC        109                       
-        DataC        101                       
-        DataC        110                       
-        DataC        116                       
-        DataC        0                         
-        DLabel       -stringConstant-5-        
-        DataC        102                       %% "false statement"
-        DataC        97                        
-        DataC        108                       
-        DataC        115                       
-        DataC        101                       
-        DataC        32                        
-        DataC        115                       
-        DataC        116                       
-        DataC        97                        
-        DataC        116                       
-        DataC        101                       
-        DataC        109                       
-        DataC        101                       
-        DataC        110                       
-        DataC        116                       
+        DataZ        8                         
+        DLabel       -stringConstant-3-i       
+        DataC        45                        %% "-"
         DataC        0                         
         Label        $$general-runtime-error   
         PushD        $errors-general-message   
@@ -143,9 +95,17 @@
         PushD        $errors-divide-by-zero    
         Jump         $$general-runtime-error   
         Label        $$main                    
-        Label        -if-stmt-7-               
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% i
+        PushI        0                         
+        StoreI                                 
+        Label        -while-stmt-5-loop        
         Label        -compare-1-arg1           
-        PushI        4                         
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% i
+        LoadI                                  
         Label        -compare-1-arg2           
         PushI        5                         
         Label        -compare-1-sub            
@@ -159,48 +119,75 @@
         PushI        0                         
         Jump         -compare-1-join           
         Label        -compare-1-join           
-        JumpFalse    -if-stmt-7-else           
+        JumpFalse    -while-stmt-5-join        
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% j
+        PushI        0                         
+        StoreI                                 
+        Label        -while-stmt-4-loop        
+        Label        -compare-2-arg1           
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% j
+        LoadI                                  
+        Label        -compare-2-arg2           
+        PushI        3                         
+        Label        -compare-2-sub            
+        Subtract                               
+        JumpNeg      -compare-2-true           
+        Jump         -compare-2-false          
+        Label        -compare-2-true           
+        PushI        1                         
+        Jump         -compare-2-join           
+        Label        -compare-2-false          
+        PushI        0                         
+        Jump         -compare-2-join           
+        Label        -compare-2-join           
+        JumpFalse    -while-stmt-4-join        
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% test
-        PushI        5                         
-        StoreI                                 
-        PushD        -stringConstant-2-        
+        Add                                    %% i
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        -stringConstant-3-i       
         PushD        $print-format-string      
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% j
+        LoadI                                  
+        PushD        $print-format-integer     
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 
-        Jump         -if-stmt-7-join           
-        Label        -if-stmt-7-else           
-        Label        -if-stmt-6-               
-        Label        -compare-3-arg1           
-        PushI        9                         
-        Label        -compare-3-arg2           
-        PushI        10                        
-        Label        -compare-3-sub            
-        Subtract                               
-        JumpPos      -compare-3-true           
-        Jump         -compare-3-false          
-        Label        -compare-3-true           
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% j
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% j
+        LoadI                                  
         PushI        1                         
-        Jump         -compare-3-join           
-        Label        -compare-3-false          
+        Add                                    
+        StoreI                                 
+        Jump         -while-stmt-4-loop        
+        Label        -while-stmt-4-join        
+        PushD        $global-memory-block      
         PushI        0                         
-        Jump         -compare-3-join           
-        Label        -compare-3-join           
-        JumpFalse    -if-stmt-6-else           
-        PushD        -stringConstant-4-        
-        PushD        $print-format-string      
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        Jump         -if-stmt-6-join           
-        Label        -if-stmt-6-else           
-        PushD        -stringConstant-5-        
-        PushD        $print-format-string      
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        Label        -if-stmt-6-join           
-        Label        -if-stmt-7-join           
+        Add                                    %% i
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% i
+        LoadI                                  
+        PushI        1                         
+        Add                                    
+        StoreI                                 
+        Jump         -while-stmt-5-loop        
+        Label        -while-stmt-5-join        
         Halt                                   
