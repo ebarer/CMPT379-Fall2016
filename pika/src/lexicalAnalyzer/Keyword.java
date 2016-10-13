@@ -10,6 +10,10 @@ public enum Keyword implements Lextant {
 	CONST("const"),
 	VAR("var"),
 	
+	IF("if"),
+	ELSE("else"),
+	WHILE("while"),
+	
 	BOOL("bool"),
 	TRUE("_true_"),
 	FALSE("_false_"),

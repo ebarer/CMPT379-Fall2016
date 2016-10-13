@@ -26,7 +26,11 @@ public class StringNode extends ParseNode {
 	}
 	
 	public IdentifierNode getIdentifier() {
-		return (IdentifierNode) this.getParent().child(0);
+		if (this.getParent().child(0) instanceof IdentifierNode) {
+			return (IdentifierNode) this.getParent().child(0);
+		} else {
+			return null;
+		}
 	}
 
 ///////////////////////////////////////////////////////////

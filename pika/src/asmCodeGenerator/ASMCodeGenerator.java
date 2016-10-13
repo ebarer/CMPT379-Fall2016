@@ -19,6 +19,7 @@ import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.FloatingConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
+import parseTree.nodeTypes.IfNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
@@ -262,6 +263,34 @@ public class ASMCodeGenerator {
 			assert false: "Type " + type + " unimplemented in opcodeForStore()";
 			return null;
 		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		// if statements
+		public void visitLeave(IfNode node) {
+			newVoidCode(node);
+			
+			Labeller labeller = new Labeller("if-stmt");
+			String startLabel  = labeller.newLabel("");
+			String elseLabel  = labeller.newLabel("else");
+			String joinLabel  = labeller.newLabel("join");
+			
+			code.add(Label, startLabel);
+			
+			ASMCodeFragment conditionCode = removeValueCode(node.child(0));
+			code.append(conditionCode);
+			code.add(JumpFalse, elseLabel);
+			
+			ASMCodeFragment blockCode = removeVoidCode(node.child(1));
+			code.append(blockCode);
+			code.add(Jump, joinLabel);
+			
+			code.add(Label, elseLabel);
+			if (node.nChildren() == 3) {
+				ASMCodeFragment elseCode = removeVoidCode(node.child(2));
+				code.append(elseCode);				
+			}
+			code.add(Label, joinLabel);
+		}
 
 
 		///////////////////////////////////////////////////////////////////////////
@@ -466,10 +495,15 @@ public class ASMCodeGenerator {
 		}
 		public void visit(StringNode node) {
 			newValueCode(node);
-			IdentifierNode identifier = node.getIdentifier();
 			
 			Labeller labeller = new Labeller("stringConstant");
-			String varName = identifier.getToken().getLexeme();
+			
+			IdentifierNode identifier = node.getIdentifier();
+			String varName = "";
+			if (identifier != null) {
+				varName = identifier.getToken().getLexeme();
+			}
+			
 			String stringLabel = labeller.newLabel(varName);
 
 			code.add(DLabel, stringLabel);

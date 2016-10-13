@@ -20,6 +20,7 @@ import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.FloatingConstantNode;
 import parseTree.nodeTypes.IdentifierNode;
+import parseTree.nodeTypes.IfNode;
 import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
@@ -130,6 +131,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			node.setType(targetType);			
 		}
 	}
+	@Override
+	public void visitLeave(IfNode node) {
+		assert node.nChildren() >= 2;
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// expressions
@@ -144,7 +149,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
 		
-		if(signature.accepts(childTypes)) {
+		if (signature.accepts(childTypes)) {
 			node.setSignature(signature);
 			node.setType(signature.resultType());
 		} else {

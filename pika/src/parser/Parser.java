@@ -14,6 +14,7 @@ import parseTree.nodeTypes.MainBlockNode;
 import parseTree.nodeTypes.DeclarationNode;
 import parseTree.nodeTypes.ErrorNode;
 import parseTree.nodeTypes.IdentifierNode;
+import parseTree.nodeTypes.IfNode;
 import parseTree.nodeTypes.CharacterNode;
 import parseTree.nodeTypes.StringNode;
 import parseTree.nodeTypes.IntegerConstantNode;
@@ -141,6 +142,9 @@ public class Parser {
 		if(startsDeclaration(nowReading)) {
 			return parseDeclaration();
 		}
+		if(startsIfStatement(nowReading)) {
+			return parseIfStatement();
+		}
 		if(startsAssignment(nowReading)) {
 			return parseAssignment();
 		}
@@ -152,6 +156,8 @@ public class Parser {
 	private boolean startsStatement(Token token) {
 		return startsDeclaration(token) ||
 			   startsAssignment(token) ||
+			   startsIfStatement(token) ||
+			   //startsWhileStatement(token) ||
 			   startsPrintStatement(token) ||
 			   startsBlockStatement(token);
 	}
@@ -179,8 +185,8 @@ public class Parser {
 		return token.isLextant(Keyword.CONST, Keyword.VAR);
 	}
 	
-	
-	// declaration -> CONST identifier := expression .
+
+	// assignment -> target := expression .
 	private ParseNode parseAssignment() {
 		if(!startsAssignment(nowReading)) {
 			return syntaxErrorNode("assignment");
@@ -197,6 +203,36 @@ public class Parser {
 	}
 	private boolean startsAssignment(Token token) {
 		return token instanceof IdentifierToken;
+	}
+	
+	
+	// if (expression) blockStatement (else blockStatement)?
+	private ParseNode parseIfStatement() {
+		if(!startsIfStatement(nowReading)) {
+			return syntaxErrorNode("if-statement");
+		}
+		
+		expect(Keyword.IF);
+
+		Token ifToken = previouslyRead;
+		ParseNode condition = parseExpression();
+		ParseNode blockStatement = parseBlockStatement();
+		
+		// Check for ELSE clause
+		if (startsElseStatement(nowReading)) {
+			expect(Keyword.ELSE);
+			ParseNode elseStatement = parseBlockStatement();
+			return IfNode.withElse(ifToken, condition, blockStatement, elseStatement);
+		} else {
+			ParseNode ifNode = new IfNode(ifToken, condition, blockStatement);	
+			return ifNode;
+		}
+	}
+	private boolean startsIfStatement(Token token) {
+		return token.isLextant(Keyword.IF);
+	}
+	private boolean startsElseStatement(Token token) {
+		return token.isLextant(Keyword.ELSE);
 	}
 	
 	
