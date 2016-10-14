@@ -3,34 +3,16 @@ package asmCodeGenerator;
 import java.util.HashMap;
 import java.util.Map;
 
+import asmCodeGenerator.codeStorage.ASMCodeChunk;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
+import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.runtime.RunTime;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
 import parseTree.*;
-import parseTree.nodeTypes.AssignmentNode;
-import parseTree.nodeTypes.BinaryOperatorNode;
-import parseTree.nodeTypes.BlockNode;
-import parseTree.nodeTypes.BooleanConstantNode;
-import parseTree.nodeTypes.CastNode;
-import parseTree.nodeTypes.CharacterNode;
-import parseTree.nodeTypes.MainBlockNode;
-import parseTree.nodeTypes.DeclarationNode;
-import parseTree.nodeTypes.FloatingConstantNode;
-import parseTree.nodeTypes.IdentifierNode;
-import parseTree.nodeTypes.IfNode;
-import parseTree.nodeTypes.IntegerConstantNode;
-import parseTree.nodeTypes.NewlineNode;
-import parseTree.nodeTypes.PrintStatementNode;
-import parseTree.nodeTypes.ProgramNode;
-import parseTree.nodeTypes.SpaceNode;
-import parseTree.nodeTypes.StringNode;
-import parseTree.nodeTypes.TabNode;
-import parseTree.nodeTypes.UnaryOperatorNode;
-import parseTree.nodeTypes.WhileNode;
-import semanticAnalyzer.types.PrimitiveType;
-import semanticAnalyzer.types.Type;
+import parseTree.nodeTypes.*;
+import semanticAnalyzer.types.*;
 import symbolTable.Binding;
 import symbolTable.Scope;
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
@@ -151,6 +133,14 @@ public class ASMCodeGenerator {
 			else if(node.getType() == PrimitiveType.FLOATING) {
 				code.add(LoadF);
 			}	
+			else if(node.getType() == PrimitiveType.RATIONAL) {
+				code.add(Duplicate);
+				code.add(LoadI);
+				code.add(Exchange);
+				code.add(PushI, 4);
+				code.add(Add);
+				code.add(LoadI);
+			}	
 			else if(node.getType() == PrimitiveType.BOOLEAN) {
 				code.add(LoadC);
 			}
@@ -222,28 +212,46 @@ public class ASMCodeGenerator {
 		}
 		
 		public void visitLeave(DeclarationNode node) {
-			newVoidCode(node);
-			
-			Type type = node.getType();
-			ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
-			ASMCodeFragment rvalue = removeValueCode(node.child(1));
-			
-			code.append(lvalue);
-			code.append(rvalue);
-			
-			code.add(opcodeForStore(type));
+			storeNode(node);
 		}
 		public void visitLeave(AssignmentNode node) {
+			storeNode(node);
+		}
+		private void storeNode(ParseNode node) {
 			newVoidCode(node);
 			
 			Type type = node.getType();
-			ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
-			ASMCodeFragment rvalue = removeValueCode(node.child(1));
-			
-			code.append(lvalue);
-			code.append(rvalue);
-			
-			code.add(opcodeForStore(type));
+			if (type == PrimitiveType.RATIONAL) {
+				ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
+				ASMCodeChunk baseAddress = lvalue.getChunk(0);
+				
+				ASMCodeFragment rvalue = removeValueCode(node.child(1));
+				ASMCodeChunk numerator = rvalue.getChunk(0);
+				ASMCodeChunk denominator = rvalue.getChunk(1);
+
+				Labeller labeller = new Labeller("rat");
+				String numLabel   = labeller.newLabel("numerator");
+				String denomLabel = labeller.newLabel("denominator");
+				
+				code.addChunk(baseAddress);
+				code.add(Duplicate);
+				code.add(Label, numLabel);
+				code.addChunk(numerator);
+				code.add(StoreI);
+				code.add(PushI, 4);
+				code.add(Add);
+				code.add(Label, denomLabel);
+				code.addChunk(denominator);
+				code.add(StoreI);
+			} else {
+				ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
+				ASMCodeFragment rvalue = removeValueCode(node.child(1));
+				
+				code.append(lvalue);
+				code.append(rvalue);
+				
+				code.add(opcodeForStore(type));				
+			}
 		}
 		private ASMOpcode opcodeForStore(Type type) {
 			if(type == PrimitiveType.INTEGER) {
@@ -251,6 +259,9 @@ public class ASMCodeGenerator {
 			}
 			if(type == PrimitiveType.FLOATING) {
 				return StoreF;
+			}
+			if(type == PrimitiveType.RATIONAL) {
+				return StoreI;
 			}
 			if(type == PrimitiveType.BOOLEAN) {
 				return StoreC;
@@ -271,7 +282,7 @@ public class ASMCodeGenerator {
 			newVoidCode(node);
 			
 			Labeller labeller = new Labeller("if-stmt");
-			String startLabel  = labeller.newLabel("");
+			String startLabel = labeller.newLabel("");
 			String elseLabel  = labeller.newLabel("else");
 			String joinLabel  = labeller.newLabel("join");
 			
@@ -423,7 +434,6 @@ public class ASMCodeGenerator {
 			code.add(Jump, joinLabel);
 			code.add(Label, falseLabel);
 			code.add(PushI, 0);
-			code.add(Jump, joinLabel);
 			code.add(Label, joinLabel);
 		}
 		private void visitNormalBinaryOperatorNode(BinaryOperatorNode node) {
@@ -467,6 +477,15 @@ public class ASMCodeGenerator {
 				assert false : "unimplemented operator in opcodeForOperator";
 			}
 			return null;
+		}
+		
+		public void visitLeave(RationalOperatorNode node) {
+			newValueCode(node);
+			ASMCodeFragment arg1 = removeValueCode(node.child(0));
+			ASMCodeFragment arg2 = removeValueCode(node.child(1));
+
+			code.append(arg1);
+			code.append(arg2);
 		}
 		
 		public void visitLeave(UnaryOperatorNode node) {

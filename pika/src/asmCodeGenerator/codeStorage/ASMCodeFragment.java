@@ -99,6 +99,9 @@ public class ASMCodeFragment {
 	public List<ASMCodeChunk> getChunks() {
 		return chunks;
 	}
+	public ASMCodeChunk getChunk(int index) {
+		return chunks.get(index);
+	}
 
 	
 	
