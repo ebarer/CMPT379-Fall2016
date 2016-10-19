@@ -1,0 +1,4 @@
+exec {
+    const result := 4.7 * "Gt\-06".
+    print result, _n_.
+}

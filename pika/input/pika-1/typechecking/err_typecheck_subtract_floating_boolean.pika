@@ -1,0 +1,4 @@
+exec {
+    const result := 9.1 - _true_.
+    print result, _n_.
+}

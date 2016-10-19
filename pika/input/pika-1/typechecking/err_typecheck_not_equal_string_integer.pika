@@ -1,0 +1,4 @@
+exec {
+    const result := "w$e" != 43.
+    print result, _n_.
+}

@@ -1,38 +1,12 @@
 package parser;
 
 import java.util.Arrays;
-import java.util.function.UnaryOperator;
-
 import logging.PikaLogger;
 import parseTree.*;
-import parseTree.nodeTypes.AssignmentNode;
-import parseTree.nodeTypes.BinaryOperatorNode;
-import parseTree.nodeTypes.BlockNode;
-import parseTree.nodeTypes.BooleanConstantNode;
-import parseTree.nodeTypes.CastNode;
-import parseTree.nodeTypes.MainBlockNode;
-import parseTree.nodeTypes.DeclarationNode;
-import parseTree.nodeTypes.ErrorNode;
-import parseTree.nodeTypes.IdentifierNode;
-import parseTree.nodeTypes.IfNode;
-import parseTree.nodeTypes.CharacterNode;
-import parseTree.nodeTypes.StringNode;
-import parseTree.nodeTypes.IntegerConstantNode;
-import parseTree.nodeTypes.FloatingConstantNode;
-import parseTree.nodeTypes.NewlineNode;
-import parseTree.nodeTypes.PrintStatementNode;
-import parseTree.nodeTypes.ProgramNode;
-import parseTree.nodeTypes.SpaceNode;
-import parseTree.nodeTypes.TabNode;
-import parseTree.nodeTypes.UnaryOperatorNode;
-import parseTree.nodeTypes.WhileNode;
-import semanticAnalyzer.types.PrimitiveType;
+import parseTree.nodeTypes.*;
 import semanticAnalyzer.types.TypeLiteral;
 import tokens.*;
-import lexicalAnalyzer.Keyword;
-import lexicalAnalyzer.Lextant;
-import lexicalAnalyzer.Punctuator;
-import lexicalAnalyzer.Scanner;
+import lexicalAnalyzer.*;
 
 
 public class Parser {
@@ -119,8 +93,13 @@ public class Parser {
 		expect(Punctuator.OPEN_BRACE);
 		
 		while(startsStatement(nowReading)) {
-			ParseNode statement = parseStatement();
-			blockStatement.appendChild(statement);
+			if (startsBlockStatement(nowReading)) {
+				ParseNode childBlockStatement = parseBlockStatement();
+				blockStatement.appendChild(childBlockStatement);
+			} else {
+				ParseNode statement = parseStatement();
+				blockStatement.appendChild(statement);
+			}
 		}
 		
 		expect(Punctuator.CLOSE_BRACE);
@@ -393,12 +372,12 @@ public class Parser {
 		}
 		
 		ParseNode left = parseAdditiveExpression();
-		if(nowReading.isLextant(Punctuator.getComparators())) {
+		while(nowReading.isLextant(Punctuator.getComparators())) {
 			Token compareToken = nowReading;
 			readToken();
 			ParseNode right = parseAdditiveExpression();
 			
-			return BinaryOperatorNode.withChildren(compareToken, left, right);
+			left = BinaryOperatorNode.withChildren(compareToken, left, right);
 		}
 		return left;
 
@@ -436,12 +415,16 @@ public class Parser {
 		}
 		
 		ParseNode left = parseAtomicExpression();
-		while(nowReading.isLextant(Punctuator.MULTIPLY, Punctuator.DIVISION)) {
+		while(nowReading.isLextant(Punctuator.getMultiplicatives())) {
 			Token multiplicativeToken = nowReading;
 			readToken();
 			ParseNode right = parseAtomicExpression();
 			
-			left = BinaryOperatorNode.withChildren(multiplicativeToken, left, right);
+			if (multiplicativeToken.isLextant(Punctuator.getRationals())) {
+				left = RationalOperatorNode.withChildren(multiplicativeToken, left, right);
+			} else {
+				left = BinaryOperatorNode.withChildren(multiplicativeToken, left, right);
+			}
 		}
 		return left;
 	}
@@ -519,8 +502,8 @@ public class Parser {
 		return syntaxErrorNode("literal");
 	}
 	private boolean startsLiteral(Token token) {
-		return  startsIntNumber(token) || startsFloatNumber(token) ||
-				startsCharacter(token) || startsString(token) ||
+		return  startsCharacter(token) || startsString(token) ||
+				startsIntNumber(token) || startsFloatNumber(token) ||
 				startsIdentifier(token) || startsBooleanConstant(token);
 	}
 

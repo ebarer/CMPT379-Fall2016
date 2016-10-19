@@ -1,0 +1,4 @@
+exec {
+    const result := ":hZNTt" - 88.
+    print result, _n_.
+}

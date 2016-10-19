@@ -1,0 +1,4 @@
+exec {
+    const result := _false_ > "D(rhp".
+    print result, _n_.
+}

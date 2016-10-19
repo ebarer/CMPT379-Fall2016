@@ -1,0 +1,5 @@
+exec {
+    var result := 25.
+     result := "[XUI7r".
+    print result, _n_.
+}

@@ -1,0 +1,43 @@
+exec {
+
+  print [ ^C^ | int ] != 56, _n_.
+  print [ ^B^ | int ] != 25, _n_.
+  print [ ^;^ | int ] != 68, _n_.
+  print [ ^l^ | int ] != 18, _n_.
+  print [ ^[^ | int ] != 15, _n_.
+  print [ ^P^ | int ] != 80, _n_.
+  print [ ^V^ | int ] != 78, _n_.
+  print [ ^_^ | int ] != 28, _n_.
+  print [ ^i^ | int ] != 72, _n_.
+  print [ ^f^ | int ] != 73, _n_.
+  print [ ^h^ | int ] != 95, _n_.
+  print [ ^!^ | int ] != 31, _n_.
+
+  print 64 != [ ^H^ | int ], _n_.
+  print 11 != [ ^G^ | int ], _n_.
+  print 19 != [ ^q^ | int ], _n_.
+  print 10 != [ ^p^ | int ], _n_.
+  print 35 != [ ^5^ | int ], _n_.
+  print 2 != [ ^R^ | int ], _n_.
+  print 82 != [ ^p^ | int ], _n_.
+  print 20 != [ ^8^ | int ], _n_.
+  print 71 != [ ^"^ | int ], _n_.
+  print 79 != [ ^{^ | int ], _n_.
+  print 49 != [ ^(^ | int ], _n_.
+  print 25 != [ ^U^ | int ], _n_.
+
+  print [ ^W^ | int ] != [ ^{^ | int ], _n_.
+  print [ ^W^ | int ] != [ ^W^ | int ], _n_.
+  print [ ^:^ | int ] != [ ^:^ | int ], _n_.
+  print [ ^"^ | int ] != [ ^S^ | int ], _n_.
+  print [ ^.^ | int ] != [ ^j^ | int ], _n_.
+  print [ ^K^ | int ] != [ ^A^ | int ], _n_.
+  print [ ^s^ | int ] != [ ^8^ | int ], _n_.
+  print [ ^1^ | int ] != [ ^`^ | int ], _n_.
+  print [ ^r^ | int ] != [ ^q^ | int ], _n_.
+  print [ ^H^ | int ] != [ ^Q^ | int ], _n_.
+  print [ ^J^ | int ] != [ ^?^ | int ], _n_.
+  print [ ^6^ | int ] != [ ^B^ | int ], _n_.
+
+}
+

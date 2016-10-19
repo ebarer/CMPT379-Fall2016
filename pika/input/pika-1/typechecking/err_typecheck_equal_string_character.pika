@@ -1,0 +1,4 @@
+exec {
+    const result := "`kY" == ^c^.
+    print result, _n_.
+}

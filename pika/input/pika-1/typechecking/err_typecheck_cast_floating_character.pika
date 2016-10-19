@@ -1,0 +1,4 @@
+exec {
+    const result := [ 8.8 | char ].
+    print result, _n_.
+}

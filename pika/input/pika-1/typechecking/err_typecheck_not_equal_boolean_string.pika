@@ -1,0 +1,4 @@
+exec {
+    const result := _true_ != "sg'q".
+    print result, _n_.
+}

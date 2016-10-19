@@ -1,0 +1,4 @@
+exec {
+    const result := "SJ" / "s1cer(,".
+    print result, _n_.
+}

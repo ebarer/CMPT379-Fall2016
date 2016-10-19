@@ -1,0 +1,14 @@
+exec {
+	{
+		var s := "me".
+		print "They";.
+		{
+			{
+				print "call";.
+			}
+			print s;.
+		}
+	}
+	print "Mister";.
+	print "Tibbs!", _n_.
+}

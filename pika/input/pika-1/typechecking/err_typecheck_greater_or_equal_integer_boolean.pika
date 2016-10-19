@@ -1,0 +1,4 @@
+exec {
+    const result := 43 >= _false_.
+    print result, _n_.
+}

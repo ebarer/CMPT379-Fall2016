@@ -1,0 +1,6 @@
+exec {
+    const result := 7 / 57.
+    var knownType := 51.
+     knownType := result.
+    print result, _n_.
+}

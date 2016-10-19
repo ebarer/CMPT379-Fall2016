@@ -1,0 +1,8 @@
+exec {
+	const c := 3 + 4 + 5.
+	const d := 3 - 4 - 5.
+	const e := 3 - 4 + 5.
+	print c; d; e, _n_.
+	const fish := 2 - 3 - 4 - 5 + 6 + 7 - 8.
+	print fish, _n_.
+}

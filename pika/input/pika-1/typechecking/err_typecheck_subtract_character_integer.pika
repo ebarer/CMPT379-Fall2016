@@ -1,0 +1,4 @@
+exec {
+    const result := ^%^ - 92.
+    print result, _n_.
+}

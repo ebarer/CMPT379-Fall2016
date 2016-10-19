@@ -1,0 +1,6 @@
+exec {
+    const result := [ 5.6 | float ].
+    var knownType := 4.7.
+     knownType := result.
+    print result, _n_.
+}

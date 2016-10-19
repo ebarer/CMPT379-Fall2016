@@ -1,0 +1,5 @@
+exec {
+	print "They call me", _n_.
+	print "Mister", _n_.
+	print "Tibbs!", _n_.
+}

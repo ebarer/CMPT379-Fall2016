@@ -1,0 +1,4 @@
+exec {
+    const w := ^\0^.
+    print w, _n_.
+}

@@ -25,6 +25,7 @@ import parseTree.nodeTypes.IntegerConstantNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
+import parseTree.nodeTypes.RationalOperatorNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.StringNode;
 import parseTree.nodeTypes.UnaryOperatorNode;
@@ -143,6 +144,29 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 	///////////////////////////////////////////////////////////////////////////
 	// expressions
+	@Override
+	public void visitLeave(RationalOperatorNode node) {
+		assert node.nChildren() == 2;
+		ParseNode left  = node.child(0);
+		ParseNode right = node.child(1);
+		List<Type> childTypes = Arrays.asList(left.getType(), right.getType());
+		
+		Lextant operator = operatorFor(node);
+
+		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
+		
+		if (signature.accepts(childTypes)) {
+			node.setSignature(signature);
+			node.setType(signature.resultType());
+		} else {
+			typeCheckError(node, childTypes);
+			node.setType(PrimitiveType.ERROR);
+		}
+	}
+	private Lextant operatorFor(RationalOperatorNode node) {
+		LextantToken token = (LextantToken) node.getToken();
+		return token.getLextant();
+	}
 	@Override
 	public void visitLeave(BinaryOperatorNode node) {
 		assert node.nChildren() == 2;

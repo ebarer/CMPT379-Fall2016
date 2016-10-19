@@ -1,0 +1,7 @@
+exec {
+	const v := 1.2.
+    const w := v.
+    const x := -2.0.
+    const y := -123.456.
+    const z := 2.0E1.
+}

@@ -1,0 +1,5 @@
+exec {
+	const v := 3.9427.
+	const vapprox := [v | int].		# don't round up
+	print v; vapprox, _n_.
+}

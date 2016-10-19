@@ -49,7 +49,6 @@ public class CastNode extends ParseNode {
 		CastNode node = new CastNode(token);
 		node.appendChild(left);
 		node.castType = right;
-		//node.signature = FunctionSignatures.signature(token.getLexeme(), left.getType(), right.getLexeme());
 		return node;
 	}
 	

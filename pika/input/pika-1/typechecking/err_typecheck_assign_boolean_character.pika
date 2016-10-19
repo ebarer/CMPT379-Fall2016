@@ -1,0 +1,5 @@
+exec {
+    var result := _false_.
+     result := ^)^.
+    print result, _n_.
+}

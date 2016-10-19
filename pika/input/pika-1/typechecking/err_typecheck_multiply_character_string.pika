@@ -1,0 +1,4 @@
+exec {
+    const result := ^o^ * "i(".
+    print result, _n_.
+}

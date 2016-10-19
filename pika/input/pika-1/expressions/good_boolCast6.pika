@@ -1,0 +1,6 @@
+exec {
+	var c := ^0^.
+	c := [ 0 | char].
+	const d := [c | bool].
+	print c; d, _n_.
+}

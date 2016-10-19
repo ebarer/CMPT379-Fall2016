@@ -1,0 +1,4 @@
+exec {
+    const result := ^'^ != 1.2.
+    print result, _n_.
+}

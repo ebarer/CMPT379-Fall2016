@@ -1,0 +1,43 @@
+exec {
+
+  print [ 9.9 | int ] >= 71, _n_.
+  print [ 6.6 | int ] >= 63, _n_.
+  print [ 1.4 | int ] >= 62, _n_.
+  print [ 4.1 | int ] >= 99, _n_.
+  print [ 2.9 | int ] >= 71, _n_.
+  print [ 8.0 | int ] >= 66, _n_.
+  print [ 4.6 | int ] >= 15, _n_.
+  print [ 3.2 | int ] >= 8, _n_.
+  print [ 4.8 | int ] >= 66, _n_.
+  print [ 1.9 | int ] >= 51, _n_.
+  print [ 5.5 | int ] >= 34, _n_.
+  print [ 8.1 | int ] >= 48, _n_.
+
+  print 6 >= [ 4.3 | int ], _n_.
+  print 84 >= [ 3.5 | int ], _n_.
+  print 54 >= [ 5.9 | int ], _n_.
+  print 29 >= [ 8.1 | int ], _n_.
+  print 71 >= [ 2.5 | int ], _n_.
+  print 22 >= [ 7.7 | int ], _n_.
+  print 28 >= [ 9.1 | int ], _n_.
+  print 32 >= [ 5.3 | int ], _n_.
+  print 44 >= [ 4.0 | int ], _n_.
+  print 54 >= [ 1.4 | int ], _n_.
+  print 24 >= [ 9.8 | int ], _n_.
+  print 10 >= [ 6.5 | int ], _n_.
+
+  print [ 4.6 | int ] >= [ 7.4 | int ], _n_.
+  print [ 4.1 | int ] >= [ 1.6 | int ], _n_.
+  print [ 3.2 | int ] >= [ 7.2 | int ], _n_.
+  print [ 7.9 | int ] >= [ 8.2 | int ], _n_.
+  print [ 2.2 | int ] >= [ 8.7 | int ], _n_.
+  print [ 3.9 | int ] >= [ 6.7 | int ], _n_.
+  print [ 7.1 | int ] >= [ 6.1 | int ], _n_.
+  print [ 7.4 | int ] >= [ 5.3 | int ], _n_.
+  print [ 2.2 | int ] >= [ 9.1 | int ], _n_.
+  print [ 9.0 | int ] >= [ 2.4 | int ], _n_.
+  print [ 7.9 | int ] >= [ 7.5 | int ], _n_.
+  print [ 4.0 | int ] >= [ 5.2 | int ], _n_.
+
+}
+

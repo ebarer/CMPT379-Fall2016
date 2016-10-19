@@ -1,7 +1,11 @@
 exec {
-	var test := 5.1.
-	print test, _n_.
-
-	var test1 := [test | int].
-	print test1, _n_.
+	var intConvert := [15096 | char].
+	print intConvert, _n_.
+	
+	var myRat1 := 3 // 8.
+	var myRat2 := 5 // 10.
+	print myRat1; myRat2, _n_.	
+	
+	var test := myRat1 + myRat2.
+	print test.
 }

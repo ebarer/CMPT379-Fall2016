@@ -1,0 +1,4 @@
+exec {
+    const result := "P<" != "T9<T[".
+    print result, _n_.
+}

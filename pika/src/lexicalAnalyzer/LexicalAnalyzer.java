@@ -46,10 +46,10 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		else if(ch.getCharacter() == '"') {
 			return scanString(ch);
 		}
-		else if(ch.isDigit()) {
+		else if(isNumber(ch)) {
 			return scanNumber(ch);
 		}
-		else if(ch.isSign()) {
+		else if (ch.isSign()) {
 			return scanSignedNumber(ch);
 		}
 		else if(ch.isLowerCase() || ch.isUpperCase()) {
@@ -140,6 +140,11 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 	private Token scanNumber(LocatedChar ch) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(ch.getCharacter());
+		
+		boolean isFloat = false;
+		if (ch.getCharacter() == '.') {
+			isFloat = true;
+		}
 
 		if (!ch.isDigit()) {
 			ch = input.peek();
@@ -148,12 +153,17 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		appendSubsequentDigits(buffer);
 		
 		// If next character is not a period, or if next character is a period
-		// but is not followed by a digit, return INTEGER
+		// but is not followed by a digit, return INTEGER, except if first
+		// character was a ., return FLOAT
 		LocatedChar c = input.next();
 		if (c.getCharacter() != '.' || !(input.peek().isDigit())) {
 			input.pushback(c);
 			if (ch.isDigit()) {
-				return IntegerToken.make(ch.getLocation(), buffer.toString());
+				if (isFloat) {
+					return FloatingToken.make(ch.getLocation(), buffer.toString());
+				} else {
+					return IntegerToken.make(ch.getLocation(), buffer.toString());
+				}
 			} else {
 				return PunctuatorScanner.scan(ch, input);
 			}
@@ -194,6 +204,11 @@ public class LexicalAnalyzer extends ScannerImp implements Scanner {
 		}
 		
 		input.pushback(c);
+	}
+	
+	private boolean isNumber(LocatedChar lc) {
+		LocatedChar next = input.peek();
+		return lc.isDigit() || lc.getCharacter() == '.' && next.isDigit();
 	}
 	
 	

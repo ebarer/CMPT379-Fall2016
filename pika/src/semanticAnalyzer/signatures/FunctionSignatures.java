@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
@@ -81,22 +83,40 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		// Arithmetic Operators
 		new FunctionSignatures(Punctuator.ADD,
 		    new FunctionSignature(ASMOpcode.Add, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FAdd, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING)
+		    new FunctionSignature(ASMOpcode.FAdd, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
+		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.Add, ASMOpcode.Add}, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.SUBTRACT,
 		    new FunctionSignature(ASMOpcode.Subtract, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FSubtract, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING)
+		    new FunctionSignature(ASMOpcode.FSubtract, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
+		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.Subtract, ASMOpcode.Subtract}, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.MULTIPLY,
 		    new FunctionSignature(ASMOpcode.Multiply, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FMultiply, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING)
+		    new FunctionSignature(ASMOpcode.FMultiply, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
+		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.Multiply, ASMOpcode.Multiply}, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.DIVISION,
 		    new FunctionSignature(ASMOpcode.Divide, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FDivide, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING)
+		    new FunctionSignature(ASMOpcode.FDivide, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
+		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.Divide, ASMOpcode.Divide}, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
+		);
+		
+		
+		// Rational Operators
+		new FunctionSignatures(Punctuator.OVER,
+		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.RATIONAL)
+		);
+		
+		new FunctionSignatures(Punctuator.EXPRESS_OVER,
+		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.RATIONAL)
+		);
+		
+		new FunctionSignatures(Punctuator.RATIONALIZE,
+		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.RATIONAL)
 		);
 		
 		
@@ -157,19 +177,31 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		// Casting Operators
 		new FunctionSignatures(Punctuator.PIPE,
 			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.CHARACTER, PrimitiveType.CHARACTER),
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
+			new FunctionSignature("toBool", PrimitiveType.CHARACTER, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
 			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
+			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.RATIONAL, PrimitiveType.RATIONAL),
 			
 			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, TypeLiteral.CHARACTER, PrimitiveType.CHARACTER),
+			new FunctionSignature("toBool", PrimitiveType.INTEGER, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
+		    new FunctionSignature("intToChar", PrimitiveType.INTEGER, TypeLiteral.CHARACTER, PrimitiveType.CHARACTER),
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, TypeLiteral.RATIONAL, PrimitiveType.RATIONAL),
 		    new FunctionSignature(ASMOpcode.ConvertF, PrimitiveType.INTEGER, TypeLiteral.FLOATING, PrimitiveType.FLOATING),
 		    
 		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.FLOATING, TypeLiteral.FLOATING, PrimitiveType.FLOATING),
 		    new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.FLOATING, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.FLOATING, TypeLiteral.RATIONAL, PrimitiveType.RATIONAL),
 		    
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.BOOLEAN, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN)
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.RATIONAL, TypeLiteral.RATIONAL, PrimitiveType.RATIONAL),
+		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.ConvertF, ASMOpcode.ConvertF, ASMOpcode.FDivide},
+		    						PrimitiveType.RATIONAL, TypeLiteral.FLOATING, PrimitiveType.FLOATING),
+		    new FunctionSignature(ASMOpcode.Divide, PrimitiveType.RATIONAL, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
+		    
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.BOOLEAN, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
+		    
+		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.STRING, TypeLiteral.STRING, PrimitiveType.STRING)
 		);
+		
+		// new FunctionSignature(::, new ArrayType(T), T, PrimitiveType.INTEGER);
 		
 		
 		// First, we use the operator itself (in this case the Punctuator ADD) as the key.

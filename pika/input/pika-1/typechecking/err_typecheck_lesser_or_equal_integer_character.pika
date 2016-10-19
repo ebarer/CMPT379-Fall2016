@@ -1,0 +1,4 @@
+exec {
+    const result := 51 <= ^H^.
+    print result, _n_.
+}

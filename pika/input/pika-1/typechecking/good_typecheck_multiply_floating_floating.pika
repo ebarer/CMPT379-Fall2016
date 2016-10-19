@@ -1,0 +1,6 @@
+exec {
+    const result := 3.7 * 8.7.
+    var knownType := 7.3.
+     knownType := result.
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := 9.9 >= "XM,>n".
+    print result, _n_.
+}

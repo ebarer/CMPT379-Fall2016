@@ -1,0 +1,4 @@
+exec {
+    const result := 1.4 <= "Jp".
+    print result, _n_.
+}

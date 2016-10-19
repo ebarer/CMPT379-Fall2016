@@ -1,0 +1,8 @@
+exec {
+    const vara := 10.
+    const var$ := 11.
+    const var9 := 12.
+    const var_ := 13.
+    const varZ := 14.
+    print vara; var$; var9; var_; varZ, _n_.
+}

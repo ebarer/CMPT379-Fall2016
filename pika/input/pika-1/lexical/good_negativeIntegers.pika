@@ -1,0 +1,8 @@
+exec {
+    const nega := -20.
+    const negb :=-20.
+    const negc := 24 + -44.
+    const negd := 24+-44.
+    const nege := 2*-10.
+    print nega; negb; negc; negd; nege, _n_.
+}

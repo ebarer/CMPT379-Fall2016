@@ -1,0 +1,43 @@
+exec {
+
+  print [ ^u^ | int ] == 92, _n_.
+  print [ ^k^ | int ] == 38, _n_.
+  print [ ^/^ | int ] == 8, _n_.
+  print [ ^a^ | int ] == 12, _n_.
+  print [ ^|^ | int ] == 56, _n_.
+  print [ ^=^ | int ] == 1, _n_.
+  print [ ^j^ | int ] == 30, _n_.
+  print [ ^l^ | int ] == 37, _n_.
+  print [ ^]^ | int ] == 32, _n_.
+  print [ ^6^ | int ] == 46, _n_.
+  print [ ^H^ | int ] == 91, _n_.
+  print [ ^@^ | int ] == 26, _n_.
+
+  print 97 == [ ^u^ | int ], _n_.
+  print 16 == [ ^*^ | int ], _n_.
+  print 15 == [ ^>^ | int ], _n_.
+  print 74 == [ ^7^ | int ], _n_.
+  print 14 == [ ^8^ | int ], _n_.
+  print 19 == [ ^V^ | int ], _n_.
+  print 2 == [ ^l^ | int ], _n_.
+  print 86 == [ ^!^ | int ], _n_.
+  print 76 == [ ^i^ | int ], _n_.
+  print 27 == [ ^<^ | int ], _n_.
+  print 55 == [ ^?^ | int ], _n_.
+  print 17 == [ ^E^ | int ], _n_.
+
+  print [ ^.^ | int ] == [ ^i^ | int ], _n_.
+  print [ ^j^ | int ] == [ ^r^ | int ], _n_.
+  print [ ^$^ | int ] == [ ^E^ | int ], _n_.
+  print [ ^m^ | int ] == [ ^)^ | int ], _n_.
+  print [ ^$^ | int ] == [ ^(^ | int ], _n_.
+  print [ ^r^ | int ] == [ ^@^ | int ], _n_.
+  print [ ^D^ | int ] == [ ^Y^ | int ], _n_.
+  print [ ^.^ | int ] == [ ^:^ | int ], _n_.
+  print [ ^r^ | int ] == [ ^=^ | int ], _n_.
+  print [ ^d^ | int ] == [ ^N^ | int ], _n_.
+  print [ ^w^ | int ] == [ ^m^ | int ], _n_.
+  print [ ^v^ | int ] == [ ^?^ | int ], _n_.
+
+}
+

@@ -1,0 +1,5 @@
+exec {
+	const v := -.2.
+    const w := +.417.
+    const x := .23.
+}

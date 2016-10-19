@@ -1,0 +1,4 @@
+exec {
+    const result := 86 >= "d.C,$L".
+    print result, _n_.
+}

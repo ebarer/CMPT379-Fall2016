@@ -1,0 +1,1 @@
+Couldn't read file "C:\Users\shermer\workspace\pika\input\pika-1\statements/output/jjj.asm"

@@ -1,0 +1,43 @@
+exec {
+
+  print [ ^m^ | int ] < 10, _n_.
+  print [ ^0^ | int ] < 5, _n_.
+  print [ ^0^ | int ] < 73, _n_.
+  print [ ^m^ | int ] < 2, _n_.
+  print [ ^ ^ | int ] < 10, _n_.
+  print [ ^P^ | int ] < 46, _n_.
+  print [ ^g^ | int ] < 73, _n_.
+  print [ ^J^ | int ] < 11, _n_.
+  print [ ^/^ | int ] < 87, _n_.
+  print [ ^+^ | int ] < 7, _n_.
+  print [ ^7^ | int ] < 44, _n_.
+  print [ ^R^ | int ] < 88, _n_.
+
+  print 90 < [ ^R^ | int ], _n_.
+  print 36 < [ ^*^ | int ], _n_.
+  print 65 < [ ^F^ | int ], _n_.
+  print 30 < [ ^}^ | int ], _n_.
+  print 4 < [ ^|^ | int ], _n_.
+  print 26 < [ ^F^ | int ], _n_.
+  print 43 < [ ^_^ | int ], _n_.
+  print 37 < [ ^H^ | int ], _n_.
+  print 54 < [ ^l^ | int ], _n_.
+  print 87 < [ ^V^ | int ], _n_.
+  print 44 < [ ^p^ | int ], _n_.
+  print 35 < [ ^p^ | int ], _n_.
+
+  print [ ^B^ | int ] < [ ^Q^ | int ], _n_.
+  print [ ^H^ | int ] < [ ^`^ | int ], _n_.
+  print [ ^_^ | int ] < [ ^L^ | int ], _n_.
+  print [ ^s^ | int ] < [ ^)^ | int ], _n_.
+  print [ ^9^ | int ] < [ ^t^ | int ], _n_.
+  print [ ^p^ | int ] < [ ^*^ | int ], _n_.
+  print [ ^S^ | int ] < [ ^g^ | int ], _n_.
+  print [ ^4^ | int ] < [ ^t^ | int ], _n_.
+  print [ ^6^ | int ] < [ ^O^ | int ], _n_.
+  print [ ^K^ | int ] < [ ^h^ | int ], _n_.
+  print [ ^ ^ | int ] < [ ^?^ | int ], _n_.
+  print [ ^Y^ | int ] < [ ^9^ | int ], _n_.
+
+}
+

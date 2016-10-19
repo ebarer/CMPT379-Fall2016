@@ -1,0 +1,4 @@
+exec {
+    const result := 73 / 8.5.
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := "[a;W" - _true_.
+    print result, _n_.
+}

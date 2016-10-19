@@ -1,0 +1,6 @@
+exec {
+    const result := [ ^s^ | char ].
+    var knownType := ^^^.
+     knownType := result.
+    print result, _n_.
+}

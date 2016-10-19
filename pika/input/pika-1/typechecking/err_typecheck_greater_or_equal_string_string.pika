@@ -1,0 +1,4 @@
+exec {
+    const result := "n%e" >= "MqsI".
+    print result, _n_.
+}

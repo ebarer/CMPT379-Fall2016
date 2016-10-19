@@ -1,0 +1,4 @@
+exec {
+    const result := "^wf\<" == 49.
+    print result, _n_.
+}

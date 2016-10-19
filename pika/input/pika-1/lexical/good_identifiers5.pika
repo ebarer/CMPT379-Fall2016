@@ -1,0 +1,12 @@
+exec {
+    const a2345678901234567890123456789012 := 10.
+    const abcdefghijklmnopqrstuvwxyzABCDEF := 11.
+    const abcdefghijklmnopqrstuvwxyzABCDE$ := 12.
+    const a2345678900 := 13.
+    const mnopqrstuvwxyzABCDEFG := 14.
+    print a2345678901234567890123456789012; 
+            abcdefghijklmnopqrstuvwxyzABCDEF;
+            abcdefghijklmnopqrstuvwxyzABCDE$;
+            a2345678900;
+            mnopqrstuvwxyzABCDEFG, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+	print  3 == 4 == _true_, _n_.
+	print  4 == 4 == _true_, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := 48 == "uU".
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := "o|e. q" + 33.
+    print result, _n_.
+}

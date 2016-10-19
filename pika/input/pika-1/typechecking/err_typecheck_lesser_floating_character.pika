@@ -1,0 +1,4 @@
+exec {
+    const result := 4.7 < ^K^.
+    print result, _n_.
+}

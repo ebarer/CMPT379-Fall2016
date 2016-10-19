@@ -1,0 +1,5 @@
+exec {
+    var result := _false_.
+     result := 88.
+    print result, _n_.
+}

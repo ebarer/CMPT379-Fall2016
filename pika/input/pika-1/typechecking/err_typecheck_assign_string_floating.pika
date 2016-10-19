@@ -1,0 +1,5 @@
+exec {
+    var result := "Pm)JR?5".
+     result := 8.6.
+    print result, _n_.
+}

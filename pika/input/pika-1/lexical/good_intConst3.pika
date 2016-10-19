@@ -1,0 +1,5 @@
+exec {
+	const starters :=  25 + 13 .
+
+	print starters, _n_.
+}

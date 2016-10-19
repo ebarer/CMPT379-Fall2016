@@ -4,10 +4,11 @@ import tokens.Token;
 
 public enum TypeLiteral implements Type {
 	BOOLEAN(1, PrimitiveType.BOOLEAN),
-	INTEGER(4, PrimitiveType.INTEGER),
-	FLOATING(8, PrimitiveType.FLOATING),
 	CHARACTER(1, PrimitiveType.CHARACTER),
 	STRING(4, PrimitiveType.STRING),
+	INTEGER(4, PrimitiveType.INTEGER),
+	FLOATING(8, PrimitiveType.FLOATING),
+	RATIONAL(8, PrimitiveType.RATIONAL),
 	
 	ERROR(0, PrimitiveType.ERROR),				// use as a value when a syntax error has occurred
 	NO_TYPE(0, PrimitiveType.NO_TYPE, "");		// use as a value when no type has been assigned.

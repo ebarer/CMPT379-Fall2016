@@ -1,0 +1,43 @@
+exec {
+
+  print [ 18 | bool ] != _false_, _n_.
+  print [ 60 | bool ] != _true_, _n_.
+  print [ 76 | bool ] != _false_, _n_.
+  print [ 2 | bool ] != _true_, _n_.
+  print [ 74 | bool ] != _false_, _n_.
+  print [ 87 | bool ] != _true_, _n_.
+  print [ 24 | bool ] != _true_, _n_.
+  print [ 83 | bool ] != _true_, _n_.
+  print [ 60 | bool ] != _false_, _n_.
+  print [ 32 | bool ] != _false_, _n_.
+  print [ 89 | bool ] != _false_, _n_.
+  print [ 80 | bool ] != _false_, _n_.
+
+  print _false_ != [ 37 | bool ], _n_.
+  print _true_ != [ 29 | bool ], _n_.
+  print _true_ != [ 68 | bool ], _n_.
+  print _true_ != [ 59 | bool ], _n_.
+  print _false_ != [ 69 | bool ], _n_.
+  print _false_ != [ 48 | bool ], _n_.
+  print _true_ != [ 74 | bool ], _n_.
+  print _false_ != [ 36 | bool ], _n_.
+  print _true_ != [ 9 | bool ], _n_.
+  print _true_ != [ 79 | bool ], _n_.
+  print _false_ != [ 36 | bool ], _n_.
+  print _true_ != [ 72 | bool ], _n_.
+
+  print [ 13 | bool ] != [ 27 | bool ], _n_.
+  print [ 70 | bool ] != [ 8 | bool ], _n_.
+  print [ 65 | bool ] != [ 75 | bool ], _n_.
+  print [ 92 | bool ] != [ 98 | bool ], _n_.
+  print [ 72 | bool ] != [ 67 | bool ], _n_.
+  print [ 35 | bool ] != [ 64 | bool ], _n_.
+  print [ 77 | bool ] != [ 19 | bool ], _n_.
+  print [ 98 | bool ] != [ 14 | bool ], _n_.
+  print [ 16 | bool ] != [ 1 | bool ], _n_.
+  print [ 52 | bool ] != [ 64 | bool ], _n_.
+  print [ 53 | bool ] != [ 93 | bool ], _n_.
+  print [ 86 | bool ] != [ 83 | bool ], _n_.
+
+}
+

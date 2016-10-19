@@ -1,0 +1,4 @@
+exec {
+    const result := [ ^X^ | float ].
+    print result, _n_.
+}

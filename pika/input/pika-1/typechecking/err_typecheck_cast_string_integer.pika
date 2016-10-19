@@ -1,0 +1,4 @@
+exec {
+    const result := [ "=." | int ].
+    print result, _n_.
+}

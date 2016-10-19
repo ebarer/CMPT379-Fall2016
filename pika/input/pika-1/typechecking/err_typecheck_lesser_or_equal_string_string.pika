@@ -1,0 +1,4 @@
+exec {
+    const result := "'SLL" <= "W3*Mp".
+    print result, _n_.
+}

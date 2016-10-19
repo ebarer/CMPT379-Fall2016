@@ -1,0 +1,18 @@
+Jump $$main					%% result dataMemory <19
+DLabel $stringConstant-1	%% (most students will have not stripped the " from the sides of the DataS string.)
+DataS "Howdy!"				%% if they did, they'd get 14 bytes.
+DLabel $stringConstant-2
+DataS "Doody!"
+Label $$main
+PushD $stringConstant-1
+Printf
+PushD $stringConstant-3
+Printf
+PushD newline
+Printf
+DLabel newline
+DataC	10
+DataC	0
+DLabel $stringConstant-3
+DataS "Howdy!"
+Halt

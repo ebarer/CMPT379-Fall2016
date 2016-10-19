@@ -1,0 +1,4 @@
+exec {
+    const result := 93 * 1.3.
+    print result, _n_.
+}

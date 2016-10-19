@@ -1,0 +1,4 @@
+exec {
+    const result := ^-^ == 5.5.
+    print result, _n_.
+}

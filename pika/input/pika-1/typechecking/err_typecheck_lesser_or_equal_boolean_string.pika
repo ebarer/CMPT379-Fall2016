@@ -1,0 +1,4 @@
+exec {
+    const result := _false_ <= "=V72".
+    print result, _n_.
+}

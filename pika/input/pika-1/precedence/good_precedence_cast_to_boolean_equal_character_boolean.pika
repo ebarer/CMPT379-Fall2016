@@ -1,0 +1,46 @@
+exec {
+	const czero := [0 | char].
+	
+  print [ ^B^ | bool ] == _false_, _n_.
+  print [ ^+^ | bool ] == _false_, _n_.
+  print [ ^r^ | bool ] == _true_, _n_.
+  print [ ^8^ | bool ] == _true_, _n_.
+  print [ ^A^ | bool ] == _true_, _n_.
+  print [ ^3^ | bool ] == _false_, _n_.
+  print [ ^Q^ | bool ] == _false_, _n_.
+  print [ ^k^ | bool ] == _true_, _n_.
+  print [ ^0^ | bool ] == _true_, _n_.
+  print [ ^3^ | bool ] == _false_, _n_.
+  print [ ^}^ | bool ] == _true_, _n_.
+  print [ ^=^ | bool ] == _true_, _n_.
+  print [ czero | bool ] == _true_, _n_.
+
+  print _true_ == [ ^i^ | bool ], _n_.
+  print _true_ == [ ^i^ | bool ], _n_.
+  print _true_ == [ ^W^ | bool ], _n_.
+  print _false_ == [ ^!^ | bool ], _n_.
+  print _false_ == [ ^)^ | bool ], _n_.
+  print _false_ == [ ^&^ | bool ], _n_.
+  print _false_ == [ ^]^ | bool ], _n_.
+  print _true_ == [ ^Y^ | bool ], _n_.
+  print _false_ == [ ^N^ | bool ], _n_.
+  print _true_ == [ ^(^ | bool ], _n_.
+  print _true_ == [ ^M^ | bool ], _n_.
+  print _false_ == [ ^0^ | bool ], _n_.
+  print _false_ == [ czero | bool ], _n_.
+
+  print [ ^W^ | bool ] == [ ^=^ | bool ], _n_.
+  print [ ^q^ | bool ] == [ ^2^ | bool ], _n_.
+  print [ ^_^ | bool ] == [ ^*^ | bool ], _n_.
+  print [ ^d^ | bool ] == [ ^N^ | bool ], _n_.
+  print [ ^%^ | bool ] == [ ^z^ | bool ], _n_.
+  print [ ^q^ | bool ] == [ ^S^ | bool ], _n_.
+  print [ ^d^ | bool ] == [ ^J^ | bool ], _n_.
+  print [ ^N^ | bool ] == [ ^V^ | bool ], _n_.
+  print [ ^P^ | bool ] == [ ^`^ | bool ], _n_.
+  print [ ^v^ | bool ] == [ ^}^ | bool ], _n_.
+  print [ ^4^ | bool ] == [ ^=^ | bool ], _n_.
+  print [ ^j^ | bool ] == [ ^l^ | bool ], _n_.
+
+}
+

@@ -1,0 +1,4 @@
+exec {
+    const result := 85 != "P@*:".
+    print result, _n_.
+}

@@ -1,0 +1,8 @@
+exec {
+    const a$_$$ := 10.
+    const Zar11 := 11.
+    const A$_$ := 12.
+    const _x$09 := 13.
+    const a$10a := 14.
+    print a$_$$; Zar11; A$_$; _x$09; a$10a, _n_.
+}

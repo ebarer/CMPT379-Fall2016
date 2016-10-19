@@ -1,0 +1,4 @@
+exec {
+    const result := ^N^ == "3\U[C".
+    print result, _n_.
+}

@@ -1,0 +1,43 @@
+exec {
+
+  print [ ^s^ | int ] <= 72, _n_.
+  print [ ^O^ | int ] <= 88, _n_.
+  print [ ^f^ | int ] <= 67, _n_.
+  print [ ^v^ | int ] <= 32, _n_.
+  print [ ^z^ | int ] <= 95, _n_.
+  print [ ^c^ | int ] <= 1, _n_.
+  print [ ^V^ | int ] <= 49, _n_.
+  print [ ^^^ | int ] <= 18, _n_.
+  print [ ^2^ | int ] <= 20, _n_.
+  print [ ^U^ | int ] <= 32, _n_.
+  print [ ^U^ | int ] <= 72, _n_.
+  print [ ^p^ | int ] <= 88, _n_.
+
+  print 24 <= [ ^c^ | int ], _n_.
+  print 43 <= [ ^5^ | int ], _n_.
+  print 42 <= [ ^j^ | int ], _n_.
+  print 20 <= [ ^h^ | int ], _n_.
+  print 46 <= [ ^W^ | int ], _n_.
+  print 64 <= [ ^F^ | int ], _n_.
+  print 17 <= [ ^p^ | int ], _n_.
+  print 32 <= [ ^.^ | int ], _n_.
+  print 80 <= [ ^c^ | int ], _n_.
+  print 70 <= [ ^W^ | int ], _n_.
+  print 50 <= [ ^#^ | int ], _n_.
+  print 17 <= [ ^u^ | int ], _n_.
+
+  print [ ^"^ | int ] <= [ ^/^ | int ], _n_.
+  print [ ^U^ | int ] <= [ ^u^ | int ], _n_.
+  print [ ^h^ | int ] <= [ ^z^ | int ], _n_.
+  print [ ^I^ | int ] <= [ ^}^ | int ], _n_.
+  print [ ^P^ | int ] <= [ ^y^ | int ], _n_.
+  print [ ^P^ | int ] <= [ ^4^ | int ], _n_.
+  print [ ^n^ | int ] <= [ ^O^ | int ], _n_.
+  print [ ^t^ | int ] <= [ ^z^ | int ], _n_.
+  print [ ^J^ | int ] <= [ ^]^ | int ], _n_.
+  print [ ^g^ | int ] <= [ ^O^ | int ], _n_.
+  print [ ^t^ | int ] <= [ ^B^ | int ], _n_.
+  print [ ^C^ | int ] <= [ ^v^ | int ], _n_.
+
+}
+

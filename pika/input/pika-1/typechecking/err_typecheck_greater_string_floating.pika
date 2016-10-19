@@ -1,0 +1,4 @@
+exec {
+    const result := "U4" > 2.2.
+    print result, _n_.
+}

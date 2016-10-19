@@ -1,0 +1,4 @@
+exec {
+    const result := ^G^ < 82.
+    print result, _n_.
+}

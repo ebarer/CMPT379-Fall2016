@@ -1,0 +1,4 @@
+exec {
+    const result := "bWg7b" <= 71.
+    print result, _n_.
+}

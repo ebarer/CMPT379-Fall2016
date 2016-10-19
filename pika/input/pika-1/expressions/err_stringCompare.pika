@@ -1,0 +1,9 @@
+exec {
+	const v := "now".
+    const w := "is the".
+    const x := v.
+    const y := "now".
+    
+    print v == w; v == x; v == y,  _n_.
+    print v != w; v != x; v != y,  _n_.
+}

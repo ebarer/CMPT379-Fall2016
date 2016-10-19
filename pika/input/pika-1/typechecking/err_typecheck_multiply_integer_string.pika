@@ -1,0 +1,4 @@
+exec {
+    const result := 96 * ".ExA>W3".
+    print result, _n_.
+}

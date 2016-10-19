@@ -1,0 +1,4 @@
+exec {
+    const result := "IN88zzO" * _false_.
+    print result, _n_.
+}

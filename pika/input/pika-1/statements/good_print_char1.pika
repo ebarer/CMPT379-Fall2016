@@ -1,0 +1,5 @@
+exec {
+	print ^z^, _n_.
+	print [13 | char], _n_.
+	print ^a^, _n_.
+}

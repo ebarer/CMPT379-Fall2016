@@ -1,0 +1,8 @@
+exec {
+	const v := "now".
+    const w := "is the".
+    const x := "time for".
+    const y := "all".
+    const z := "good".
+    print v; w; x; y; z, _n_.
+}

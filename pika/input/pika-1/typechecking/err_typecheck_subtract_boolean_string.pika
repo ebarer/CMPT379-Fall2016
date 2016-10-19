@@ -1,0 +1,4 @@
+exec {
+    const result := _false_ - "!rE".
+    print result, _n_.
+}

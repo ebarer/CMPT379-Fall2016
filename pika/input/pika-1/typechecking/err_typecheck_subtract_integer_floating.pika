@@ -1,0 +1,4 @@
+exec {
+    const result := 89 - 8.2.
+    print result, _n_.
+}

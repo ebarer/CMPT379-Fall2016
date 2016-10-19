@@ -21,10 +21,11 @@ public class PikaCompiler extends PikaApplication {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
-		checkArguments(args, className());
+		//checkArguments(args, className());
 		
 		Tokens.setPrintLevel(Tokens.Level.FULL);
-		compile(args[0]);
+		String file = String.join("", args);
+		compile(file);
 	}
 	
 	/** analyzes a file specified by filename.

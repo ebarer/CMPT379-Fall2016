@@ -1,0 +1,6 @@
+exec {
+    const result := [ 91 | char ].
+    var knownType := ^k^.
+     knownType := result.
+    print result, _n_.
+}

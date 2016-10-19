@@ -1,0 +1,4 @@
+exec {
+    const result := "Ig)j`" >= 79.
+    print result, _n_.
+}

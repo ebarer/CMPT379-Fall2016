@@ -1,0 +1,5 @@
+exec {
+	const v := 0.
+	const ratio := 6 / v.
+	print ratio.
+}

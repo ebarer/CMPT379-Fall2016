@@ -20,6 +20,7 @@ import parseTree.nodeTypes.UnaryOperatorNode;
 import parseTree.nodeTypes.WhileNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.ProgramNode;
+import parseTree.nodeTypes.RationalOperatorNode;
 import parseTree.nodeTypes.SpaceNode;
 
 // Visitor pattern with pre- and post-order visits
@@ -52,6 +53,9 @@ public interface ParseNodeVisitor {
 	
 	void visitEnter(BinaryOperatorNode node);
 	void visitLeave(BinaryOperatorNode node);
+	
+	void visitEnter(RationalOperatorNode node);
+	void visitLeave(RationalOperatorNode node);
 	
 	void visitEnter(UnaryOperatorNode node);
 	void visitLeave(UnaryOperatorNode node);
@@ -144,6 +148,12 @@ public interface ParseNodeVisitor {
 			defaultVisitEnter(node);
 		}
 		public void visitLeave(BinaryOperatorNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(RationalOperatorNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(RationalOperatorNode node) {
 			defaultVisitLeave(node);
 		}
 		public void visitEnter(UnaryOperatorNode node) {

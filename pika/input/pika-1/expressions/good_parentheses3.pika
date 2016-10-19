@@ -1,0 +1,6 @@
+exec {
+	const c := 3 - 4 - 5.
+	const d := 3 - (4 - 5).
+	const e := (3 - (4 - 5)).
+	print c; d; e, _n_.
+}

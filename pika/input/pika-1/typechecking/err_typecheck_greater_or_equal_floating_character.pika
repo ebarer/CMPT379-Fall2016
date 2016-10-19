@@ -1,0 +1,4 @@
+exec {
+    const result := 2.8 >= ^T^.
+    print result, _n_.
+}

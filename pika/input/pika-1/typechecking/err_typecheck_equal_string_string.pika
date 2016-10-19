@@ -1,0 +1,4 @@
+exec {
+    const result := "x\" == "tq".
+    print result, _n_.
+}

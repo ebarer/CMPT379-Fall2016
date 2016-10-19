@@ -1,0 +1,5 @@
+exec {
+	var c := 42.
+	const d := [c | int].
+	print c; d, _n_.
+}

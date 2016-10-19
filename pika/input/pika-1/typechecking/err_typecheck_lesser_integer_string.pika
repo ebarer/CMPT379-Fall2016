@@ -1,0 +1,4 @@
+exec {
+    const result := 98 < "q%Q".
+    print result, _n_.
+}

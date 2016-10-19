@@ -1,0 +1,43 @@
+exec {
+
+  print [ ^p^ | int ] + 94, _n_.
+  print [ ^"^ | int ] + 17, _n_.
+  print [ ^O^ | int ] + 14, _n_.
+  print [ ^S^ | int ] + 11, _n_.
+  print [ ^L^ | int ] + 21, _n_.
+  print [ ^p^ | int ] + 77, _n_.
+  print [ ^I^ | int ] + 2, _n_.
+  print [ ^t^ | int ] + 92, _n_.
+  print [ ^1^ | int ] + 61, _n_.
+  print [ ^1^ | int ] + 98, _n_.
+  print [ ^g^ | int ] + 38, _n_.
+  print [ ^=^ | int ] + 78, _n_.
+
+  print 11 + [ ^5^ | int ], _n_.
+  print 68 + [ ^g^ | int ], _n_.
+  print 51 + [ ^8^ | int ], _n_.
+  print 61 + [ ^f^ | int ], _n_.
+  print 6 + [ ^O^ | int ], _n_.
+  print 27 + [ ^}^ | int ], _n_.
+  print 41 + [ ^k^ | int ], _n_.
+  print 66 + [ ^Q^ | int ], _n_.
+  print 69 + [ ^a^ | int ], _n_.
+  print 40 + [ ^)^ | int ], _n_.
+  print 40 + [ ^X^ | int ], _n_.
+  print 43 + [ ^y^ | int ], _n_.
+
+  print [ ^B^ | int ] + [ ^1^ | int ], _n_.
+  print [ ^>^ | int ] + [ ^X^ | int ], _n_.
+  print [ ^3^ | int ] + [ ^j^ | int ], _n_.
+  print [ ^V^ | int ] + [ ^M^ | int ], _n_.
+  print [ ^/^ | int ] + [ ^7^ | int ], _n_.
+  print [ ^H^ | int ] + [ ^8^ | int ], _n_.
+  print [ ^N^ | int ] + [ ^w^ | int ], _n_.
+  print [ ^Y^ | int ] + [ ^Z^ | int ], _n_.
+  print [ ^N^ | int ] + [ ^;^ | int ], _n_.
+  print [ ^c^ | int ] + [ ^(^ | int ], _n_.
+  print [ ^{^ | int ] + [ ^@^ | int ], _n_.
+  print [ ^w^ | int ] + [ ^j^ | int ], _n_.
+
+}
+

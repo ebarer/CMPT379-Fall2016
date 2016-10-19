@@ -1,0 +1,4 @@
+exec {
+    const result := ^C^ / 96.
+    print result, _n_.
+}

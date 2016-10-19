@@ -1,0 +1,4 @@
+exec {
+    const result := "n(" != _false_.
+    print result, _n_.
+}

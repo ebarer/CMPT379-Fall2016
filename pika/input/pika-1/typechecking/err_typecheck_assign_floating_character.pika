@@ -1,0 +1,5 @@
+exec {
+    var result := 1.3.
+     result := ^B^.
+    print result, _n_.
+}

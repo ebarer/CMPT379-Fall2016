@@ -1,0 +1,5 @@
+exec {
+	const tasters :=  - 265.
+
+	print tasters, _n_.
+}

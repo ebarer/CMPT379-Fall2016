@@ -1,0 +1,5 @@
+exec {
+    var result := "A$Y3RZI".
+     result := 6.
+    print result, _n_.
+}

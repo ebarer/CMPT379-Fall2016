@@ -1,0 +1,5 @@
+exec {
+	print -592654, _n_.
+	print 3999999, _n_.
+	print 1234, _n_.
+}

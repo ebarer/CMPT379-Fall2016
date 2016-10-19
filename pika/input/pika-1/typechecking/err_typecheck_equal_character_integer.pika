@@ -1,0 +1,4 @@
+exec {
+    const result := ^"^ == 27.
+    print result, _n_.
+}

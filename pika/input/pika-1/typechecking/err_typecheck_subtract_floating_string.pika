@@ -1,0 +1,4 @@
+exec {
+    const result := 4.2 - "iha]Fm^".
+    print result, _n_.
+}

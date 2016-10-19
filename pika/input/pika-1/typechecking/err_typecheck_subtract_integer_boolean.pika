@@ -1,0 +1,4 @@
+exec {
+    const result := 94 - _false_.
+    print result, _n_.
+}

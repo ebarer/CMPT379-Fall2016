@@ -1,0 +1,4 @@
+exec {
+    const result := 6.2 >= 71.
+    print result, _n_.
+}

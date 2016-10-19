@@ -1,0 +1,6 @@
+exec {
+    const result := 81 < 77.
+    var knownType := _true_.
+     knownType := result.
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := "jk" < ^S^.
+    print result, _n_.
+}

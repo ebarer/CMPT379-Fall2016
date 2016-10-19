@@ -1,0 +1,5 @@
+exec {
+	const c := ^0^.
+	const d := [c | bool].
+	print c; d, _n_.
+}

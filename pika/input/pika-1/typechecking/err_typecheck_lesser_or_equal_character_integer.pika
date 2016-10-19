@@ -1,0 +1,4 @@
+exec {
+    const result := ^v^ <= 72.
+    print result, _n_.
+}

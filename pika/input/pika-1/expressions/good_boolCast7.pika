@@ -1,0 +1,5 @@
+exec {
+	var c := _true_.
+	const d := [c | bool].
+	print c; d, _n_.
+}

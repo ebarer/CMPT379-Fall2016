@@ -1,0 +1,43 @@
+exec {
+
+  print [ 56 | float ] - 5.4, _n_.
+  print [ 58 | float ] - 5.3, _n_.
+  print [ 24 | float ] - 4.3, _n_.
+  print [ 74 | float ] - 9.0, _n_.
+  print [ 1 | float ] - 5.6, _n_.
+  print [ 60 | float ] - 7.5, _n_.
+  print [ 86 | float ] - 1.9, _n_.
+  print [ 99 | float ] - 8.9, _n_.
+  print [ 82 | float ] - 8.3, _n_.
+  print [ 64 | float ] - 4.2, _n_.
+  print [ 27 | float ] - 8.3, _n_.
+  print [ 61 | float ] - 1.2, _n_.
+
+  print 5.1 - [ 77 | float ], _n_.
+  print 6.5 - [ 50 | float ], _n_.
+  print 5.5 - [ 43 | float ], _n_.
+  print 2.7 - [ 27 | float ], _n_.
+  print 4.9 - [ 29 | float ], _n_.
+  print 2.9 - [ 87 | float ], _n_.
+  print 2.1 - [ 53 | float ], _n_.
+  print 1.1 - [ 74 | float ], _n_.
+  print 1.8 - [ 76 | float ], _n_.
+  print 4.4 - [ 71 | float ], _n_.
+  print 7.7 - [ 85 | float ], _n_.
+  print 4.0 - [ 20 | float ], _n_.
+
+  print [ 33 | float ] - [ 30 | float ], _n_.
+  print [ 12 | float ] - [ 35 | float ], _n_.
+  print [ 2 | float ] - [ 54 | float ], _n_.
+  print [ 87 | float ] - [ 12 | float ], _n_.
+  print [ 91 | float ] - [ 78 | float ], _n_.
+  print [ 96 | float ] - [ 3 | float ], _n_.
+  print [ 17 | float ] - [ 60 | float ], _n_.
+  print [ 30 | float ] - [ 37 | float ], _n_.
+  print [ 92 | float ] - [ 7 | float ], _n_.
+  print [ 54 | float ] - [ 47 | float ], _n_.
+  print [ 63 | float ] - [ 70 | float ], _n_.
+  print [ 51 | float ] - [ 55 | float ], _n_.
+
+}
+

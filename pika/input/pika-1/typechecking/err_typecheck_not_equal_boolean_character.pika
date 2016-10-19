@@ -1,0 +1,4 @@
+exec {
+    const result := _false_ != ^k^.
+    print result, _n_.
+}

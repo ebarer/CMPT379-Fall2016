@@ -1,0 +1,4 @@
+exec {
+    const result := "o;$Iwy" >= 5.8.
+    print result, _n_.
+}

@@ -1,0 +1,6 @@
+exec {
+    const result := [ "YmsB" | string ].
+    var knownType := "[&h8".
+     knownType := result.
+    print result, _n_.
+}

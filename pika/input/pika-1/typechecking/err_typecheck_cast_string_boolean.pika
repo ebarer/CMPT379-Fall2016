@@ -1,0 +1,4 @@
+exec {
+    const result := [ "nD!Mq" | bool ].
+    print result, _n_.
+}

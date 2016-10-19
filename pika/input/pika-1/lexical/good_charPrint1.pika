@@ -1,0 +1,8 @@
+exec {
+	const v := ^!^.
+    const w := v.
+    const x := ^ ^.
+    const y := ^$^.
+    const z := ^8^.
+    print v, w, x, y, z, _n_.
+}

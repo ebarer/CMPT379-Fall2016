@@ -1,0 +1,4 @@
+exec {
+    const result := "eFM" - ^!^.
+    print result, _n_.
+}

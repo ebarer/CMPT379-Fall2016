@@ -1,0 +1,4 @@
+exec {
+    const result := "<e" - 9.9.
+    print result, _n_.
+}

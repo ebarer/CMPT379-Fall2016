@@ -1,0 +1,4 @@
+exec {
+    const result := 57 >= ^l^.
+    print result, _n_.
+}

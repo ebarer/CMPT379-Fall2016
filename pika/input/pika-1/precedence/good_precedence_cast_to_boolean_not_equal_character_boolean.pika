@@ -1,0 +1,47 @@
+exec {
+	const czero := [0 | char].
+	
+
+  print [ ^F^ | bool ] != _true_, _n_.
+  print [ ^:^ | bool ] != _true_, _n_.
+  print [ ^1^ | bool ] != _false_, _n_.
+  print [ ^J^ | bool ] != _true_, _n_.
+  print [ ^s^ | bool ] != _true_, _n_.
+  print [ ^"^ | bool ] != _false_, _n_.
+  print [ ^2^ | bool ] != _true_, _n_.
+  print [ ^Q^ | bool ] != _false_, _n_.
+  print [ ^F^ | bool ] != _false_, _n_.
+  print [ ^0^ | bool ] != _true_, _n_.
+  print [ ^=^ | bool ] != _true_, _n_.
+  print [ ^e^ | bool ] != _false_, _n_.
+  print [ czero | bool ] != _true_, _n_.
+
+  print _false_ != [ ^F^ | bool ], _n_.
+  print _false_ != [ ^3^ | bool ], _n_.
+  print _false_ != [ ^'^ | bool ], _n_.
+  print _true_ != [ ^X^ | bool ], _n_.
+  print _false_ != [ ^i^ | bool ], _n_.
+  print _false_ != [ ^m^ | bool ], _n_.
+  print _false_ != [ ^S^ | bool ], _n_.
+  print _false_ != [ ^'^ | bool ], _n_.
+  print _true_ != [ ^>^ | bool ], _n_.
+  print _false_ != [ ^ ^ | bool ], _n_.
+  print _false_ != [ ^\^ | bool ], _n_.
+  print _false_ != [ ^c^ | bool ], _n_.
+  print _false_ != [ czero | bool ], _n_.
+
+  print [ ^4^ | bool ] != [ ^W^ | bool ], _n_.
+  print [ ^{^ | bool ] != [ ^K^ | bool ], _n_.
+  print [ ^R^ | bool ] != [ ^w^ | bool ], _n_.
+  print [ ^{^ | bool ] != [ ^y^ | bool ], _n_.
+  print [ ^X^ | bool ] != [ ^8^ | bool ], _n_.
+  print [ ^X^ | bool ] != [ ^e^ | bool ], _n_.
+  print [ ^=^ | bool ] != [ ^O^ | bool ], _n_.
+  print [ ^z^ | bool ] != [ ^Q^ | bool ], _n_.
+  print [ ^;^ | bool ] != [ ^d^ | bool ], _n_.
+  print [ ^o^ | bool ] != [ ^l^ | bool ], _n_.
+  print [ ^J^ | bool ] != [ ^[^ | bool ], _n_.
+  print [ ^1^ | bool ] != [ ^Z^ | bool ], _n_.
+
+}
+

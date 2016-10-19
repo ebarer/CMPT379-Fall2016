@@ -1,0 +1,4 @@
+exec {
+    const result := 10 <= "$%%sO:4".
+    print result, _n_.
+}

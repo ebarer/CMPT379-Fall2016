@@ -1,0 +1,4 @@
+exec {
+    const result := ^&^ > "c9(l".
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := 5.6 / ")H*nz".
+    print result, _n_.
+}

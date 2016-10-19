@@ -1,0 +1,5 @@
+exec {
+    var result := ^7^.
+     result := "pW:y".
+    print result, _n_.
+}

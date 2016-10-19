@@ -1,0 +1,4 @@
+exec {
+    const result := 9.6 > "EWczUw=".
+    print result, _n_.
+}

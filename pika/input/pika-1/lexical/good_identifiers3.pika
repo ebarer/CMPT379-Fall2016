@@ -1,0 +1,8 @@
+exec {
+    const Var := 10.
+    const Zar := 11.
+    const Aar := 12.
+    const _ar := 13.
+    const aar := 14.
+    print Var; Zar; Aar; _ar; aar, _n_.
+}

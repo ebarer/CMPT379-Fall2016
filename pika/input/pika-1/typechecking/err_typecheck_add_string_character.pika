@@ -1,0 +1,4 @@
+exec {
+    const result := "W[p3" + ^A^.
+    print result, _n_.
+}

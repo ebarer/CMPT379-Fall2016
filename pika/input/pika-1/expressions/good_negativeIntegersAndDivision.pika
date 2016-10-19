@@ -1,0 +1,5 @@
+exec {
+    const fahrenheit := -40.
+    const centigrade := (fahrenheit - 32) * 5 / 9.
+    print fahrenheit; centigrade, _n_.
+}

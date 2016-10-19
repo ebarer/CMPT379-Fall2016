@@ -1,0 +1,4 @@
+exec {
+    const result := ^`^ * 4.1.
+    print result, _n_.
+}

@@ -1,0 +1,32 @@
+exec {
+	print ^<^, _n_.
+	print ^ ^; ^x^ < ^y^, _n_.
+	print ^ ^; ^y^ < ^y^, _n_.
+	print ^ ^; ^z^ < ^y^, _n_.
+	print _n_.
+	print ^<^, ^=^, _n_.
+	print ^ ^; ^x^ <= ^y^, _n_.
+	print ^ ^; ^y^ <= ^y^, _n_.
+	print ^ ^; ^z^ <= ^y^, _n_.
+	print _n_.
+	print ^>^, _n_.
+	print ^ ^; ^x^ > ^y^, _n_.
+	print ^ ^; ^y^ > ^y^, _n_.
+	print ^ ^; ^z^ > ^y^, _n_.
+	print _n_.
+	print ^>^, ^=^, _n_.
+	print ^ ^; ^x^ >= ^y^, _n_.
+	print ^ ^; ^y^ >= ^y^, _n_.
+	print ^ ^; ^z^ >= ^y^, _n_.
+	print _n_.
+	print ^=^, ^=^, _n_.
+	print ^ ^; ^x^ == ^y^, _n_.
+	print ^ ^; ^y^ == ^y^, _n_.
+	print ^ ^; ^z^ == ^y^, _n_.
+	print _n_.
+	print ^!^, ^=^, _n_.
+	print ^ ^; ^x^ != ^y^, _n_.
+	print ^ ^; ^y^ != ^y^, _n_.
+	print ^ ^; ^z^ != ^y^, _n_.
+	print _n_.
+}

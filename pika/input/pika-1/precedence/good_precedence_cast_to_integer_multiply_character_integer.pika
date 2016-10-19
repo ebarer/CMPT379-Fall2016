@@ -1,0 +1,43 @@
+exec {
+
+  print [ ^x^ | int ] * 73, _n_.
+  print [ ^q^ | int ] * 98, _n_.
+  print [ ^n^ | int ] * 66, _n_.
+  print [ ^]^ | int ] * 83, _n_.
+  print [ ^T^ | int ] * 20, _n_.
+  print [ ^@^ | int ] * 39, _n_.
+  print [ ^J^ | int ] * 13, _n_.
+  print [ ^t^ | int ] * 47, _n_.
+  print [ ^!^ | int ] * 72, _n_.
+  print [ ^#^ | int ] * 68, _n_.
+  print [ ^[^ | int ] * 57, _n_.
+  print [ ^u^ | int ] * 34, _n_.
+
+  print 8 * [ ^b^ | int ], _n_.
+  print 25 * [ ^x^ | int ], _n_.
+  print 91 * [ ^J^ | int ], _n_.
+  print 50 * [ ^4^ | int ], _n_.
+  print 1 * [ ^\^ | int ], _n_.
+  print 71 * [ ^)^ | int ], _n_.
+  print 57 * [ ^h^ | int ], _n_.
+  print 25 * [ ^|^ | int ], _n_.
+  print 68 * [ ^O^ | int ], _n_.
+  print 46 * [ ^;^ | int ], _n_.
+  print 64 * [ ^k^ | int ], _n_.
+  print 21 * [ ^-^ | int ], _n_.
+
+  print [ ^$^ | int ] * [ ^{^ | int ], _n_.
+  print [ ^8^ | int ] * [ ^M^ | int ], _n_.
+  print [ ^{^ | int ] * [ ^*^ | int ], _n_.
+  print [ ^c^ | int ] * [ ^:^ | int ], _n_.
+  print [ ^j^ | int ] * [ ^Q^ | int ], _n_.
+  print [ ^8^ | int ] * [ ^%^ | int ], _n_.
+  print [ ^?^ | int ] * [ ^^^ | int ], _n_.
+  print [ ^?^ | int ] * [ ^%^ | int ], _n_.
+  print [ ^G^ | int ] * [ ^r^ | int ], _n_.
+  print [ ^s^ | int ] * [ ^\^ | int ], _n_.
+  print [ ^5^ | int ] * [ ^8^ | int ], _n_.
+  print [ ^H^ | int ] * [ ^6^ | int ], _n_.
+
+}
+

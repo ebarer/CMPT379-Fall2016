@@ -1,0 +1,4 @@
+exec {
+    const result := "c7S'" == 1.9.
+    print result, _n_.
+}

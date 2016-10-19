@@ -1,0 +1,4 @@
+exec {
+    const result := ^{^ - ^%^.
+    print result, _n_.
+}

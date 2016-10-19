@@ -1,0 +1,4 @@
+exec {
+    const result := 59 == ^a^.
+    print result, _n_.
+}

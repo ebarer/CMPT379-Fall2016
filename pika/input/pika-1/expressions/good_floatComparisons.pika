@@ -1,0 +1,32 @@
+exec {
+	print ^<^, _n_.
+	print ^ ^; 3.0 < 4.0, _n_.
+	print ^ ^; 4.0 < 4.0, _n_.
+	print ^ ^; 5.0 < 4.0, _n_.
+	print _n_.
+	print ^<^, ^=^, _n_.
+	print ^ ^; 3.0 <= 4.0, _n_.
+	print ^ ^; 4.0 <= 4.0, _n_.
+	print ^ ^; 5.0 <= 4.0, _n_.
+	print _n_.
+	print ^>^, _n_.
+	print ^ ^; 3.0 > 4.0, _n_.
+	print ^ ^; 4.0 > 4.0, _n_.
+	print ^ ^; 5.0 > 4.0, _n_.
+	print _n_.
+	print ^>^, ^=^, _n_.
+	print ^ ^; 3.0 >= 4.0, _n_.
+	print ^ ^; 4.0 >= 4.0, _n_.
+	print ^ ^; 5.0 >= 4.0, _n_.
+	print _n_.
+	print ^=^, ^=^, _n_.
+	print ^ ^; 3.0 == 4.0, _n_.
+	print ^ ^; 4.0 == 4.0, _n_.
+	print ^ ^; 5.0 == 4.0, _n_.
+	print _n_.
+	print ^!^, ^=^, _n_.
+	print ^ ^; 3.0 != 4.0, _n_.
+	print ^ ^; 4.0 != 4.0, _n_.
+	print ^ ^; 5.0 != 4.0, _n_.
+	print _n_.
+}

@@ -1,0 +1,13 @@
+exec {
+	{
+		print "They";.
+		{
+			print "call";.
+		}
+		{
+			print "me";.
+		}
+	}
+	print "Mister";.
+	print "Tibbs!", _n_.
+}

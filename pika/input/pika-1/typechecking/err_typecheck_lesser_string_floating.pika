@@ -1,0 +1,4 @@
+exec {
+    const result := "dHs " < 4.4.
+    print result, _n_.
+}

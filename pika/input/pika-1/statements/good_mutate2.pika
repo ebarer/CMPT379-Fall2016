@@ -1,0 +1,14 @@
+exec {
+	var c := 3.2.
+	const d := 8 * 5.
+	print c; d, _n_.
+	var e := 1.333.
+	c := 4.9.
+	print c; d; e, _n_.
+	var f := 2.818.
+	c := 0.0.
+	print c; d; e; f, _n_.
+	var g := 3.2E3.
+	c := 77.77.
+	print c; d; e; f; g, _n_.
+}

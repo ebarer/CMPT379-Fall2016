@@ -1,0 +1,5 @@
+exec {
+	const quarters :=  5.
+
+	print quarters, _n_.
+}

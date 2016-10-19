@@ -1,0 +1,6 @@
+exec {
+    const result := ^&^ <= ^z^.
+    var knownType := _true_.
+     knownType := result.
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := 8 > "t.U0n".
+    print result, _n_.
+}

@@ -1,0 +1,43 @@
+exec {
+
+  print [ 11 | char ] <= ^Z^, _n_.
+  print [ 36 | char ] <= ^D^, _n_.
+  print [ 28 | char ] <= ^Q^, _n_.
+  print [ 44 | char ] <= ^[^, _n_.
+  print [ 54 | char ] <= ^g^, _n_.
+  print [ 44 | char ] <= ^X^, _n_.
+  print [ 49 | char ] <= ^:^, _n_.
+  print [ 11 | char ] <= ^f^, _n_.
+  print [ 20 | char ] <= ^G^, _n_.
+  print [ 42 | char ] <= ^7^, _n_.
+  print [ 71 | char ] <= ^:^, _n_.
+  print [ 37 | char ] <= ^E^, _n_.
+
+  print ^5^ <= [ 68 | char ], _n_.
+  print ^X^ <= [ 72 | char ], _n_.
+  print ^m^ <= [ 23 | char ], _n_.
+  print ^S^ <= [ 51 | char ], _n_.
+  print ^T^ <= [ 13 | char ], _n_.
+  print ^b^ <= [ 23 | char ], _n_.
+  print ^Y^ <= [ 52 | char ], _n_.
+  print ^5^ <= [ 64 | char ], _n_.
+  print ^7^ <= [ 80 | char ], _n_.
+  print ^%^ <= [ 21 | char ], _n_.
+  print ^N^ <= [ 78 | char ], _n_.
+  print ^4^ <= [ 8 | char ], _n_.
+
+  print [ 72 | char ] <= [ 90 | char ], _n_.
+  print [ 8 | char ] <= [ 86 | char ], _n_.
+  print [ 27 | char ] <= [ 25 | char ], _n_.
+  print [ 47 | char ] <= [ 20 | char ], _n_.
+  print [ 24 | char ] <= [ 50 | char ], _n_.
+  print [ 33 | char ] <= [ 58 | char ], _n_.
+  print [ 60 | char ] <= [ 75 | char ], _n_.
+  print [ 69 | char ] <= [ 95 | char ], _n_.
+  print [ 92 | char ] <= [ 81 | char ], _n_.
+  print [ 6 | char ] <= [ 32 | char ], _n_.
+  print [ 80 | char ] <= [ 79 | char ], _n_.
+  print [ 17 | char ] <= [ 46 | char ], _n_.
+
+}
+

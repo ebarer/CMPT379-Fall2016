@@ -1,0 +1,4 @@
+exec {
+    const result := 5.4 > ^/^.
+    print result, _n_.
+}

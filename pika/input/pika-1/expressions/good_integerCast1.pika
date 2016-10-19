@@ -1,0 +1,5 @@
+exec {
+	const v := 3.1415.
+	const vapprox := [v | int].
+	print v; vapprox, _n_.
+}

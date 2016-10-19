@@ -1,0 +1,6 @@
+exec {
+    const result := 9.9 == 4.7.
+    var knownType := _false_.
+     knownType := result.
+    print result, _n_.
+}

@@ -1,0 +1,23 @@
+Jump $$main					%% result contains PushF 24.96
+DataZ 8
+DLabel $stringConstant-1
+DataC 99		%% c
+DataC 100		%% d
+DataC 101		%% e
+DataC 102		%% f
+DataC 103	    %% g
+DataC 0
+Label $$main
+PushF 20.3
+PushF 4.66
+FAdd
+DLabel $float-print-format-newline
+DataC   37
+DataC	103
+DataC	10
+DataC   0
+PushD $float-print-format-newline
+Printf
+PushD $stringConstant-1
+Printf
+Halt

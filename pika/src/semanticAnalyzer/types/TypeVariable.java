@@ -1,17 +1,20 @@
 package semanticAnalyzer.types;
 
 public enum TypeVariable implements Type {
-	VARIABLE(8);
+	VARIABLE(PrimitiveType.ANY);
 	
 	private int sizeInBytes;
+	private Type subtype;
 	private String infoString;
-	
-	private TypeVariable(int size) {
-		this.sizeInBytes = size;
+
+	private TypeVariable(Type type) {
+		this.subtype = type;
+		this.sizeInBytes = type.getSize();
 		this.infoString = toString();
 	}
-	private TypeVariable(int size, String infoString) {
-		this.sizeInBytes = size;
+	private TypeVariable(Type type, String infoString) {
+		this.subtype = type;
+		this.sizeInBytes = type.getSize();
 		this.infoString = infoString;
 	}
 	public int getSize() {
@@ -19,5 +22,20 @@ public enum TypeVariable implements Type {
 	}
 	public String infoString() {
 		return infoString;
+	}
+	
+	// ACCESSOR METHODS
+	public void setType(Type type) {
+		this.subtype = type;
+		this.sizeInBytes = type.getSize();
+	}
+	
+	public Type getType() {
+		return this.subtype;
+	}
+	
+	public void reset() {
+		this.subtype = PrimitiveType.ANY;
+		this.sizeInBytes = 0;
 	}
 }

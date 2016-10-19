@@ -1,0 +1,4 @@
+exec {
+    const result := [ ^t^ | string ].
+    print result, _n_.
+}

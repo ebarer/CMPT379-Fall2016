@@ -1,0 +1,4 @@
+exec {
+    const result := 96 / "itY".
+    print result, _n_.
+}

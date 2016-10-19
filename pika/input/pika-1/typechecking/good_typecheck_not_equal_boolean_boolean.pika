@@ -1,0 +1,6 @@
+exec {
+    const result := _true_ != _true_.
+    var knownType := _true_.
+     knownType := result.
+    print result, _n_.
+}

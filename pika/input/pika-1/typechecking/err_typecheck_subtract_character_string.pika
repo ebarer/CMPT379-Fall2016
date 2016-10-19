@@ -1,0 +1,4 @@
+exec {
+    const result := ^<^ - "GB5UA@".
+    print result, _n_.
+}

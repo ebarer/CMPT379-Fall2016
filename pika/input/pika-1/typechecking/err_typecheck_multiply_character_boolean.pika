@@ -1,0 +1,4 @@
+exec {
+    const result := ^,^ * _true_.
+    print result, _n_.
+}

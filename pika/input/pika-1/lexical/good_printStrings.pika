@@ -1,0 +1,7 @@
+exec {
+	var v := "now".
+    const w := v.
+    v := "how".
+    const z := "cow".
+    print v; w; "brown"; z, _n_.
+}

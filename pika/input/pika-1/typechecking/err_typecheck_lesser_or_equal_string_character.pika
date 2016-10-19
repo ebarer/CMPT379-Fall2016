@@ -1,0 +1,4 @@
+exec {
+    const result := "ey" <= ^7^.
+    print result, _n_.
+}

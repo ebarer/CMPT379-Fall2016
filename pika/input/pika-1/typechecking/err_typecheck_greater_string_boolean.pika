@@ -1,0 +1,4 @@
+exec {
+    const result := "U'J&oE" > _false_.
+    print result, _n_.
+}

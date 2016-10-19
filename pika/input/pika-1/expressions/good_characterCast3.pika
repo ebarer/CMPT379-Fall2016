@@ -1,0 +1,5 @@
+exec {
+	var c := ^t^.
+	const d := [c | char].
+	print c; d, _n_.
+}

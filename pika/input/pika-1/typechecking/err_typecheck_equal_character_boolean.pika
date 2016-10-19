@@ -1,0 +1,4 @@
+exec {
+    const result := ^g^ == _true_.
+    print result, _n_.
+}

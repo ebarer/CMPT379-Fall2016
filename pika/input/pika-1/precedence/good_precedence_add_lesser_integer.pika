@@ -1,0 +1,43 @@
+exec {
+
+  print 18 + 63 < 45, _n_.
+  print 42 + 48 < 25, _n_.
+  print 55 + 63 < 24, _n_.
+  print 76 + 21 < 34, _n_.
+  print 71 + 72 < 12, _n_.
+  print 86 + 97 < 22, _n_.
+  print 81 + 8 < 37, _n_.
+  print 64 + 54 < 4, _n_.
+  print 40 + 41 < 1, _n_.
+  print 25 + 92 < 15, _n_.
+  print 42 + 98 < 38, _n_.
+  print 79 + 93 < 3, _n_.
+
+  print 47 < 96 + 72, _n_.
+  print 35 < 3 + 31, _n_.
+  print 38 < 77 + 75, _n_.
+  print 32 < 95 + 31, _n_.
+  print 10 < 64 + 72, _n_.
+  print 71 < 13 + 47, _n_.
+  print 28 < 68 + 29, _n_.
+  print 45 < 4 + 6, _n_.
+  print 29 < 46 + 17, _n_.
+  print 30 < 7 + 2, _n_.
+  print 41 < 37 + 81, _n_.
+  print 15 < 16 + 58, _n_.
+
+  print 8 + 88 < 13 + 28, _n_.
+  print 75 + 49 < 40 + 43, _n_.
+  print 30 + 99 < 3 + 11, _n_.
+  print 35 + 68 < 88 + 83, _n_.
+  print 68 + 32 < 77 + 17, _n_.
+  print 33 + 91 < 46 + 59, _n_.
+  print 5 + 89 < 51 + 30, _n_.
+  print 54 + 3 < 3 + 23, _n_.
+  print 90 + 95 < 1 + 82, _n_.
+  print 1 + 61 < 59 + 39, _n_.
+  print 18 + 81 < 88 + 73, _n_.
+  print 37 + 38 < 53 + 5, _n_.
+
+}
+

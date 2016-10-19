@@ -1,0 +1,6 @@
+exec {
+    const result := ^n^ == ^:^.
+    var knownType := _false_.
+     knownType := result.
+    print result, _n_.
+}

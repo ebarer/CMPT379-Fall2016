@@ -1,0 +1,4 @@
+exec {
+    const result := [ "F( ." | float ].
+    print result, _n_.
+}

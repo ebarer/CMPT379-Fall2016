@@ -1,0 +1,4 @@
+exec {
+    const result := 8.4 < "S?M4".
+    print result, _n_.
+}

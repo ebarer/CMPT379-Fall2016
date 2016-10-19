@@ -1,0 +1,4 @@
+exec {
+    const nega := 10 -20.
+    print nega; _n_.
+}

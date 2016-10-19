@@ -1,0 +1,4 @@
+exec {
+    const result := "qi" + _true_.
+    print result, _n_.
+}

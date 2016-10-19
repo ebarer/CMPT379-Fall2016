@@ -1,0 +1,4 @@
+exec {
+    const result := "Cxq?&Z" >= ^v^.
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := ^z^ / ^6^.
+    print result, _n_.
+}

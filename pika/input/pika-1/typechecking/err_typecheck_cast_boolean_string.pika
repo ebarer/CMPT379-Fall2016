@@ -1,0 +1,4 @@
+exec {
+    const result := [ _true_ | string ].
+    print result, _n_.
+}

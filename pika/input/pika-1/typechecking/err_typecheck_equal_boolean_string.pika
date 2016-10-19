@@ -1,0 +1,4 @@
+exec {
+    const result := _false_ == "doQ7p".
+    print result, _n_.
+}

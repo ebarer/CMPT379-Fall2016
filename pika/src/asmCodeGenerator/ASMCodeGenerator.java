@@ -3,9 +3,10 @@ package asmCodeGenerator;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sun.xml.internal.bind.v2.model.runtime.RuntimeTypeInfo;
+
 import asmCodeGenerator.codeStorage.ASMCodeChunk;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
-import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.runtime.RunTime;
 import lexicalAnalyzer.Lextant;
@@ -134,12 +135,20 @@ public class ASMCodeGenerator {
 				code.add(LoadF);
 			}	
 			else if(node.getType() == PrimitiveType.RATIONAL) {
+				// Push denominator to temporary storage
 				code.add(Duplicate);
-				code.add(LoadI);
-				code.add(Exchange);
 				code.add(PushI, 4);
 				code.add(Add);
-				code.add(LoadI);
+				code.add(ASMOpcode.LoadI);
+				code.add(ASMOpcode.PushD, RunTime.RATIONAL_TEMP_DENOMINATOR_1);
+				code.add(Exchange);
+				code.add(ASMOpcode.StoreI);
+				
+				// Push numerator to temporary storage
+				code.add(ASMOpcode.LoadI);
+				code.add(ASMOpcode.PushD, RunTime.RATIONAL_TEMP_NUMERATOR_1);
+				code.add(Exchange);
+				code.add(ASMOpcode.StoreI);
 			}	
 			else if(node.getType() == PrimitiveType.BOOLEAN) {
 				code.add(LoadC);
@@ -221,35 +230,24 @@ public class ASMCodeGenerator {
 			newVoidCode(node);
 			
 			Type type = node.getType();
+			ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
+			ASMCodeFragment rvalue = removeValueCode(node.child(1));
+			
+			code.append(lvalue);
+			code.append(rvalue);
+			
+			// TODO: Better way to handle this?
 			if (type == PrimitiveType.RATIONAL) {
-				ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
-				ASMCodeChunk baseAddress = lvalue.getChunk(0);
-				
-				ASMCodeFragment rvalue = removeValueCode(node.child(1));
-				ASMCodeChunk numerator = rvalue.getChunk(0);
-				ASMCodeChunk denominator = rvalue.getChunk(1);
-
-				Labeller labeller = new Labeller("rat");
-				String numLabel   = labeller.newLabel("numerator");
-				String denomLabel = labeller.newLabel("denominator");
-				
-				code.addChunk(baseAddress);
-				code.add(Duplicate);
-				code.add(Label, numLabel);
-				code.addChunk(numerator);
-				code.add(StoreI);
+				code.add(ASMOpcode.Duplicate);
 				code.add(PushI, 4);
 				code.add(Add);
-				code.add(Label, denomLabel);
-				code.addChunk(denominator);
+				code.add(ASMOpcode.PushD, RunTime.RATIONAL_TEMP_DENOMINATOR_1);
+				code.add(LoadI);
+				code.add(StoreI);
+				code.add(ASMOpcode.PushD, RunTime.RATIONAL_TEMP_NUMERATOR_1);
+				code.add(LoadI);
 				code.add(StoreI);
 			} else {
-				ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
-				ASMCodeFragment rvalue = removeValueCode(node.child(1));
-				
-				code.append(lvalue);
-				code.append(rvalue);
-				
 				code.add(opcodeForStore(type));				
 			}
 		}
@@ -484,8 +482,13 @@ public class ASMCodeGenerator {
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 
+			// TODO: Fix
+			code.add(PushD, RunTime.RATIONAL_TEMP_NUMERATOR_1);
 			code.append(arg1);
+			code.add(StoreI);
+			code.add(PushD, RunTime.RATIONAL_TEMP_DENOMINATOR_1);
 			code.append(arg2);
+			code.add(StoreI);
 		}
 		
 		public void visitLeave(UnaryOperatorNode node) {
@@ -511,6 +514,16 @@ public class ASMCodeGenerator {
 			if (variant instanceof ASMOpcode) {
 				ASMOpcode opcode = (ASMOpcode) variant;
 				code.add(opcode);
+			} else if (variant instanceof String) {
+				if (variant == "intToChar") {
+					code.add(ASMOpcode.PushI, 127);
+					code.add(ASMOpcode.BTAnd);
+				}
+				
+				if (variant == "toBool") {
+					code.add(PushI, 1);
+					code.add(And);
+				}
 			}
 		}
 

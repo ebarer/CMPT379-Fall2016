@@ -1,0 +1,4 @@
+exec {
+    const result := _true_ >= "(g".
+    print result, _n_.
+}

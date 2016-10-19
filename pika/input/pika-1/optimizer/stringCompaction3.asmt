@@ -1,0 +1,27 @@
+Jump $$main					%% result dataMemory <24
+DLabel $stringConstant-1
+DataC        72                        %% "Howdy!"
+DataC        111                       
+DataC        119                       
+DataC        100                       
+DataC        121                       
+DataC        33                        
+DataC        0  
+DLabel $stringConstant-2
+DataS "Doody!"
+Label $$main
+PushD $stringConstant-1
+PushD $stringConstant-3
+DLabel $stringConstant-3
+DataC		 34				%% "Howdy!" with the double quotes
+DataC        72                        
+DataC        111                       
+DataC        119                       
+DataC        100                       
+DataC        121                       
+DataC        33                        
+DataC        0
+DataC		 34				
+DLabel $stringConstant-4   %% This should match one of the above howdies and be eliminated.		   
+DataS "Howdy!"
+Halt

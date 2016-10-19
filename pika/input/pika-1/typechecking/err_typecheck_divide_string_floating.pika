@@ -1,0 +1,4 @@
+exec {
+    const result := ")r" / 7.5.
+    print result, _n_.
+}

@@ -1,0 +1,5 @@
+exec {
+    var result := "W)".
+     result := "4MV./;Y".
+    print result, _n_.
+}

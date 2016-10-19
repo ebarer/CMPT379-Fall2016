@@ -1,0 +1,43 @@
+exec {
+
+  print [ 81 | float ] != 9.0, _n_.
+  print [ 43 | float ] != 5.0, _n_.
+  print [ 68 | float ] != 2.2, _n_.
+  print [ 64 | float ] != 4.3, _n_.
+  print [ 34 | float ] != 6.0, _n_.
+  print [ 1 | float ] != 9.7, _n_.
+  print [ 37 | float ] != 5.3, _n_.
+  print [ 19 | float ] != 3.1, _n_.
+  print [ 15 | float ] != 4.7, _n_.
+  print [ 42 | float ] != 3.7, _n_.
+  print [ 10 | float ] != 3.6, _n_.
+  print [ 76 | float ] != 7.3, _n_.
+
+  print 5.4 != [ 73 | float ], _n_.
+  print 4.3 != [ 17 | float ], _n_.
+  print 1.5 != [ 19 | float ], _n_.
+  print 8.0 != [ 7 | float ], _n_.
+  print 1.8 != [ 62 | float ], _n_.
+  print 5.1 != [ 30 | float ], _n_.
+  print 7.9 != [ 20 | float ], _n_.
+  print 4.9 != [ 97 | float ], _n_.
+  print 3.9 != [ 71 | float ], _n_.
+  print 1.1 != [ 20 | float ], _n_.
+  print 2.4 != [ 93 | float ], _n_.
+  print 2.4 != [ 45 | float ], _n_.
+
+  print [ 71 | float ] != [ 83 | float ], _n_.
+  print [ 99 | float ] != [ 42 | float ], _n_.
+  print [ 10 | float ] != [ 96 | float ], _n_.
+  print [ 84 | float ] != [ 61 | float ], _n_.
+  print [ 97 | float ] != [ 53 | float ], _n_.
+  print [ 48 | float ] != [ 50 | float ], _n_.
+  print [ 26 | float ] != [ 95 | float ], _n_.
+  print [ 77 | float ] != [ 27 | float ], _n_.
+  print [ 80 | float ] != [ 15 | float ], _n_.
+  print [ 83 | float ] != [ 86 | float ], _n_.
+  print [ 89 | float ] != [ 87 | float ], _n_.
+  print [ 21 | float ] != [ 63 | float ], _n_.
+
+}
+

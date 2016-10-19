@@ -1,0 +1,6 @@
+exec {
+    const result := [ 4.1 | int ].
+    var knownType := 75.
+     knownType := result.
+    print result, _n_.
+}

@@ -1,0 +1,5 @@
+exec {
+	const c := 2.2.
+	const d := [c | float] + 41.21.
+	print c; d, _n_.
+}

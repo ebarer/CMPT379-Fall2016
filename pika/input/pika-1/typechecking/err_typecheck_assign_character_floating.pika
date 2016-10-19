@@ -1,0 +1,5 @@
+exec {
+    var result := ^M^.
+     result := 3.2.
+    print result, _n_.
+}

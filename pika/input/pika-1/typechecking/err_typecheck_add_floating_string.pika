@@ -1,0 +1,4 @@
+exec {
+    const result := 5.6 + "}1w,".
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := ^_^ / "lLh.d+f".
+    print result, _n_.
+}

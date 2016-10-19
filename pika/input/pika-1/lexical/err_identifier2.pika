@@ -1,0 +1,4 @@
+exec {
+    const ~abc := 10.
+    print ~abc, _n_.
+}

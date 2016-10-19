@@ -3,7 +3,6 @@ package lexicalAnalyzer;
 import tokens.LextantToken;
 import tokens.Token;
 
-
 public enum Punctuator implements Lextant {
 	SPACE(";"),
 	SEPARATOR(","),
@@ -13,6 +12,10 @@ public enum Punctuator implements Lextant {
 	SUBTRACT("-"),
 	MULTIPLY("*"),
 	DIVISION("/"),
+	
+	OVER("//"),
+	EXPRESS_OVER("///"),
+	RATIONALIZE("////"),
 	
 	AND("&&"),
 	OR("||"),
@@ -57,6 +60,16 @@ public enum Punctuator implements Lextant {
 	private static LexemeMap<Punctuator> lexemeToPunctuator = new LexemeMap<Punctuator>(values(), NULL_PUNCTUATOR);
 	public static Punctuator forLexeme(String lexeme) {
 		   return lexemeToPunctuator.forLexeme(lexeme);
+	}
+	
+	public static Lextant[] getMultiplicatives() {
+		Lextant[] multiplicatives = { MULTIPLY, DIVISION, OVER, EXPRESS_OVER, RATIONALIZE };
+		return multiplicatives;
+	}
+	
+	public static Lextant[] getRationals() {
+		Lextant[] rationals = { OVER, EXPRESS_OVER, RATIONALIZE };
+		return rationals;
 	}
 	
 	public static Lextant[] getComparators() {

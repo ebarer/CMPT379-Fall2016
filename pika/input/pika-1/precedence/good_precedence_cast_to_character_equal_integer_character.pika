@@ -1,0 +1,43 @@
+exec {
+
+  print [ 98 | char ] == ^W^, _n_.
+  print [ 4 | char ] == ^"^, _n_.
+  print [ 80 | char ] == ^q^, _n_.
+  print [ 14 | char ] == ^;^, _n_.
+  print [ 62 | char ] == ^I^, _n_.
+  print [ 85 | char ] == ^.^, _n_.
+  print [ 87 | char ] == ^ ^, _n_.
+  print [ 49 | char ] == ^R^, _n_.
+  print [ 12 | char ] == ^{^, _n_.
+  print [ 54 | char ] == ^|^, _n_.
+  print [ 3 | char ] == ^1^, _n_.
+  print [ 38 | char ] == ^ ^, _n_.
+
+  print ^a^ == [ 77 | char ], _n_.
+  print ^J^ == [ 3 | char ], _n_.
+  print ^>^ == [ 32 | char ], _n_.
+  print ^U^ == [ 67 | char ], _n_.
+  print ^2^ == [ 27 | char ], _n_.
+  print ^Y^ == [ 21 | char ], _n_.
+  print ^Q^ == [ 93 | char ], _n_.
+  print ^%^ == [ 66 | char ], _n_.
+  print ^|^ == [ 51 | char ], _n_.
+  print ^@^ == [ 27 | char ], _n_.
+  print ^]^ == [ 91 | char ], _n_.
+  print ^z^ == [ 23 | char ], _n_.
+
+  print [ 32 | char ] == [ 83 | char ], _n_.
+  print [ 42 | char ] == [ 33 | char ], _n_.
+  print [ 70 | char ] == [ 83 | char ], _n_.
+  print [ 14 | char ] == [ 69 | char ], _n_.
+  print [ 15 | char ] == [ 75 | char ], _n_.
+  print [ 73 | char ] == [ 27 | char ], _n_.
+  print [ 18 | char ] == [ 8 | char ], _n_.
+  print [ 29 | char ] == [ 61 | char ], _n_.
+  print [ 88 | char ] == [ 43 | char ], _n_.
+  print [ 9 | char ] == [ 65 | char ], _n_.
+  print [ 41 | char ] == [ 55 | char ], _n_.
+  print [ 29 | char ] == [ 77 | char ], _n_.
+
+}
+

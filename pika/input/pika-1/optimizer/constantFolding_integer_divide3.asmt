@@ -1,0 +1,26 @@
+Jump $$main					%% result contains Jump $$end
+DataZ 8
+DLabel $stringConstant-1
+DataC 99		%% c
+DataC 100		%% d
+DataC 101		%% e
+DataC 102		%% f
+DataC 103	    %% g
+DataC 0
+Label $$main
+PushI 39366
+PushI 0
+Duplicate
+JumpFalse $$end
+Divide
+DLabel $int-print-format-newline
+DataC   37
+DataC	100
+DataC	10
+DataC   0
+PushD $int-print-format-newline
+Printf
+Label $$end
+PushD $stringConstant-1
+Printf
+Halt

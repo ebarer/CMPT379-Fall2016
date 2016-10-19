@@ -1,0 +1,8 @@
+exec {
+	const n := 37.
+	const d := 128*n.
+	const y := [d - 1 | char].
+	const iy := [y | int].
+	const iyy := [[d - 1 | char] | int].
+	print iy; iyy, _n_.
+}

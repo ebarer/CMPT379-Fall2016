@@ -1,0 +1,43 @@
+exec {
+
+  print [ 42 | char ] != ^L^, _n_.
+  print [ 15 | char ] != ^$^, _n_.
+  print [ 63 | char ] != ^8^, _n_.
+  print [ 23 | char ] != ^Y^, _n_.
+  print [ 6 | char ] != ^%^, _n_.
+  print [ 86 | char ] != ^8^, _n_.
+  print [ 45 | char ] != ^G^, _n_.
+  print [ 95 | char ] != ^2^, _n_.
+  print [ 87 | char ] != ^%^, _n_.
+  print [ 64 | char ] != ^"^, _n_.
+  print [ 32 | char ] != ^4^, _n_.
+  print [ 73 | char ] != ^1^, _n_.
+
+  print ^.^ != [ 5 | char ], _n_.
+  print ^+^ != [ 42 | char ], _n_.
+  print ^;^ != [ 33 | char ], _n_.
+  print ^h^ != [ 20 | char ], _n_.
+  print ^L^ != [ 82 | char ], _n_.
+  print ^S^ != [ 23 | char ], _n_.
+  print ^Y^ != [ 84 | char ], _n_.
+  print ^D^ != [ 27 | char ], _n_.
+  print ^u^ != [ 20 | char ], _n_.
+  print ^\^ != [ 93 | char ], _n_.
+  print ^b^ != [ 88 | char ], _n_.
+  print ^W^ != [ 85 | char ], _n_.
+
+  print [ 57 | char ] != [ 39 | char ], _n_.
+  print [ 31 | char ] != [ 49 | char ], _n_.
+  print [ 68 | char ] != [ 75 | char ], _n_.
+  print [ 52 | char ] != [ 9 | char ], _n_.
+  print [ 19 | char ] != [ 61 | char ], _n_.
+  print [ 50 | char ] != [ 10 | char ], _n_.
+  print [ 43 | char ] != [ 58 | char ], _n_.
+  print [ 6 | char ] != [ 67 | char ], _n_.
+  print [ 93 | char ] != [ 10 | char ], _n_.
+  print [ 45 | char ] != [ 41 | char ], _n_.
+  print [ 42 | char ] != [ 63 | char ], _n_.
+  print [ 23 | char ] != [ 76 | char ], _n_.
+
+}
+

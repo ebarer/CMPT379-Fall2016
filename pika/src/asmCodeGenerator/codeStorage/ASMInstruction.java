@@ -153,7 +153,7 @@ public class ASMInstruction {
 	
 	private String argumentString() {
 		if(opcode.takesFloat()) {
-			return String.format("%-25f", (Double)argument);
+			return String.format("%-25g", (Double)argument);
 		}
 		
 		if(opcode.takesInteger()) {

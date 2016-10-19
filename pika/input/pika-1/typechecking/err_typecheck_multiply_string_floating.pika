@@ -1,0 +1,4 @@
+exec {
+    const result := "^B&G" * 5.7.
+    print result, _n_.
+}

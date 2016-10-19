@@ -1,0 +1,4 @@
+exec {
+    const result := ^t^ / 6.6.
+    print result, _n_.
+}

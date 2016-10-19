@@ -1,0 +1,4 @@
+exec {
+    const result := "3FJ) #f" < _true_.
+    print result, _n_.
+}

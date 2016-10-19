@@ -1,0 +1,8 @@
+exec {
+	const c := ^x^.
+	const n := 117.
+	const d := 128*n + [c | int].
+	print c; d, _n_.
+	const ctwo := [d | char].
+	print ctwo, _n_.
+}

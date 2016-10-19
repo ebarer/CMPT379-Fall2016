@@ -1,0 +1,4 @@
+exec {
+    const result := ^M^ < 8.7.
+    print result, _n_.
+}

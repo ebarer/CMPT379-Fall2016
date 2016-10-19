@@ -1,0 +1,24 @@
+Jump $$main					%% result dataMemory =14
+DLabel $stringConstant-1
+DataC        72                        %% "Howdy!"
+DataC        111                       
+DataC        119                       
+DataC        100                       
+DataC        121                       
+DataC        33                        
+DataC        0  
+DLabel $stringConstant-2
+DataS "Doody!"
+Label $$main
+PushD $stringConstant-1
+PushD $stringConstant-3
+DLabel $stringConstant-3
+DLabel $stringConstant-4
+DataC        72                        %% "Howdy!"
+DataC        111                       
+DataC        119                       
+DataC        100                       
+DataC        121                       
+DataC        33                        
+DataC        0  
+Halt

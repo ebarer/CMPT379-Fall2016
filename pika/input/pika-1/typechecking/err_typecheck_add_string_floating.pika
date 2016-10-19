@@ -1,0 +1,4 @@
+exec {
+    const result := "IFHY$_" + 5.7.
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := [ 11 | string ].
+    print result, _n_.
+}

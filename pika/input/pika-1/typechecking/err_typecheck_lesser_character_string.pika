@@ -1,0 +1,4 @@
+exec {
+    const result := ^u^ < "|'j".
+    print result, _n_.
+}

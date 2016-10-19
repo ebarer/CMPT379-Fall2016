@@ -1,0 +1,4 @@
+exec {
+    const result := 9.9 + ^3^.
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := [ "IVx^B" | char ].
+    print result, _n_.
+}

@@ -1,0 +1,4 @@
+exec {
+    const result := 13 + _false_.
+    print result, _n_.
+}

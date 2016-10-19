@@ -1,0 +1,4 @@
+exec {
+    const result := "ugX}b" + "w=x),".
+    print result, _n_.
+}

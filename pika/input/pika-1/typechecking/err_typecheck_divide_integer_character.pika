@@ -1,0 +1,4 @@
+exec {
+    const result := 92 / ^H^.
+    print result, _n_.
+}

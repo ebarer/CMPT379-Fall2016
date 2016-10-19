@@ -1,0 +1,4 @@
+exec {
+    const result := ^3^ >= "i1b".
+    print result, _n_.
+}

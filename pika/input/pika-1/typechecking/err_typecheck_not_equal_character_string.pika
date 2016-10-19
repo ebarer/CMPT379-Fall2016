@@ -1,0 +1,4 @@
+exec {
+    const result := ^-^ != "Q\v&{".
+    print result, _n_.
+}

@@ -1,0 +1,19 @@
+exec {
+	var t := 10.
+	var s := "Mister".
+	{
+		var s := 12.
+		print "They";.
+		{
+			t := s.
+			const s := "me".
+			{
+				print "call";.
+			}
+			print s;.
+		}
+	}
+	print s;.
+	print "Tibbs!", _n_.
+	print t, _n_.
+}

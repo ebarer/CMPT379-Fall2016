@@ -1,0 +1,14 @@
+exec {
+	print ^=^, ^=^, _n_.
+	print ^ ^; _true_ == _true_, _n_.
+	print ^ ^; _true_ == _false_, _n_.
+	print ^ ^; _false_ == _true_, _n_.
+	print ^ ^; _false_ == _false_, _n_.
+	print _n_.
+	print ^!^, ^=^, _n_.
+	print ^ ^; _true_ != _true_, _n_.
+	print ^ ^; _true_ != _false_, _n_.
+	print ^ ^; _false_ != _true_, _n_.
+	print ^ ^; _false_ != _false_, _n_.
+	print _n_.
+}

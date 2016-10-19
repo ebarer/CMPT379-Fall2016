@@ -1,0 +1,4 @@
+exec {
+    const result := ^g^ <= "4 7Gt".
+    print result, _n_.
+}

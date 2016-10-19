@@ -1,0 +1,4 @@
+exec {
+    const result := "<,_MRUw" * "5N".
+    print result, _n_.
+}

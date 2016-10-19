@@ -1,0 +1,4 @@
+exec {
+    const result := ^'^ + "ov/]Z<".
+    print result, _n_.
+}

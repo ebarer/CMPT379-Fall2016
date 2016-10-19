@@ -1,0 +1,4 @@
+exec {
+    const result := "*iolLai" - "Y43'r?".
+    print result, _n_.
+}
