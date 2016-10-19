@@ -3,9 +3,6 @@ package asmCodeGenerator;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.xml.internal.bind.v2.model.runtime.RuntimeTypeInfo;
-
-import asmCodeGenerator.codeStorage.ASMCodeChunk;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.runtime.RunTime;

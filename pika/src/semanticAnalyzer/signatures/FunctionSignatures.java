@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;

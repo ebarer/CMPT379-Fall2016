@@ -110,8 +110,6 @@ public class Parser {
 	}
 	
 	
-	
-	
 	///////////////////////////////////////////////////////////
 	// statements
 	
@@ -450,25 +448,26 @@ public class Parser {
 			readToken();
 			
 			expect(Punctuator.CLOSE_BRACKET);
-			
 			return CastNode.withChildren(castToken, left, castType);
-		} else if (startsParenthetical(nowReading)) {
+		}
+		
+		if (startsParenthetical(nowReading)) {
 			expect(Punctuator.OPEN_PARENTHESIS);
 			ParseNode left = parseExpression();
 			expect(Punctuator.CLOSE_PARENTHESIS);
-			
 			return left;
-		} else if (startsNegation(nowReading)) {
+		}
+		
+		if (startsNegation(nowReading)) {
 			expect(Punctuator.NOT);
 			Token negationToken = previouslyRead;
 			
 			ParseNode right = parseExpression();
 			ParseNode left = UnaryOperatorNode.withChild(negationToken, right); 
-			
 			return left;
-		} else {
-			return parseLiteral();
 		}
+		
+		return parseLiteral();
 	}
 	private boolean startsAtomicExpression(Token token) {
 		if (startsParenthetical(token) || startsCast(token) || startsNegation(token)) {
