@@ -77,11 +77,6 @@ public enum Punctuator implements Lextant {
 		return comparators;
 	}
 	
-	public static Lextant[] getBooleanOperators() {
-		Lextant[] comparators = { AND, OR };
-		return comparators;
-	}
-	
 //	public static Punctuator forLexeme(String lexeme) {
 //	for(Punctuator punctuator: values()) {
 //		if(punctuator.lexeme.equals(lexeme)) {

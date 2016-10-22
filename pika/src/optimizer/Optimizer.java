@@ -293,10 +293,10 @@ public class Optimizer {
 			
 			// Insert folded instruction
 			if (opcode == ASMOpcode.PushF) {
-				ASMInstruction instr = new ASMInstruction(ASMOpcode.PushI, ((Double)val).intValue());
+				ASMInstruction instr = new ASMInstruction(ASMOpcode.PushI, argument);
 				instructions.add(loc, instr);
 			} else {
-				ASMInstruction instr = new ASMInstruction(ASMOpcode.PushF, ((Integer)val).doubleValue());
+				ASMInstruction instr = new ASMInstruction(ASMOpcode.PushF, argument);
 				instructions.add(loc, instr);
 			}
 			

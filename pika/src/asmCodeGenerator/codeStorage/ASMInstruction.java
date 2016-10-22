@@ -67,6 +67,9 @@ public class ASMInstruction {
 	public Object getArgument() {
 		return argument;
 	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 	public String getComment() {
 		return comment;
 	}
@@ -153,7 +156,8 @@ public class ASMInstruction {
 	
 	private String argumentString() {
 		if(opcode.takesFloat()) {
-			return String.format("%-25g", (Double)argument);
+			// TODO: Change to %-25g
+            return String.format("%-25f", (Double)argument);
 		}
 		
 		if(opcode.takesInteger()) {

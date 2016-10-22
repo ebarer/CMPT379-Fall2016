@@ -1,0 +1,25 @@
+exec {	
+	var myInt := 5.
+	var myFloat := 3.4.
+	var myChar := ^e^.
+
+	print myInt; myFloat; myChar; _n_.
+
+	var myRat := [myInt | rat].
+	print myRat, _n_.
+
+	myRat := myInt // [myFloat | int].
+	print myRat, _n_.
+
+	var myRat2 := [myChar | rat].
+	print myRat2, _n_.
+
+	myRat := [myRat2 | int] // [myRat | int].
+	print myRat, _n_.
+
+	myChar := ^x^.
+	print [[myChar | rat] | int] // [myRat | int], _n_.
+
+	var myRat3 := [myFloat | rat].
+	print myRat3, _n_.
+}

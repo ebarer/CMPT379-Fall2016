@@ -19,6 +19,22 @@
         DataC        37                        
         DataC        100                       
         DataC        0                         
+        DLabel       $print-format-rational-fraction 
+        DataC        37                        %% "%d/%d"
+        DataC        100                       
+        DataC        47                        
+        DataC        37                        
+        DataC        100                       
+        DataC        0                         
+        DLabel       $print-format-rational-neg-fraction 
+        DataC        45                        %% "-_%d/%d"
+        DataC        95                        
+        DataC        37                        
+        DataC        100                       
+        DataC        47                        
+        DataC        37                        
+        DataC        100                       
+        DataC        0                         
         DLabel       $print-format-boolean     
         DataC        37                        %% "%s"
         DataC        115                       
@@ -99,9 +115,15 @@
         DataI        0                         
         DLabel       $rational-temp-denominator-2 
         DataI        0                         
+        DLabel       $rational-print-whole     
+        DataI        0                         
+        DLabel       $rational-print-numerator 
+        DataI        0                         
+        DLabel       $rational-print-denominator 
+        DataI        0                         
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        25                        
+        DataZ        4                         
         Label        $$general-runtime-error   
         PushD        $errors-general-message   
         Printf                                 
@@ -109,191 +131,92 @@
         Label        $$divide-by-zero          
         PushD        $errors-divide-by-zero    
         Jump         $$general-runtime-error   
+        Label        $sub-rational-find-gcd    
+        PushD        $rational-temp-numerator-1 
+        LoadI                                  
+        PushD        $rational-temp-denominator-1 
+        LoadI                                  
+        PushD        $rational-temp-denominator-2 
+        Exchange                               
+        StoreI                                 
+        PushD        $rational-temp-numerator-2 
+        Exchange                               
+        StoreI                                 
+        Label        gcd-loop                  
+        PushD        $rational-temp-denominator-2 
+        LoadI                                  
+        JumpFalse    gcd-exit-loop             
+        PushD        $rational-temp-numerator-2 
+        LoadI                                  
+        PushD        $rational-temp-denominator-2 
+        LoadI                                  
+        Remainder                              
+        PushD        $rational-temp-numerator-2 
+        LoadI                                  
+        PushD        $rational-temp-denominator-2 
+        LoadI                                  
+        PushD        $rational-temp-numerator-2 
+        Exchange                               
+        StoreI                                 
+        PushD        $rational-temp-denominator-2 
+        Exchange                               
+        StoreI                                 
+        PushD        $rational-temp-denominator-2 
+        Exchange                               
+        StoreI                                 
+        Jump         gcd-loop                  
+        Label        gcd-exit-loop             
+        PushD        $rational-temp-numerator-2 
+        LoadI                                  
+        Duplicate                              
+        JumpPos      gcd-skip-negate-loop      
+        Negate                                 
+        Label        gcd-skip-negate-loop      
+        PushD        $rational-temp-numerator-2 
+        Exchange                               
+        StoreI                                 
+        PushD        $rational-temp-numerator-1 
+        LoadI                                  
+        PushD        $rational-temp-numerator-2 
+        LoadI                                  
+        Divide                                 
+        PushD        $rational-temp-numerator-1 
+        Exchange                               
+        StoreI                                 
+        PushD        $rational-temp-denominator-1 
+        LoadI                                  
+        PushD        $rational-temp-numerator-2 
+        LoadI                                  
+        Divide                                 
+        PushD        $rational-temp-denominator-1 
+        Exchange                               
+        StoreI                                 
+        Return                                 
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% intConvert
-        PushI        15096                     
-        PushI        127                       
-        BTAnd                                  
-        StoreC                                 
-        PushD        $global-memory-block      
-        PushI        0                         
-        Add                                    %% intConvert
-        LoadC                                  
-        PushD        $print-format-character   
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        1                         
-        Add                                    %% myRat1
-        PushD        $rational-temp-numerator-1 
-        PushI        3                         
-        StoreI                                 
-        PushD        $rational-temp-denominator-1 
-        PushI        8                         
-        StoreI                                 
-        Duplicate                              
-        PushI        4                         
-        Add                                    
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        StoreI                                 
-        PushD        $rational-temp-numerator-1 
-        LoadI                                  
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        9                         
-        Add                                    %% myRat2
-        PushD        $rational-temp-numerator-1 
+        Add                                    %% myInt
         PushI        5                         
         StoreI                                 
-        PushD        $rational-temp-denominator-1 
-        PushI        10                        
-        StoreI                                 
-        Duplicate                              
-        PushI        4                         
-        Add                                    
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        StoreI                                 
-        PushD        $rational-temp-numerator-1 
-        LoadI                                  
-        StoreI                                 
         PushD        $global-memory-block      
-        PushI        1                         
-        Add                                    %% myRat1
-        Duplicate                              
-        PushI        4                         
-        Add                                    
+        PushI        0                         
+        Add                                    %% myInt
         LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        Exchange                               
-        StoreI                                 
-        LoadI                                  
-        PushD        $rational-temp-numerator-1 
-        Exchange                               
-        StoreI                                 
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        PushD        $rational-temp-numerator-1 
-        LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        Remainder                              
-        Duplicate                              
-        JumpFalse    -print-rational-1-skip-fraction 
-        PushD        $rational-temp-numerator-1 
-        LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        Divide                                 
-        PushD        $print-format-rational    
-        Printf                                 
-        PushD        $print-format-space       
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        9                         
-        Add                                    %% myRat2
-        Duplicate                              
-        PushI        4                         
-        Add                                    
-        LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        Exchange                               
-        StoreI                                 
-        LoadI                                  
-        PushD        $rational-temp-numerator-1 
-        Exchange                               
-        StoreI                                 
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        PushD        $rational-temp-numerator-1 
-        LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        Remainder                              
-        Duplicate                              
-        JumpFalse    -print-rational-2-skip-fraction 
-        PushD        $rational-temp-numerator-1 
-        LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        Divide                                 
-        PushD        $print-format-rational    
+        PushD        $print-format-integer     
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 
         PushD        $global-memory-block      
-        PushI        17                        
-        Add                                    %% test
-        PushD        $global-memory-block      
-        PushI        1                         
-        Add                                    %% myRat1
-        Duplicate                              
-        PushI        4                         
-        Add                                    
-        LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        Exchange                               
-        StoreI                                 
-        LoadI                                  
-        PushD        $rational-temp-numerator-1 
-        Exchange                               
-        StoreI                                 
-        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% myInt
         PushI        9                         
-        Add                                    %% myRat2
-        Duplicate                              
-        PushI        4                         
-        Add                                    
-        LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        Exchange                               
-        StoreI                                 
-        LoadI                                  
-        PushD        $rational-temp-numerator-1 
-        Exchange                               
-        StoreI                                 
-        Add                                    
-        Duplicate                              
-        PushI        4                         
-        Add                                    
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        StoreI                                 
-        PushD        $rational-temp-numerator-1 
-        LoadI                                  
         StoreI                                 
         PushD        $global-memory-block      
-        PushI        17                        
-        Add                                    %% test
-        Duplicate                              
-        PushI        4                         
-        Add                                    
+        PushI        0                         
+        Add                                    %% myInt
         LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        Exchange                               
-        StoreI                                 
-        LoadI                                  
-        PushD        $rational-temp-numerator-1 
-        Exchange                               
-        StoreI                                 
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        PushD        $rational-temp-numerator-1 
-        LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        Remainder                              
-        Duplicate                              
-        JumpFalse    -print-rational-3-skip-fraction 
-        PushD        $rational-temp-numerator-1 
-        LoadI                                  
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        Divide                                 
-        PushD        $print-format-rational    
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-newline     
         Printf                                 
         Halt                                   

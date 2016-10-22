@@ -53,6 +53,8 @@ public enum TypeLiteral implements Type {
 			return TypeLiteral.INTEGER;
 		case "float":
 			return TypeLiteral.FLOATING;
+		case "rat":
+			return TypeLiteral.RATIONAL;
 		default:
 			return TypeLiteral.ERROR;
 		}

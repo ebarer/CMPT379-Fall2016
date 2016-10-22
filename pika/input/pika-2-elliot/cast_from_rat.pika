@@ -1,0 +1,25 @@
+exec {	
+	var myRat1 := -3 // 8.
+	print myRat1, _n_.
+
+	var convRat := [myRat1 | rat].
+	print convRat, _n_.
+
+	var convInt := [myRat1 | int].
+	print convInt, _n_.
+
+	var convFloat := [myRat1 | float].
+	print convFloat, _n_.
+
+	myRat1 := 20 // 8.
+	print myRat1, _n_.
+
+	convRat := [myRat1 | rat].
+	print convRat, _n_.
+
+	convInt := [myRat1 | int].
+	print convInt, _n_.
+
+	convFloat := [myRat1 | float].
+	print convFloat, _n_.
+}

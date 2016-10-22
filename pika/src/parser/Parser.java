@@ -121,14 +121,14 @@ public class Parser {
 		if(startsDeclaration(nowReading)) {
 			return parseDeclaration();
 		}
+		if(startsAssignment(nowReading)) {
+			return parseAssignment();
+		}
 		if(startsIfStatement(nowReading)) {
 			return parseIfStatement();
 		}
 		if(startsWhileStatement(nowReading)) {
 			return parseWhileStatement();
-		}
-		if(startsAssignment(nowReading)) {
-			return parseAssignment();
 		}
 		if(startsPrintStatement(nowReading)) {
 			return parsePrintStatement();
@@ -174,7 +174,20 @@ public class Parser {
 			return syntaxErrorNode("assignment");
 		}
 		
-		ParseNode target = parseIdentifier();		
+		ParseNode target = null;
+		
+		if (nowReading instanceof IdentifierToken) {
+			target = parseIdentifier();			
+		}
+		
+		if (startsParenthetical(nowReading)) {
+			target = parseExpression();
+		}
+		
+		//TODO: if (ARRAY) {}
+		
+		assert target != null;
+
 		expect(Punctuator.ASSIGN);
 		Token assignmentToken = Punctuator.ASSIGN.prototype();
 		ParseNode expression = parseExpression();
@@ -184,7 +197,8 @@ public class Parser {
 		return AssignmentNode.withChildren(assignmentToken, target, expression);
 	}
 	private boolean startsAssignment(Token token) {
-		return token instanceof IdentifierToken;
+		return (token instanceof IdentifierToken ||
+				startsParenthetical(token));
 	}
 	
 	
@@ -322,35 +336,57 @@ public class Parser {
 	
 	///////////////////////////////////////////////////////////
 	// expressions
-	// expr                     -> booleanExpression
-	// booleanExpression        -> comparisonExpression
+	// expr                     -> booleanOrExpression
+	// booleanOrExpression      -> booleanAndExpression
+	// booleanAndExpression     -> comparisonExpression
 	// comparisonExpression     -> additiveExpression [> additiveExpression]?
 	// additiveExpression       -> multiplicativeExpression [+ multiplicativeExpression]*  (left-assoc)
 	// multiplicativeExpression -> atomicExpression [MULT atomicExpression]*  (left-assoc)
-	// atomicExpression         -> unaryExpression
-	// unaryExpression			-> literal
+	// unaryExpression			-> atomicExpression
+	// atomicExpression         -> literal
 	// literal                  -> intNumber | floatNumber | booleanConstant | identifier 
 
-	// expr  -> comparisonExpression
+	// expr  -> booleanOrExpression
 	private ParseNode parseExpression() {		
 		if(!startsExpression(nowReading)) {
 			return syntaxErrorNode("expression");
 		}
-		return parseBooleanExpression();
+		return parseBooleanOrExpression();
 	}
 	private boolean startsExpression(Token token) {
-		return startsBooleanExpression(token);
+		return startsBooleanOrExpression(token);
 	}
 	
-	// booleanExpression -> comparisonExpression
-	private ParseNode parseBooleanExpression() {
-		if(!startsBooleanExpression(nowReading)) {
-			return syntaxErrorNode("boolean expression");
+	// booleanOrExpression -> booleanAndExpression
+	private ParseNode parseBooleanOrExpression() {
+		if(!startsBooleanOrExpression(nowReading)) {
+			return syntaxErrorNode("booleanOrExpression");
+		}
+		
+		// ned to be left recursive??
+		ParseNode left = parseBooleanAndExpression();
+		while(nowReading.isLextant(Punctuator.OR)) {
+			Token booleanToken = nowReading;
+			readToken();
+			ParseNode right = parseBooleanAndExpression();
+			
+			left = BinaryOperatorNode.withChildren(booleanToken, left, right);
+		}
+		return left;
+	}
+	private boolean startsBooleanOrExpression(Token token) {
+		return startsBooleanAndExpression(token);
+	}
+	
+	// booleanAndExpression -> comparisonExpression
+	private ParseNode parseBooleanAndExpression() {
+		if(!startsBooleanAndExpression(nowReading)) {
+			return syntaxErrorNode("booleanAndExpression");
 		}
 		
 		// ned to be left recursive??
 		ParseNode left = parseComparisonExpression();
-		while(nowReading.isLextant(Punctuator.getBooleanOperators())) {
+		while(nowReading.isLextant(Punctuator.AND)) {
 			Token booleanToken = nowReading;
 			readToken();
 			ParseNode right = parseComparisonExpression();
@@ -359,14 +395,14 @@ public class Parser {
 		}
 		return left;
 	}
-	private boolean startsBooleanExpression(Token token) {
+	private boolean startsBooleanAndExpression(Token token) {
 		return startsComparisonExpression(token);
 	}
 
 	// comparisonExpression -> additiveExpression [> additiveExpression]?
 	private ParseNode parseComparisonExpression() {
 		if(!startsComparisonExpression(nowReading)) {
-			return syntaxErrorNode("comparison expression");
+			return syntaxErrorNode("comparisonExpression");
 		}
 		
 		ParseNode left = parseAdditiveExpression();
@@ -412,11 +448,11 @@ public class Parser {
 			return syntaxErrorNode("multiplicativeExpression");
 		}
 		
-		ParseNode left = parseAtomicExpression();
+		ParseNode left = parseUnaryExpression();
 		while(nowReading.isLextant(Punctuator.getMultiplicatives())) {
 			Token multiplicativeToken = nowReading;
 			readToken();
-			ParseNode right = parseAtomicExpression();
+			ParseNode right = parseUnaryExpression();
 			
 			if (multiplicativeToken.isLextant(Punctuator.getRationals())) {
 				left = RationalOperatorNode.withChildren(multiplicativeToken, left, right);
@@ -427,13 +463,44 @@ public class Parser {
 		return left;
 	}
 	private boolean startsMultiplicativeExpression(Token token) {
-		return startsAtomicExpression(token);
+		return startsUnaryExpression(token);
+	}
+	
+	private ParseNode parseUnaryExpression() {
+		if(!startsUnaryExpression(nowReading)) {
+			return syntaxErrorNode("unaryExpression");
+		}
+		
+		if (startsNegation(nowReading)) {
+			expect(Punctuator.NOT);
+			Token negationToken = previouslyRead;
+			
+			ParseNode right = parseExpression();
+			ParseNode left = UnaryOperatorNode.withChild(negationToken, right); 
+			return left;
+		}
+		
+		return parseAtomicExpression();
+	}
+	private boolean startsUnaryExpression(Token token) {
+		if (startsNegation(token)) {
+			return true;
+		} else {
+			return startsAtomicExpression(token);
+		}
 	}
 	
 	// atomicExpression -> literal
 	private ParseNode parseAtomicExpression() {
 		if(!startsAtomicExpression(nowReading)) {
-			return syntaxErrorNode("atomic expression");
+			return syntaxErrorNode("atomicExpression");
+		}
+		
+		if (startsParenthetical(nowReading)) {
+			expect(Punctuator.OPEN_PARENTHESIS);
+			ParseNode left = parseExpression();
+			expect(Punctuator.CLOSE_PARENTHESIS);
+			return left;
 		}
 		
 		if (startsCast(nowReading)){
@@ -449,22 +516,6 @@ public class Parser {
 			
 			expect(Punctuator.CLOSE_BRACKET);
 			return CastNode.withChildren(castToken, left, castType);
-		}
-		
-		if (startsParenthetical(nowReading)) {
-			expect(Punctuator.OPEN_PARENTHESIS);
-			ParseNode left = parseExpression();
-			expect(Punctuator.CLOSE_PARENTHESIS);
-			return left;
-		}
-		
-		if (startsNegation(nowReading)) {
-			expect(Punctuator.NOT);
-			Token negationToken = previouslyRead;
-			
-			ParseNode right = parseExpression();
-			ParseNode left = UnaryOperatorNode.withChild(negationToken, right); 
-			return left;
 		}
 		
 		return parseLiteral();
@@ -568,6 +619,11 @@ public class Parser {
 		if(!startsIdentifier(nowReading)) {
 			return syntaxErrorNode("identifier");
 		}
+		
+		if (startsParenthetical(nowReading)) {
+			parseAtomicExpression();
+		}
+		
 		readToken();
 		return new IdentifierNode(previouslyRead);
 	}
@@ -613,6 +669,7 @@ public class Parser {
 	private void error(String message) {
 		PikaLogger log = PikaLogger.getLogger("compiler.Parser");
 		log.severe("syntax error: " + message);
+		System.exit(0);
 	}	
 }
 

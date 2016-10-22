@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import asmCodeGenerator.codeGenerator.*;
 import asmCodeGenerator.codeStorage.ASMOpcode;
-import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import semanticAnalyzer.types.TypeLiteral;
 import lexicalAnalyzer.Punctuator;
+import static semanticAnalyzer.types.PrimitiveType.*;
 
 
 public class FunctionSignatures extends ArrayList<FunctionSignature> {
@@ -60,14 +61,6 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		FunctionSignatures signatures = FunctionSignatures.signaturesOf(key);
 		return signatures.acceptingSignature(types);
 	}
-
-	
-	///////////////////////////////////////////////////////////////////
-	// Signatures for pika-0 operators
-	// this section will probably disappear in pika-1 (in favor of FunctionSignatures)
-	//private static FunctionSignature addSignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER);
-	//private static FunctionSignature multiplySignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER);
-	//private static FunctionSignature greaterSignature = new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN);
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////
@@ -79,146 +72,129 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 
 		// Arithmetic Operators
 		new FunctionSignatures(Punctuator.ADD,
-		    new FunctionSignature(ASMOpcode.Add, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FAdd, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
-		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.Add, ASMOpcode.Add}, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
+		    new FunctionSignature(ASMOpcode.Add, 		INTEGER, 	INTEGER, 	INTEGER),
+		    new FunctionSignature(ASMOpcode.FAdd, 		FLOATING, 	FLOATING, 	FLOATING),
+		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.ADD, FLOATING),
+		    						RATIONAL,	RATIONAL, 	RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.SUBTRACT,
-		    new FunctionSignature(ASMOpcode.Subtract, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FSubtract, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
-		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.Subtract, ASMOpcode.Subtract}, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
+		    new FunctionSignature(ASMOpcode.Subtract, 	INTEGER, 	INTEGER, 	INTEGER),
+		    new FunctionSignature(ASMOpcode.FSubtract, 	FLOATING, 	FLOATING, 	FLOATING),
+		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.SUBTRACT, FLOATING), 
+		    						RATIONAL, 	RATIONAL,	RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.MULTIPLY,
-		    new FunctionSignature(ASMOpcode.Multiply, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FMultiply, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
-		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.Multiply, ASMOpcode.Multiply}, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
+		    new FunctionSignature(ASMOpcode.Multiply, 	INTEGER, 	INTEGER, 	INTEGER),
+		    new FunctionSignature(ASMOpcode.FMultiply, 	FLOATING, 	FLOATING, 	FLOATING),
+		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.MULTIPLY, FLOATING), 
+		    						RATIONAL, 	RATIONAL, 	RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.DIVISION,
-		    new FunctionSignature(ASMOpcode.Divide, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.FDivide, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.FLOATING),
-		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.Divide, ASMOpcode.Divide}, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL, PrimitiveType.RATIONAL)
+		    new FunctionSignature(ASMOpcode.Divide, 	INTEGER, 	INTEGER, 	INTEGER),
+		    new FunctionSignature(ASMOpcode.FDivide, 	FLOATING, 	FLOATING, 	FLOATING),
+		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.DIVISION, FLOATING),
+		    						RATIONAL, 	RATIONAL, 	RATIONAL)
 		);
 		
 		
 		// Rational Operators
 		new FunctionSignatures(Punctuator.OVER,
-		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.RATIONAL)
+		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.EXPRESS_OVER,
-		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.RATIONAL)
+		    new FunctionSignature(1, 	RATIONAL, 	INTEGER, 	INTEGER),
+		    new FunctionSignature(1, 	FLOATING, 	INTEGER, 	INTEGER)
 		);
 		
 		new FunctionSignatures(Punctuator.RATIONALIZE,
-		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.RATIONAL)
-		);
-		
-		
-		// Comparison Operators
-		new FunctionSignatures(Punctuator.LESS_OR_EQUAL,
-			new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.BOOLEAN)
-		);
-		
-		new FunctionSignatures(Punctuator.LESS,
-			new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.BOOLEAN)
-		);
-		
-		new FunctionSignatures(Punctuator.GREATER,
-			new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.BOOLEAN)
-		);
-		
-		new FunctionSignatures(Punctuator.GREATER_OR_EQUAL,
-			new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.BOOLEAN)
-		);
-		
-		new FunctionSignatures(Punctuator.EQUAL,
-			new FunctionSignature(1, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN),
-			new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.BOOLEAN)
-		);
-		
-		new FunctionSignatures(Punctuator.NOT_EQUAL,
-			new FunctionSignature(1, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN),
-			new FunctionSignature(1, PrimitiveType.CHARACTER, PrimitiveType.CHARACTER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.INTEGER, PrimitiveType.INTEGER, PrimitiveType.BOOLEAN),
-		    new FunctionSignature(1, PrimitiveType.FLOATING, PrimitiveType.FLOATING, PrimitiveType.BOOLEAN)
-		);
-		
-		
-		// Boolean Operators
-		new FunctionSignatures(Punctuator.AND,
-		    new FunctionSignature(ASMOpcode.And, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
-		);
-		
-		new FunctionSignatures(Punctuator.OR,
-				new FunctionSignature(ASMOpcode.Or, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
-		);
-		
-		new FunctionSignatures(Punctuator.NOT,
-			new FunctionSignature(ASMOpcode.BNegate, PrimitiveType.BOOLEAN, PrimitiveType.BOOLEAN)
+				new FunctionSignature(1, 	RATIONAL, 	INTEGER, 	RATIONAL),
+			    new FunctionSignature(1, 	FLOATING, 	INTEGER, 	RATIONAL)
 		);
 		
 		
 		// Casting Operators
 		new FunctionSignatures(Punctuator.PIPE,
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.CHARACTER, PrimitiveType.CHARACTER),
-			new FunctionSignature("toBool", PrimitiveType.CHARACTER, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.CHARACTER, TypeLiteral.RATIONAL, PrimitiveType.RATIONAL),
+			new FunctionSignature(1, 								CHARACTER, 	TypeLiteral.CHARACTER, 	CHARACTER),
+			new FunctionSignature(new CastToBoolSCG(CHARACTER), 	CHARACTER, 	TypeLiteral.BOOLEAN, 	BOOLEAN),
+			new FunctionSignature(1, 								CHARACTER, 	TypeLiteral.INTEGER, 	INTEGER),
+			new FunctionSignature(new CastToRatSCG(CHARACTER), 		CHARACTER, 	TypeLiteral.RATIONAL, 	RATIONAL),
 			
-			new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
-			new FunctionSignature("toBool", PrimitiveType.INTEGER, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
-		    new FunctionSignature("intToChar", PrimitiveType.INTEGER, TypeLiteral.CHARACTER, PrimitiveType.CHARACTER),
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.INTEGER, TypeLiteral.RATIONAL, PrimitiveType.RATIONAL),
-		    new FunctionSignature(ASMOpcode.ConvertF, PrimitiveType.INTEGER, TypeLiteral.FLOATING, PrimitiveType.FLOATING),
+			new FunctionSignature(1, 								INTEGER, 	TypeLiteral.INTEGER, 	INTEGER),
+			new FunctionSignature(new CastToBoolSCG(INTEGER), 		INTEGER, 	TypeLiteral.BOOLEAN, 	BOOLEAN),
+		    new FunctionSignature(new CastIntToCharSCG(INTEGER), 	INTEGER, 	TypeLiteral.CHARACTER, 	CHARACTER),
+		    new FunctionSignature(new CastToRatSCG(INTEGER), 		INTEGER, 	TypeLiteral.RATIONAL, 	RATIONAL),
+		    new FunctionSignature(ASMOpcode.ConvertF, 				INTEGER, 	TypeLiteral.FLOATING, 	FLOATING),
 		    
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.FLOATING, TypeLiteral.FLOATING, PrimitiveType.FLOATING),
-		    new FunctionSignature(ASMOpcode.ConvertI, PrimitiveType.FLOATING, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.FLOATING, TypeLiteral.RATIONAL, PrimitiveType.RATIONAL),
+		    new FunctionSignature(1, 								FLOATING, 	TypeLiteral.FLOATING, 	FLOATING),
+		    new FunctionSignature(ASMOpcode.ConvertI, 				FLOATING, 	TypeLiteral.INTEGER, 	INTEGER),
+		    new FunctionSignature(new CastToRatSCG(FLOATING), 		FLOATING, 	TypeLiteral.RATIONAL, 	RATIONAL),
 		    
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.RATIONAL, TypeLiteral.RATIONAL, PrimitiveType.RATIONAL),
-		    new FunctionSignature(new ASMOpcode[] {ASMOpcode.ConvertF, ASMOpcode.ConvertF, ASMOpcode.FDivide},
-		    						PrimitiveType.RATIONAL, TypeLiteral.FLOATING, PrimitiveType.FLOATING),
-		    new FunctionSignature(ASMOpcode.Divide, PrimitiveType.RATIONAL, TypeLiteral.INTEGER, PrimitiveType.INTEGER),
+		    new FunctionSignature(1, 								RATIONAL, 	TypeLiteral.RATIONAL, 	RATIONAL),
+		    new FunctionSignature(new CastRatToFloatSCG(RATIONAL), 	RATIONAL, 	TypeLiteral.FLOATING, 	FLOATING),
+		    new FunctionSignature(ASMOpcode.Divide, 				RATIONAL, 	TypeLiteral.INTEGER, 	INTEGER),
 		    
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.BOOLEAN, TypeLiteral.BOOLEAN, PrimitiveType.BOOLEAN),
+		    new FunctionSignature(1, 								BOOLEAN, 	TypeLiteral.BOOLEAN, 	BOOLEAN),
 		    
-		    new FunctionSignature(ASMOpcode.Nop, PrimitiveType.STRING, TypeLiteral.STRING, PrimitiveType.STRING)
+		    new FunctionSignature(1, 								STRING, 	TypeLiteral.STRING, 	STRING)
 		);
 		
-		// new FunctionSignature(::, new ArrayType(T), T, PrimitiveType.INTEGER);
+		
+		// Comparison Operators
+		new FunctionSignatures(Punctuator.LESS_OR_EQUAL,
+			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+		);
+		
+		new FunctionSignatures(Punctuator.LESS,
+			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+		);
+		
+		new FunctionSignatures(Punctuator.GREATER,
+			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+		);
+		
+		new FunctionSignatures(Punctuator.GREATER_OR_EQUAL,
+			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+		);
+		
+		new FunctionSignatures(Punctuator.EQUAL,
+			new FunctionSignature(1, BOOLEAN, 	BOOLEAN, 	BOOLEAN),
+			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+		);
+		
+		new FunctionSignatures(Punctuator.NOT_EQUAL,
+			new FunctionSignature(1, BOOLEAN, 	BOOLEAN, 	BOOLEAN),
+			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+		);
 		
 		
-		// First, we use the operator itself (in this case the Punctuator ADD) as the key.
-		// Then, we give that key two signatures: one an (INT x INT -> INT) and the other
-		// a (FLOAT x FLOAT -> FLOAT).  Each signature has a "whichVariant" parameter where
-		// I'm placing the instruction (ASMOpcode) that needs to be executed.
-		//
-		// I'll follow the convention that if a signature has an ASMOpcode for its whichVariant,
-		// then to generate code for the operation, one only needs to generate the code for
-		// the operands (in order) and then add to that the Opcode.  For instance, the code for
-		// floating addition should look like:
-		//
-		//		(generate argument 1)	: may be many instructions
-		//		(generate argument 2)   : ditto
-		//		FAdd					: just one instruction
-		//
-		// If the code that an operator should generate is more complicated than this, then
-		// I will not use an ASMOpcode for the whichVariant.  In these cases I typically use
-		// a small object with one method (the "Command" design pattern) that generates the
-		// required code.
+		// Boolean Operators
+		new FunctionSignatures(Punctuator.AND,
+		    new FunctionSignature(ASMOpcode.And, 	 BOOLEAN, BOOLEAN, BOOLEAN)
+		);
+		
+		new FunctionSignatures(Punctuator.OR,
+			new FunctionSignature(ASMOpcode.Or,  	 BOOLEAN, BOOLEAN, BOOLEAN)
+		);
+		
+		new FunctionSignatures(Punctuator.NOT,
+			new FunctionSignature(ASMOpcode.BNegate, BOOLEAN, BOOLEAN)
+		);
 
 	}
 

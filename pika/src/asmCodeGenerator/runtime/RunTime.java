@@ -1,32 +1,44 @@
 package asmCodeGenerator.runtime;
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
+
+import asmCodeGenerator.codeGenerator.RationalInvertSCG;
+import asmCodeGenerator.codeGenerator.RationalTempToStackSCG;
+import asmCodeGenerator.codeGenerator.RationalStackToTempSCG;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
+import asmCodeGenerator.codeStorage.ASMOpcode;
 public class RunTime {
-	public static final String EAT_LOCATION_ZERO      = "$eat-location-zero";		// helps us distinguish null pointers from real ones.
-	public static final String INTEGER_PRINT_FORMAT   = "$print-format-integer";
-	public static final String FLOATING_PRINT_FORMAT  = "$print-format-floating";
-	public static final String RATIONAL_PRINT_FORMAT  = "$print-format-rational";
-	public static final String BOOLEAN_PRINT_FORMAT   = "$print-format-boolean";
-	public static final String CHARACTER_PRINT_FORMAT = "$print-format-character";
-	public static final String STRING_PRINT_FORMAT 	  = "$print-format-string";
-	public static final String NEWLINE_PRINT_FORMAT   = "$print-format-newline";
-	public static final String TAB_PRINT_FORMAT   	  = "$print-format-tab";
-	public static final String SPACE_PRINT_FORMAT     = "$print-format-space";
-	public static final String BOOLEAN_TRUE_STRING    = "$boolean-true-string";
-	public static final String BOOLEAN_FALSE_STRING   = "$boolean-false-string";
-	
-	public static final String GLOBAL_MEMORY_BLOCK    = "$global-memory-block";
-	public static final String USABLE_MEMORY_START    = "$usable-memory-start";
+	public static final String EAT_LOCATION_ZERO      		= "$eat-location-zero";		// helps us distinguish null pointers from real ones.
+	public static final String INTEGER_PRINT_FORMAT   		= "$print-format-integer";
+	public static final String FLOATING_PRINT_FORMAT  		= "$print-format-floating";
+	public static final String RATIONAL_PRINT_FORMAT  		= "$print-format-rational";
+	public static final String RATIONAL_FRACTION_PRINT_FORMAT  			= "$print-format-rational-fraction";
+	public static final String RATIONAL_NEG_FRACTION_PRINT_FORMAT  		= "$print-format-rational-neg-fraction";
+	public static final String BOOLEAN_PRINT_FORMAT   		= "$print-format-boolean";
+	public static final String CHARACTER_PRINT_FORMAT 		= "$print-format-character";
+	public static final String STRING_PRINT_FORMAT 	  		= "$print-format-string";
+	public static final String NEWLINE_PRINT_FORMAT   		= "$print-format-newline";
+	public static final String TAB_PRINT_FORMAT   	  		= "$print-format-tab";
+	public static final String SPACE_PRINT_FORMAT     		= "$print-format-space";
+	public static final String BOOLEAN_TRUE_STRING    		= "$boolean-true-string";
+	public static final String BOOLEAN_FALSE_STRING   		= "$boolean-false-string";
 	
 	public static final String RATIONAL_TEMP_NUMERATOR_1	= "$rational-temp-numerator-1";
 	public static final String RATIONAL_TEMP_DENOMINATOR_1 	= "$rational-temp-denominator-1";
 	public static final String RATIONAL_TEMP_NUMERATOR_2 	= "$rational-temp-numerator-2";
 	public static final String RATIONAL_TEMP_DENOMINATOR_2 	= "$rational-temp-denominator-2";
+	public static final String RATIONAL_PRINT_WHOLE			= "$rational-print-whole";
+	public static final String RATIONAL_PRINT_NUMERATOR 	= "$rational-print-numerator";
+	public static final String RATIONAL_PRINT_DENOMINATOR 	= "$rational-print-denominator";
 	
-	public static final String MAIN_PROGRAM_LABEL     = "$$main";
+	public static final String SUB_RATIONAL_FIND_GCD		= "$sub-rational-find-gcd";
 	
-	public static final String GENERAL_RUNTIME_ERROR = "$$general-runtime-error";
+	public static final String GLOBAL_MEMORY_BLOCK    		= "$global-memory-block";
+	public static final String USABLE_MEMORY_START    		= "$usable-memory-start";
+	
+	public static final String MAIN_PROGRAM_LABEL     		= "$$main";
+	
+	public static final String GENERAL_RUNTIME_ERROR 		= "$$general-runtime-error";
 	public static final String DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$divide-by-zero";
 
 	private ASMCodeFragment environmentASM() {
@@ -35,6 +47,7 @@ public class RunTime {
 		result.append(stringsForPrintf());
 		result.append(runtimeErrors());
 		result.append(temporaryStorage());
+		result.append(subRationalFindGCD());
 		result.add(DLabel, USABLE_MEMORY_START);
 		return result;
 	}
@@ -55,6 +68,10 @@ public class RunTime {
 		frag.add(DataS, "%g");
 		frag.add(DLabel, RATIONAL_PRINT_FORMAT);
 		frag.add(DataS, "%d_%d/%d");
+		frag.add(DLabel, RATIONAL_FRACTION_PRINT_FORMAT);
+		frag.add(DataS, "%d/%d");
+		frag.add(DLabel, RATIONAL_NEG_FRACTION_PRINT_FORMAT);
+		frag.add(DataS, "-_%d/%d");
 		frag.add(DLabel, BOOLEAN_PRINT_FORMAT);
 		frag.add(DataS, "%s");
 		frag.add(DLabel, CHARACTER_PRINT_FORMAT);
@@ -116,7 +133,86 @@ public class RunTime {
 		frag.add(DataI, 0);
 		frag.add(DLabel, RATIONAL_TEMP_DENOMINATOR_2);
 		frag.add(DataI, 0);
+		
+		frag.add(DLabel, RATIONAL_PRINT_WHOLE);
+		frag.add(DataI, 0);
+		frag.add(DLabel, RATIONAL_PRINT_NUMERATOR);
+		frag.add(DataI, 0);
+		frag.add(DLabel, RATIONAL_PRINT_DENOMINATOR);
+		frag.add(DataI, 0);
+		
 		return frag;
+	}
+	
+	private ASMCodeFragment subRationalFindGCD() {
+		String loopLabel = "gcd-loop";
+		String exitLabel = "gcd-exit-loop";
+		String skipNegateLabel = "gcd-skip-negate-loop";
+		
+		RationalTempToStackSCG load = new RationalTempToStackSCG();
+		RationalStackToTempSCG store = new RationalStackToTempSCG();
+		RationalInvertSCG swap = new RationalInvertSCG();
+		
+		ASMCodeFragment subroutine = new ASMCodeFragment(GENERATES_VOID);
+		subroutine.add(Label, SUB_RATIONAL_FIND_GCD);
+		
+		// Get values and store in secondary temp location
+		subroutine.addChunk(load.generate(1));
+		subroutine.addChunk(store.generate(2));
+		
+		// While loop, repeat until GCD found
+		subroutine.add(Label, loopLabel);
+		// If denominator is not 0, continue loop
+		subroutine.add(PushD, RATIONAL_TEMP_DENOMINATOR_2);
+		subroutine.add(LoadI);
+		subroutine.add(JumpFalse, exitLabel);
+		
+		// Grab remainder of division between numerator and denominator
+		subroutine.addChunk(load.generate(2));
+		subroutine.add(ASMOpcode.Remainder);
+		
+		// Swap values and store remainder calculation
+		// in the denominator
+		subroutine.addChunk(swap.generate(2));
+		subroutine.add(PushD, RATIONAL_TEMP_DENOMINATOR_2);
+		subroutine.add(Exchange);
+		subroutine.add(ASMOpcode.StoreI);
+		subroutine.add(Jump, loopLabel);
+		subroutine.add(Label, exitLabel);
+		
+		// Ensure GCD is positive
+		subroutine.add(PushD, RATIONAL_TEMP_NUMERATOR_2);
+		subroutine.add(LoadI);
+		subroutine.add(Duplicate);
+		subroutine.add(JumpPos, skipNegateLabel);
+		subroutine.add(Negate);
+		subroutine.add(Label, skipNegateLabel);
+		subroutine.add(PushD, RATIONAL_TEMP_NUMERATOR_2);
+		subroutine.add(Exchange);
+		subroutine.add(StoreI);
+		
+		// Divide numerator by GCD, update value
+		subroutine.add(PushD, RATIONAL_TEMP_NUMERATOR_1);
+		subroutine.add(LoadI);
+		subroutine.add(PushD, RATIONAL_TEMP_NUMERATOR_2);
+		subroutine.add(LoadI);
+		subroutine.add(Divide);
+		subroutine.add(PushD, RATIONAL_TEMP_NUMERATOR_1);
+		subroutine.add(Exchange);
+		subroutine.add(StoreI);
+		
+		// Divide denominator by GCD, update value
+		subroutine.add(PushD, RATIONAL_TEMP_DENOMINATOR_1);
+		subroutine.add(LoadI);
+		subroutine.add(PushD, RATIONAL_TEMP_NUMERATOR_2);
+		subroutine.add(LoadI);
+		subroutine.add(Divide);
+		subroutine.add(PushD, RATIONAL_TEMP_DENOMINATOR_1);
+		subroutine.add(Exchange);
+		subroutine.add(StoreI);
+		
+		subroutine.add(Return);
+		return subroutine;
 	}
 	
 	public static ASMCodeFragment getEnvironment() {

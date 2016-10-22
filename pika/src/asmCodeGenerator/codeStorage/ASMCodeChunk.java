@@ -42,6 +42,11 @@ public class ASMCodeChunk {
 		ASMInstruction instruction = new ASMInstruction(opcode);
 		instructions.add(instruction);
 	}
+	public void append(ASMCodeChunk chunk) {
+		for (ASMInstruction instr : chunk.getInstructions()) {
+			this.instructions.add(instr);
+		}
+	}
 	
 	public List<ASMInstruction> getInstructions() {
 		return instructions;

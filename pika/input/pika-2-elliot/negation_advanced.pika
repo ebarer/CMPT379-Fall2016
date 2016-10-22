@@ -1,0 +1,11 @@
+exec {
+	var test1 := _true_.
+	var test2 := _false_.
+	print test1; test2, _n_.
+
+	test2 := !test2.
+	print !(test1); test2, _n_.
+
+	var test3 := 4.
+	print test3; !test3, _n_.
+}
