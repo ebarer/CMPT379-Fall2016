@@ -28,11 +28,12 @@ public class ASMCodeGenerator {
 	
 	public ASMCodeFragment makeASM() {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
-		
-		code.append( RunTime.getEnvironment() );
-		code.append( globalVariableBlockASM() );
-		code.append( programASM() );
-		// code.append( MemoryManager.codeForAfterApplication() );
+
+		code.append(MemoryManager.codeForInitialization());
+		code.append(RunTime.getEnvironment());
+		code.append(globalVariableBlockASM());
+		code.append(programASM());
+		code.append(MemoryManager.codeForAfterApplication());
 		
 		return code;
 	}
@@ -141,6 +142,9 @@ public class ASMCodeGenerator {
 			else if(node.getType() == PrimitiveType.STRING) {
 				code.add(LoadI);
 			}
+			else if(node.getType() instanceof ArrayType) {
+				code.add(LoadI);
+			}
 			else {
 				assert false : "node " + node;
 			}
@@ -242,6 +246,9 @@ public class ASMCodeGenerator {
 				code.add(ASMOpcode.StoreC);
 			}
 			else if(type == PrimitiveType.STRING) {
+				code.add(ASMOpcode.StoreI);
+			}
+			else if(type instanceof ArrayType) {
 				code.add(ASMOpcode.StoreI);
 			}
 			else {
@@ -545,6 +552,89 @@ public class ASMCodeGenerator {
 			}
 		}
 
+		public void visitLeave(ArrayNode node) {
+			newValueCode(node);
+			
+			Labeller labeller = new Labeller("array");
+			String startLabel  = labeller.newLabel("");
+			String recordLabel  = labeller.newLabel("create-record");
+			String startChildrenLabel  = labeller.newLabel("start-store-children");
+			String endChildrenLabel  = labeller.newLabel("end-store-children");
+			code.add(ASMOpcode.Label, startLabel);
+			
+			Lextant operator = node.getOperator();			
+			if (operator == Keyword.NEW) {
+				ASMCodeChunk subtypeChunk = new ASMCodeChunk();
+				
+				// Push length onto stack
+				if (node.isEmpty()) {	// Empty
+					ASMCodeFragment length = removeValueCode(node.child(0));
+					code.append(length);
+					code.append(length);
+					ArrayNegativeIndexSCG negativeIndexSCG = new ArrayNegativeIndexSCG();
+					code.addChunk(negativeIndexSCG.generate());
+				} else {	// Populatd
+					code.add(ASMOpcode.PushI, node.nChildren());
+					code.add(ASMOpcode.PushI, node.nChildren());
+				}
+				
+				// Push subtype size onto stack
+				code.addChunk(subtypeChunk);
+				code.add(ASMOpcode.PushI, node.getSubtype().getSize());
+				code.add(ASMOpcode.Multiply);
+				
+				// Allocate memory for array
+				ArrayAllocateSCG scg1 = new ArrayAllocateSCG();
+				code.addChunk(scg1.generate(operator));
+				
+				// Store header
+				code.add(ASMOpcode.Label, recordLabel);
+				ArrayGenerateRecordSCG scg2 = new ArrayGenerateRecordSCG();
+				boolean isReference = false;
+				if (node.getSubtype() instanceof ArrayType) {
+					isReference = true;
+				}
+				code.addChunk(scg2.generate(node, isReference));
+				
+				// Push address onto stack
+				ArrayTempToStackSCG scg3 = new ArrayTempToStackSCG();
+				code.addChunk(scg3.generate(operator));
+				
+				code.add(ASMOpcode.Label, startChildrenLabel);
+				if (!node.isEmpty()) {
+					for (int i = 0; i < node.nChildren(); i++) {
+						code.add(ASMOpcode.Duplicate);
+						code.add(ASMOpcode.PushI, node.getOffset(i));
+						code.add(ASMOpcode.Add);
+						
+						ASMCodeFragment child = removeValueCode(node.child(i));
+						code.append(child);
+						
+						opcodeForStore(node.getSubtype());
+					}
+				}
+				code.add(ASMOpcode.Label, endChildrenLabel);
+			}
+			
+			if (operator == Keyword.CLONE) {				
+				// Store CloneNode address
+				ASMCodeFragment arg1 = removeValueCode(node.child(0));
+				code.add(ASMOpcode.PushD, RunTime.ARRAY_TEMP_2);
+				code.append(arg1);
+				code.add(ASMOpcode.StoreI);
+				
+				ArrayAllocateSCG scg1 = new ArrayAllocateSCG();
+				code.addChunk(scg1.generate(operator));
+				
+				// Push address onto stack
+				ArrayTempToStackSCG scg3 = new ArrayTempToStackSCG();
+				code.addChunk(scg3.generate(operator));
+				
+				ArrayCloneSCG scg2 = new ArrayCloneSCG();
+				code.addChunk(scg2.generate(node));				
+			}
+		}
+		
 		
 		///////////////////////////////////////////////////////////////////////////
 		// leaf nodes (ErrorNode not necessary)

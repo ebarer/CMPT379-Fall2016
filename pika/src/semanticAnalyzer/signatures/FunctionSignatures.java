@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import asmCodeGenerator.codeGenerator.*;
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import semanticAnalyzer.types.ArrayType;
 import semanticAnalyzer.types.Type;
 import semanticAnalyzer.types.TypeLiteral;
 import lexicalAnalyzer.Punctuator;
@@ -111,8 +112,8 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		);
 		
 		new FunctionSignatures(Punctuator.RATIONALIZE,
-				new FunctionSignature(1, 	RATIONAL, 	INTEGER, 	RATIONAL),
-			    new FunctionSignature(1, 	FLOATING, 	INTEGER, 	RATIONAL)
+			new FunctionSignature(1, 	RATIONAL, 	INTEGER, 	RATIONAL),
+			new FunctionSignature(1, 	FLOATING, 	INTEGER, 	RATIONAL)
 		);
 		
 		
@@ -139,47 +140,49 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		    
 		    new FunctionSignature(1, 								BOOLEAN, 	TypeLiteral.BOOLEAN, 	BOOLEAN),
 		    
-		    new FunctionSignature(1, 								STRING, 	TypeLiteral.STRING, 	STRING)
+		    new FunctionSignature(1, 								STRING, 	TypeLiteral.STRING, 	STRING),
+		    
+		    new FunctionSignature(1, 						new ArrayType(), 	TypeLiteral.ARRAY, 		new ArrayType())
 		);
 		
 		
 		// Comparison Operators
 		new FunctionSignatures(Punctuator.LESS_OR_EQUAL,
-			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
-		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.LESS,
-			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
-		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.GREATER,
-			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
-		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.GREATER_OR_EQUAL,
-			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
-		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.EQUAL,
-			new FunctionSignature(1, BOOLEAN, 	BOOLEAN, 	BOOLEAN),
-			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
-		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+			new FunctionSignature(1, 	BOOLEAN, 	BOOLEAN, 	BOOLEAN),
+			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1,	FLOATING, 	FLOATING, 	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.NOT_EQUAL,
-			new FunctionSignature(1, BOOLEAN, 	BOOLEAN, 	BOOLEAN),
-			new FunctionSignature(1, CHARACTER, CHARACTER, 	BOOLEAN),
-		    new FunctionSignature(1, INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, FLOATING, 	FLOATING, 	BOOLEAN)
+			new FunctionSignature(1,	BOOLEAN, 	BOOLEAN, 	BOOLEAN),
+			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
 		);
 		
 		
@@ -195,6 +198,13 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		new FunctionSignatures(Punctuator.NOT,
 			new FunctionSignature(ASMOpcode.BNegate, BOOLEAN, BOOLEAN)
 		);
+		
+		
+		// Array Constructors
+//		new FunctionSignatures(Keyword.CLONE,
+//			new FunctionSignature(1, 	ArrayType.ARRAY),
+//			new FunctionSignature(1,	ArrayType.ARRAY,	ArrayType.ARRAY)
+//		);
 
 	}
 

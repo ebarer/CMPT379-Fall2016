@@ -8,4 +8,7 @@ exec {
 
 	var test3 := 4.
 	print test3; !test3, _n_.
+
+	var myTest := !!!!!!_true_.
+	print myTest, _n_.
 }

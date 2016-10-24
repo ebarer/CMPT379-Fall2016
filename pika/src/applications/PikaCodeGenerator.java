@@ -78,6 +78,7 @@ public class PikaCodeGenerator extends PikaApplication {
 		PrintStream out = new PrintStream(file);
 		out.print(code);
 		out.close();
+		System.out.println("Program COMPILED successfully: " + filename);
 	}
 
 	private static boolean thereAreErrors() {

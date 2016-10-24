@@ -9,6 +9,7 @@ public enum TypeLiteral implements Type {
 	INTEGER(4, PrimitiveType.INTEGER),
 	FLOATING(8, PrimitiveType.FLOATING),
 	RATIONAL(8, PrimitiveType.RATIONAL),
+	ARRAY(8, new ArrayType()),
 	
 	ERROR(0, PrimitiveType.ERROR),				// use as a value when a syntax error has occurred
 	NO_TYPE(0, PrimitiveType.NO_TYPE, "");		// use as a value when no type has been assigned.
@@ -34,7 +35,7 @@ public enum TypeLiteral implements Type {
 		return type;
 	}
 	public String infoString() {
-		return infoString;
+		return "TypeLiteral-" + infoString;
 	}
 	
 	
@@ -55,6 +56,8 @@ public enum TypeLiteral implements Type {
 			return TypeLiteral.FLOATING;
 		case "rat":
 			return TypeLiteral.RATIONAL;
+		case "[":
+			return TypeLiteral.ARRAY;
 		default:
 			return TypeLiteral.ERROR;
 		}

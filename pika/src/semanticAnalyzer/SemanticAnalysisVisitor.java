@@ -1,39 +1,18 @@
 package semanticAnalyzer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
-import parseTree.nodeTypes.AssignmentNode;
-import parseTree.nodeTypes.BinaryOperatorNode;
-import parseTree.nodeTypes.BlockNode;
-import parseTree.nodeTypes.BooleanConstantNode;
-import parseTree.nodeTypes.CastNode;
-import parseTree.nodeTypes.CharacterNode;
-import parseTree.nodeTypes.MainBlockNode;
-import parseTree.nodeTypes.DeclarationNode;
-import parseTree.nodeTypes.ErrorNode;
-import parseTree.nodeTypes.FloatingConstantNode;
-import parseTree.nodeTypes.IdentifierNode;
-import parseTree.nodeTypes.IfNode;
-import parseTree.nodeTypes.IntegerConstantNode;
-import parseTree.nodeTypes.NewlineNode;
-import parseTree.nodeTypes.PrintStatementNode;
-import parseTree.nodeTypes.ProgramNode;
-import parseTree.nodeTypes.RationalOperatorNode;
-import parseTree.nodeTypes.SpaceNode;
-import parseTree.nodeTypes.StringNode;
-import parseTree.nodeTypes.UnaryOperatorNode;
-import parseTree.nodeTypes.WhileNode;
-import semanticAnalyzer.signatures.FunctionSignature;
-import semanticAnalyzer.signatures.FunctionSignatures;
-import semanticAnalyzer.types.PrimitiveType;
-import semanticAnalyzer.types.Type;
+import parseTree.nodeTypes.*;
+import semanticAnalyzer.signatures.*;
+import semanticAnalyzer.types.*;
 import symbolTable.Binding;
 import symbolTable.Scope;
 import tokens.LextantToken;
@@ -44,6 +23,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visitLeave(ParseNode node) {
 		throw new RuntimeException("Node class unimplemented in SemanticAnalysisVisitor: " + node.getClass());
 	}
+	
 	
 	///////////////////////////////////////////////////////////////////////////
 	// constructs larger than statements
@@ -82,6 +62,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private void leaveScope(ParseNode node) {
 		node.getScope().leave();
 	}
+	
 	
 	///////////////////////////////////////////////////////////////////////////
 	// statements, declarations, and assignments
@@ -125,23 +106,53 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			ParseNode expression = node.child(1);
 			Type expressionType = expression.getType();
 			
-			// Check for type-match
-			if (targetType != expressionType) {
-				logError("Cannot assign value of type '" + expressionType + "' to type '" + targetType + "'");
+			// Check for type-match, ignore if both are ArrayType
+			if ((targetType instanceof ArrayType) && (expressionType instanceof ArrayType)) {
+				Type targetSubtype = ((ArrayType)targetType).getSubtype();
+				Type expressionSubtype = ((ArrayType)expressionType).getSubtype();
+				
+				while ((targetSubtype instanceof ArrayType) && (expressionSubtype instanceof ArrayType)) {
+					targetSubtype = ((ArrayType)targetSubtype).getSubtype();
+					expressionSubtype = ((ArrayType)expressionSubtype).getSubtype();
+				}
+				
+				if (targetSubtype instanceof TypeLiteral) {
+					targetSubtype = ((TypeLiteral) targetSubtype).getType();
+				}
+				
+				if (expressionSubtype instanceof TypeLiteral) {
+					expressionSubtype = ((TypeLiteral) expressionSubtype).getType();
+				}
+				
+				if (targetSubtype != expressionSubtype) {
+					logError("Cannot assign value of type '" + expressionType.infoString() + "' to type '" + targetType.infoString() + "'");
+				}
+			} else {
+				if (targetType != expressionType) {
+					logError("Cannot assign value of type '" + expressionType + "' to type '" + targetType + "'");
+				}
 			}
 			
-			node.setType(targetType);			
+			node.setType(expressionType);
+			target.setType(expressionType);
 		}
 	}
 	@Override
 	public void visitLeave(IfNode node) {
 		assert node.nChildren() >= 2;
+		if (node.child(0).getType() != PrimitiveType.BOOLEAN) {
+			typeCheckError(node, Arrays.asList(node.child(0).getType()));
+		}
 	}
 	@Override
 	public void visitLeave(WhileNode node) {
 		assert node.nChildren() >= 2;
+		if (node.child(0).getType() != PrimitiveType.BOOLEAN) {
+			typeCheckError(node, Arrays.asList(node.child(0).getType()));
+		}
 	}
 
+	
 	///////////////////////////////////////////////////////////////////////////
 	// expressions
 	@Override
@@ -227,8 +238,52 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			node.setType(PrimitiveType.ERROR);
 		}
 	}
+	@Override
+	public void visitLeave(ArrayNode node) {
+		List<Type> childTypes = new ArrayList<Type>();
+		node.getChildren().forEach((child) -> childTypes.add(child.getType()));
+		
+		Lextant operator = operatorFor(node);
+		
+		if (operator == Keyword.NEW) {
+			if (!node.isEmpty()) {
+				// TODO: Perform promotions
+				
+				// Check that all values are of same type
+				Type t = childTypes.get(0);
+				int numType = Collections.frequency(childTypes, t);
+				if (!(t instanceof ArrayType) && numType != node.nChildren()) {
+					typeCheckError(node, childTypes);
+					node.setType(PrimitiveType.ERROR);
+				}
+			
+				// Set type
+				node.setSubtype(childTypes.get(0));
+			} else {
+				if (childTypes.get(0) != PrimitiveType.INTEGER) {
+					typeCheckError(node, childTypes);
+					node.setType(PrimitiveType.ERROR);
+				}
+			}
+		}
+		
+		if (operator == Keyword.CLONE) {
+			assert node.nChildren() == 1;
 
+			if (!(childTypes.get(0) instanceof ArrayType)) {
+				typeCheckError(node, childTypes);
+				node.setType(PrimitiveType.ERROR);
+			}
 
+			node.setType(childTypes.get(0));
+		}
+	}
+	private Lextant operatorFor(ArrayNode node) {
+		LextantToken token = (LextantToken) node.getToken();
+		return token.getLextant();
+	}
+
+	
 	///////////////////////////////////////////////////////////////////////////
 	// simple leaf nodes
 	@Override
@@ -261,6 +316,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visit(SpaceNode node) {
 	}
+	
+	
 	///////////////////////////////////////////////////////////////////////////
 	// IdentifierNodes, with helper methods
 	@Override
@@ -287,9 +344,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		identifierNode.setBinding(binding);
 	}
 	
+	
 	///////////////////////////////////////////////////////////////////////////
 	// error logging/printing
-
 	private void typeCheckError(ParseNode node, List<Type> operandTypes) {
 		Token token = node.getToken();
 		
@@ -299,6 +356,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private void logError(String message) {
 		PikaLogger log = PikaLogger.getLogger("compiler.semanticAnalyzer");
 		log.severe(message);
-		System.exit(0);
+		// TODO: System.exit(0);
 	}
 }

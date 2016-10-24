@@ -21,11 +21,10 @@ public class PikaCompiler extends PikaApplication {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
-		//checkArguments(args, className());
+		checkArguments(args, className());
 		
 		Tokens.setPrintLevel(Tokens.Level.FULL);
-		String file = String.join("", args);
-		compile(file);
+		compile(args[0]);
 	}
 	
 	/** analyzes a file specified by filename.
@@ -36,6 +35,7 @@ public class PikaCompiler extends PikaApplication {
 		Scanner scanner         = LexicalAnalyzer.make(filename);
 		ParseNode syntaxTree    = Parser.parse(scanner);
 		ParseNode decoratedTree = SemanticAnalyzer.analyze(syntaxTree);
+		
 		generateCodeIfNoErrors(filename, decoratedTree);
 	}
 
@@ -80,7 +80,7 @@ public class PikaCompiler extends PikaApplication {
 		PrintStream out = new PrintStream(file);
 		out.print(code);
 		out.close();
-		System.out.println("Program compiled successfully: " + filename);
+		System.out.println("Program compiled + OPTIMIZED successfully: " + filename);
 	}
 
 	private static boolean thereAreErrors() {

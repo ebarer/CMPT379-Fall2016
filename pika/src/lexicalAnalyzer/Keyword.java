@@ -9,6 +9,10 @@ public enum Keyword implements Lextant {
 
 	CONST("const"),
 	VAR("var"),
+
+	NEW("new"),
+	CLONE("clone"),
+	RELEASE("release"),
 	
 	IF("if"),
 	ELSE("else"),
@@ -21,6 +25,7 @@ public enum Keyword implements Lextant {
 	STRING("string"),
 	INT("int"),
 	FLOAT("float"),
+	RATIONAL("rat"),
 	
 	PRINT("print"),
 	NEWLINE("_n_"),

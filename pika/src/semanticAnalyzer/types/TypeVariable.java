@@ -1,18 +1,16 @@
 package semanticAnalyzer.types;
 
-public enum TypeVariable implements Type {
-	VARIABLE(PrimitiveType.ANY);
-	
+public class TypeVariable implements Type {
 	private int sizeInBytes;
 	private Type subtype;
 	private String infoString;
 
-	private TypeVariable(Type type) {
+	public TypeVariable(Type type) {
 		this.subtype = type;
 		this.sizeInBytes = type.getSize();
 		this.infoString = toString();
 	}
-	private TypeVariable(Type type, String infoString) {
+	public TypeVariable(Type type, String infoString) {
 		this.subtype = type;
 		this.sizeInBytes = type.getSize();
 		this.infoString = infoString;

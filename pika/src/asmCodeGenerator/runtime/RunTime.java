@@ -27,19 +27,32 @@ public class RunTime {
 	public static final String RATIONAL_TEMP_DENOMINATOR_1 	= "$rational-temp-denominator-1";
 	public static final String RATIONAL_TEMP_NUMERATOR_2 	= "$rational-temp-numerator-2";
 	public static final String RATIONAL_TEMP_DENOMINATOR_2 	= "$rational-temp-denominator-2";
-	public static final String RATIONAL_PRINT_WHOLE			= "$rational-print-whole";
-	public static final String RATIONAL_PRINT_NUMERATOR 	= "$rational-print-numerator";
-	public static final String RATIONAL_PRINT_DENOMINATOR 	= "$rational-print-denominator";
+	
+	public static final String ARRAY_TEMP_0					= "$array-temp-0";
+	public static final String ARRAY_TEMP_1					= "$array-temp-1";
+	public static final String ARRAY_TEMP_2					= "$array-temp-2";
+	public static final String ARRAY_TEMP_3					= "$array-temp-3";
+	public static final String ARRAY_TEMP_4					= "$array-temp-4";
+	public static final String ARRAY_TEMP_5					= "$array-temp-5";
+	
+	public static final String PRINT_RATIONAL_TEMP_1		= "$print-rational-temp-1";
+	public static final String PRINT_RATIONAL_TEMP_2 		= "$print-rational-temp-2";
+	public static final String PRINT_RATIONAL_TEMP_3 		= "$print-rational-temp-3";
+	public static final String PRINT_TEMP_1					= "$print-temp-1";
+	public static final String PRINT_TEMP_2 				= "$print-temp-2";
+	public static final String PRINT_TEMP_3 				= "$print-temp-3";
 	
 	public static final String SUB_RATIONAL_FIND_GCD		= "$sub-rational-find-gcd";
+	public static final String SUB_PRINT_ARRAY				= "$sub-print-array";
 	
 	public static final String GLOBAL_MEMORY_BLOCK    		= "$global-memory-block";
 	public static final String USABLE_MEMORY_START    		= "$usable-memory-start";
 	
 	public static final String MAIN_PROGRAM_LABEL     		= "$$main";
 	
-	public static final String GENERAL_RUNTIME_ERROR 		= "$$general-runtime-error";
-	public static final String DIVIDE_BY_ZERO_RUNTIME_ERROR = "$$divide-by-zero";
+	public static final String GENERAL_RUNTIME_ERROR 			= "$$general-runtime-error";
+	public static final String DIVIDE_BY_ZERO_RUNTIME_ERROR 	= "$$divide-by-zero";
+	public static final String NEGATIVE_INDEX_RUNTIME_ERROR 	= "$$negative-index";
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
@@ -69,7 +82,7 @@ public class RunTime {
 		frag.add(DLabel, RATIONAL_PRINT_FORMAT);
 		frag.add(DataS, "%d_%d/%d");
 		frag.add(DLabel, RATIONAL_FRACTION_PRINT_FORMAT);
-		frag.add(DataS, "%d/%d");
+		frag.add(DataS, "_%d/%d");
 		frag.add(DLabel, RATIONAL_NEG_FRACTION_PRINT_FORMAT);
 		frag.add(DataS, "-_%d/%d");
 		frag.add(DLabel, BOOLEAN_PRINT_FORMAT);
@@ -97,6 +110,7 @@ public class RunTime {
 		
 		generalRuntimeError(frag);
 		divideByZeroError(frag);
+		arrayNegativeIndexError(frag);
 		
 		return frag;
 	}
@@ -122,9 +136,31 @@ public class RunTime {
 		frag.add(PushD, divideByZeroMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
+	private void arrayNegativeIndexError(ASMCodeFragment frag) {
+		String divideByZeroMessage = "$errors-negative-index";
+		
+		frag.add(DLabel, divideByZeroMessage);
+		frag.add(DataS, "negative index used for array");
+		
+		frag.add(Label, NEGATIVE_INDEX_RUNTIME_ERROR);
+		frag.add(PushD, divideByZeroMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
 	
 	private ASMCodeFragment temporaryStorage() {
 		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
+		
+		frag.add(DLabel, ARRAY_TEMP_1);
+		frag.add(DataI, 0);
+		frag.add(DLabel, ARRAY_TEMP_2);
+		frag.add(DataI, 0);
+		frag.add(DLabel, ARRAY_TEMP_3);
+		frag.add(DataI, 0);
+		frag.add(DLabel, ARRAY_TEMP_4);
+		frag.add(DataI, 0);
+		frag.add(DLabel, ARRAY_TEMP_5);
+		frag.add(DataI, 0);
+		
 		frag.add(DLabel, RATIONAL_TEMP_NUMERATOR_1);
 		frag.add(DataI, 0);
 		frag.add(DLabel, RATIONAL_TEMP_DENOMINATOR_1);
@@ -134,11 +170,18 @@ public class RunTime {
 		frag.add(DLabel, RATIONAL_TEMP_DENOMINATOR_2);
 		frag.add(DataI, 0);
 		
-		frag.add(DLabel, RATIONAL_PRINT_WHOLE);
+		frag.add(DLabel, PRINT_TEMP_1);
 		frag.add(DataI, 0);
-		frag.add(DLabel, RATIONAL_PRINT_NUMERATOR);
+		frag.add(DLabel, PRINT_TEMP_2);
 		frag.add(DataI, 0);
-		frag.add(DLabel, RATIONAL_PRINT_DENOMINATOR);
+		frag.add(DLabel, PRINT_TEMP_3);
+		frag.add(DataI, 0);
+		
+		frag.add(DLabel, PRINT_RATIONAL_TEMP_1);
+		frag.add(DataI, 0);
+		frag.add(DLabel, PRINT_RATIONAL_TEMP_2);
+		frag.add(DataI, 0);
+		frag.add(DLabel, PRINT_RATIONAL_TEMP_3);
 		frag.add(DataI, 0);
 		
 		return frag;

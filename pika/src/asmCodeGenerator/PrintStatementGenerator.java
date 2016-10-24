@@ -1,21 +1,19 @@
 package asmCodeGenerator;
 
-import static asmCodeGenerator.codeStorage.ASMOpcode.Jump;
-import static asmCodeGenerator.codeStorage.ASMOpcode.JumpTrue;
-import static asmCodeGenerator.codeStorage.ASMOpcode.Label;
-import static asmCodeGenerator.codeStorage.ASMOpcode.Printf;
-import static asmCodeGenerator.codeStorage.ASMOpcode.PushD;
 import parseTree.ParseNode;
 import parseTree.nodeTypes.NewlineNode;
 import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.TabNode;
+import semanticAnalyzer.types.ArrayType;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import asmCodeGenerator.ASMCodeGenerator.CodeVisitor;
+import asmCodeGenerator.codeGenerator.PrintArraySCG;
+import asmCodeGenerator.codeGenerator.PrintBooleanSCG;
 import asmCodeGenerator.codeGenerator.PrintRationalSCG;
-import asmCodeGenerator.codeGenerator.RationalStackToTempSCG;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
+import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.runtime.RunTime;
 
 public class PrintStatementGenerator {
@@ -44,37 +42,27 @@ public class PrintStatementGenerator {
 	private void appendPrintCode(ParseNode node) {
 		Type type = node.getType();
 		ASMCodeFragment value = visitor.removeValueCode(node);
+		
 		code.append(value);
 		
 		if (type == PrimitiveType.RATIONAL) {
-			RationalStackToTempSCG scg1 = new RationalStackToTempSCG();
-			code.addChunk(scg1.generate());
-			
 			PrintRationalSCG scg = new PrintRationalSCG();
-			code.addChunk(scg.generate(node));
+			code.addChunk(scg.generate());
+		} else if (type instanceof ArrayType) {			
+			PrintArraySCG scg = new PrintArraySCG();
+			Type subType = ((ArrayType) type).getSubtype();
+			code.addChunk(scg.generate(subType));
 		} else {
 			String format = printFormat(type);
-			convertToStringIfBoolean(node);
+			
+			if (type == PrimitiveType.BOOLEAN) {
+				PrintBooleanSCG scg = new PrintBooleanSCG();
+				code.addChunk(scg.generate());
+			}
 		
-			code.add(PushD, format);
-			code.add(Printf);
+			code.add(ASMOpcode.PushD, format);
+			code.add(ASMOpcode.Printf);
 		}
-	}
-	private void convertToStringIfBoolean(ParseNode node) {
-		if(node.getType() != PrimitiveType.BOOLEAN) {
-			return;
-		}
-		
-		Labeller labeller = new Labeller("print-boolean");
-		String trueLabel = labeller.newLabel("true");
-		String endLabel = labeller.newLabel("join");
-
-		code.add(JumpTrue, trueLabel);
-		code.add(PushD, RunTime.BOOLEAN_FALSE_STRING);
-		code.add(Jump, endLabel);
-		code.add(Label, trueLabel);
-		code.add(PushD, RunTime.BOOLEAN_TRUE_STRING);
-		code.add(Label, endLabel);
 	}
 
 
