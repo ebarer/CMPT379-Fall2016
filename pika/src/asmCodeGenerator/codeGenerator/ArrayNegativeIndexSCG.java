@@ -9,7 +9,7 @@ public class ArrayNegativeIndexSCG implements SimpleCodeGenerator {
 	@Override
 	public ASMCodeChunk generate() {
 		chunk.add(ASMOpcode.Duplicate);
-		chunk.add(ASMOpcode.JumpNeg, RunTime.NEGATIVE_INDEX_RUNTIME_ERROR);
+		chunk.add(ASMOpcode.JumpNeg, RunTime.BAD_INDEX_RUNTIME_ERROR);
 		return chunk;
 	}
 

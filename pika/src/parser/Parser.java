@@ -173,7 +173,7 @@ public class Parser {
 		ParseNode target = null;
 		
 		if (nowReading instanceof IdentifierToken) {
-			target = parseIdentifier();			
+			target = parseIdentifier();
 		}
 		
 		if (startsParenthetical(nowReading)) {
@@ -294,7 +294,6 @@ public class Parser {
 	// arrayExpression -> [expressionList] 
 	private ParseNode parseArrayExpression(ParseNode val) {
 		if (previouslyRead.isLextant(Punctuator.SEPARATOR, Punctuator.CLOSE_BRACKET)) {
-			//TODO: ArrayToken token = new ArrayToken(type)
 			Token token = Keyword.NEW.prototype();
 			ArrayNode result = ArrayNode.withChildren(token, val, false);
 
@@ -544,19 +543,19 @@ public class Parser {
 			return syntaxErrorNode("unaryExpression");
 		}
 		
-		if (startsNegation(nowReading)) {
-			expect(Punctuator.NOT);
-			Token negationToken = previouslyRead;
+		if (startsNegation(nowReading) || startsLength(nowReading)) {
+			expect(Punctuator.NOT, Keyword.LENGTH);
+			Token token = previouslyRead;
 			
 			ParseNode right = parseExpression();
-			ParseNode left = UnaryOperatorNode.withChild(negationToken, right); 
+			ParseNode left = UnaryOperatorNode.withChild(token, right); 
 			return left;
 		}
 		
 		return parseAtomicExpression();
 	}
 	private boolean startsUnaryExpression(Token token) {
-		if (startsNegation(token)) {
+		if (startsNegation(token) || startsLength(token)) {
 			return true;
 		} else {
 			return startsAtomicExpression(token);
@@ -564,6 +563,9 @@ public class Parser {
 	}
 	private boolean startsNegation(Token token) {
 		return token.isLextant(Punctuator.NOT); 
+	}
+	private boolean startsLength(Token token) {
+		return token.isLextant(Keyword.LENGTH); 
 	}
 	
 	// atomicExpression -> literal
@@ -711,13 +713,28 @@ public class Parser {
 			parseAtomicExpression();
 		}
 		
+		Token identifier = nowReading;
 		readToken();
-		return new IdentifierNode(previouslyRead);
+		
+		if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+			ParseNode index = parseIndex();
+			return IdentifierNode.withChildren(identifier, index);
+		} else {
+			return new IdentifierNode(identifier);
+		}
 	}
 	private boolean startsIdentifier(Token token) {
 		return token instanceof IdentifierToken;
 	}
 
+	// index (terminal)
+	private ParseNode parseIndex() {
+		expect(Punctuator.OPEN_BRACKET);
+		ParseNode index = parseExpression();	
+		expect(Punctuator.CLOSE_BRACKET);
+		return index;
+	}
+	
 	// boolean constant (terminal)
 	private ParseNode parseBooleanConstant() {
 		if(!startsBooleanConstant(nowReading)) {
@@ -756,7 +773,7 @@ public class Parser {
 	private void error(String message) {
 		PikaLogger log = PikaLogger.getLogger("compiler.Parser");
 		log.severe("syntax error: " + message);
-		//TODO : System.exit(0);
+		//TODO: System.exit(0);
 	}	
 }
 

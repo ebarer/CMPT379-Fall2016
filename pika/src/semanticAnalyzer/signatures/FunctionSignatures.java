@@ -9,6 +9,7 @@ import asmCodeGenerator.codeStorage.ASMOpcode;
 import semanticAnalyzer.types.ArrayType;
 import semanticAnalyzer.types.Type;
 import semanticAnalyzer.types.TypeLiteral;
+import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Punctuator;
 import static semanticAnalyzer.types.PrimitiveType.*;
 
@@ -175,7 +176,8 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 			new FunctionSignature(1, 	BOOLEAN, 	BOOLEAN, 	BOOLEAN),
 			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
 		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1,	FLOATING, 	FLOATING, 	BOOLEAN)
+		    new FunctionSignature(1,	FLOATING, 	FLOATING, 	BOOLEAN),
+		    new FunctionSignature(1,	new ArrayType(), 	new ArrayType(), 	BOOLEAN) 	// TODO: Variable type not working
 		);
 		
 		new FunctionSignatures(Punctuator.NOT_EQUAL,
@@ -197,6 +199,12 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		
 		new FunctionSignatures(Punctuator.NOT,
 			new FunctionSignature(ASMOpcode.BNegate, BOOLEAN, BOOLEAN)
+		);
+		
+		
+		// Array Operators
+		new FunctionSignatures(Keyword.LENGTH,
+			new FunctionSignature(1, 	new ArrayType(), 	INTEGER)		// TODO: Variable type not working
 		);
 		
 		

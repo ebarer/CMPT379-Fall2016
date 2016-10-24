@@ -87,17 +87,22 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visitLeave(AssignmentNode node) {
 		if (node.child(0) instanceof IdentifierNode) {
+			// Define target
 			IdentifierNode target = (IdentifierNode) node.child(0);
 			target.setBinding(target.findVariableBinding());
-			target.setType(target.getBinding().getType());
+			
 			Type targetType = target.getBinding().getType();
+			if (targetType instanceof ArrayType && target.isIndexed()) {
+				targetType = ((ArrayType)targetType).getSubtype();
+			}
+			target.setType(targetType);
 			
 			if (target.isMutable() == null) {
 				return;
 			}
 			
 			// Check for immutability
-			if (!target.isMutable()) {
+			if (!target.isMutable() && !target.isIndexed()) {
 				String targetName = target.getToken().getLexeme();
 				logError("Cannot assign to value: '" + targetName + "' is a 'const' constant.");
 				return;
@@ -291,10 +296,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		node.setType(PrimitiveType.BOOLEAN);
 	}
 	@Override
-	public void visit(ErrorNode node) {
-		node.setType(PrimitiveType.ERROR);
-	}
-	@Override
 	public void visit(IntegerConstantNode node) {
 		node.setType(PrimitiveType.INTEGER);
 	}
@@ -316,16 +317,24 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visit(SpaceNode node) {
 	}
+	@Override
+	public void visit(ErrorNode node) {
+		node.setType(PrimitiveType.ERROR);
+	}
 	
 	
 	///////////////////////////////////////////////////////////////////////////
 	// IdentifierNodes, with helper methods
 	@Override
-	public void visit(IdentifierNode node) {
+	public void visitLeave(IdentifierNode node) {
 		if(!isBeingDeclared(node) && !isBeingAssigned(node)) {		
-			Binding binding = node.findVariableBinding();
-			node.setType(binding.getType());
-			node.setBinding(binding);
+			node.setBinding(node.findVariableBinding());
+			
+			Type type = node.getBinding().getType();
+			if (type instanceof ArrayType && node.isIndexed()) {
+				type = ((ArrayType)type).getSubtype();
+			}
+			node.setType(type);
 		}
 		// else parent DeclarationNode does the processing.
 	}

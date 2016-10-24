@@ -28,7 +28,9 @@ public class RunTime {
 	public static final String RATIONAL_TEMP_NUMERATOR_2 	= "$rational-temp-numerator-2";
 	public static final String RATIONAL_TEMP_DENOMINATOR_2 	= "$rational-temp-denominator-2";
 	
-	public static final String ARRAY_TEMP_0					= "$array-temp-0";
+	public static final String INDEX_TEMP_1					= "$index-temp-1";
+	public static final String INDEX_TEMP_2					= "$index-temp-2";
+
 	public static final String ARRAY_TEMP_1					= "$array-temp-1";
 	public static final String ARRAY_TEMP_2					= "$array-temp-2";
 	public static final String ARRAY_TEMP_3					= "$array-temp-3";
@@ -52,7 +54,7 @@ public class RunTime {
 	
 	public static final String GENERAL_RUNTIME_ERROR 			= "$$general-runtime-error";
 	public static final String DIVIDE_BY_ZERO_RUNTIME_ERROR 	= "$$divide-by-zero";
-	public static final String NEGATIVE_INDEX_RUNTIME_ERROR 	= "$$negative-index";
+	public static final String BAD_INDEX_RUNTIME_ERROR 			= "$$bad-index";
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
@@ -110,7 +112,7 @@ public class RunTime {
 		
 		generalRuntimeError(frag);
 		divideByZeroError(frag);
-		arrayNegativeIndexError(frag);
+		arrayBadIndexError(frag);
 		
 		return frag;
 	}
@@ -136,19 +138,24 @@ public class RunTime {
 		frag.add(PushD, divideByZeroMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
-	private void arrayNegativeIndexError(ASMCodeFragment frag) {
-		String divideByZeroMessage = "$errors-negative-index";
+	private void arrayBadIndexError(ASMCodeFragment frag) {
+		String divideByZeroMessage = "$errors-bad-index";
 		
 		frag.add(DLabel, divideByZeroMessage);
-		frag.add(DataS, "negative index used for array");
+		frag.add(DataS, "bad index used for array");
 		
-		frag.add(Label, NEGATIVE_INDEX_RUNTIME_ERROR);
+		frag.add(Label, BAD_INDEX_RUNTIME_ERROR);
 		frag.add(PushD, divideByZeroMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 	
 	private ASMCodeFragment temporaryStorage() {
 		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
+		
+		frag.add(DLabel, INDEX_TEMP_1);
+		frag.add(DataI, 0);
+		frag.add(DLabel, INDEX_TEMP_2);
+		frag.add(DataI, 0);
 		
 		frag.add(DLabel, ARRAY_TEMP_1);
 		frag.add(DataI, 0);

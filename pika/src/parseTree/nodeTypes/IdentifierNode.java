@@ -25,6 +25,8 @@ public class IdentifierNode extends ParseNode {
 		} else {
 			this.binding = null;
 		}
+		
+		initChildren();
 	}
 	
 ////////////////////////////////////////////////////////////
@@ -43,6 +45,20 @@ public class IdentifierNode extends ParseNode {
 	
 	public Boolean isMutable() {
 		return (binding != null) ? binding.isMutable() : null;
+	}
+	
+	public boolean isIndexed() {
+		return this.nChildren() > 0;
+	}
+	
+	
+////////////////////////////////////////////////////////////
+// convenience factory
+
+	public static IdentifierNode withChildren(Token token, ParseNode index) {
+		IdentifierNode node = new IdentifierNode(token);
+		node.appendChild(index);
+		return node;
 	}
 	
 ////////////////////////////////////////////////////////////
@@ -75,6 +91,8 @@ public class IdentifierNode extends ParseNode {
 // accept a visitor
 		
 	public void accept(ParseNodeVisitor visitor) {
-		visitor.visit(this);
+		visitor.visitEnter(this);
+		visitChildren(visitor);
+		visitor.visitLeave(this);
 	}
 }

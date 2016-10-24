@@ -35,7 +35,7 @@ public enum TypeLiteral implements Type {
 		return type;
 	}
 	public String infoString() {
-		return "TypeLiteral-" + infoString;
+		return infoString;
 	}
 	
 	

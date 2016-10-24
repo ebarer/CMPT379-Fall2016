@@ -27,6 +27,6 @@ public enum PrimitiveType implements Type {
 		return sizeInBytes;
 	}
 	public String infoString() {
-		return "PrimitiveType-" + infoString;
+		return infoString;
 	}
 }

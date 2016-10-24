@@ -13,6 +13,7 @@ public enum Keyword implements Lextant {
 	NEW("new"),
 	CLONE("clone"),
 	RELEASE("release"),
+	LENGTH("length"),
 	
 	IF("if"),
 	ELSE("else"),

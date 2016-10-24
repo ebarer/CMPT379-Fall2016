@@ -50,9 +50,9 @@ public class ASMCodeGenerator {
 	private ASMCodeFragment programASM() {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
 		
-		code.add(    Label, RunTime.MAIN_PROGRAM_LABEL);
+		code.add(Label, RunTime.MAIN_PROGRAM_LABEL);
 		code.append( programCode());
-		code.add(    Halt );
+		code.add(Halt, "", "%% End of Execution");
 		
 		return code;
 	}
@@ -113,6 +113,7 @@ public class ASMCodeGenerator {
 			return frag;
 		}
 		
+		
 	    ////////////////////////////////////////////////////////////////////
         // convert code to value-generating code.
 		private void makeFragmentValueCode(ASMCodeFragment code, ParseNode node) {
@@ -151,12 +152,12 @@ public class ASMCodeGenerator {
 			code.markAsValue();
 		}
 		
+		
 	    ////////////////////////////////////////////////////////////////////
         // ensures all types of ParseNode in given AST have at least a visitLeave	
 		public void visitLeave(ParseNode node) {
 			assert false : "node " + node + " not handled in ASMCodeGenerator";
 		}
-		
 		
 		
 		///////////////////////////////////////////////////////////////////////////
@@ -183,6 +184,53 @@ public class ASMCodeGenerator {
 			}
 		}
 
+		
+		///////////////////////////////////////////////////////////////////////////
+		// identifiers	
+		
+		public void visitLeave(IdentifierNode node) {
+			newAddressCode(node);
+			Binding binding = node.getBinding();
+			binding.generateAddress(code);
+			
+			if (node.isIndexed()) {
+				// TODO: Make into a code generator
+				// Store array base in INDEX_TEMP_1
+				code.add(LoadI);
+				code.add(PushD, RunTime.INDEX_TEMP_1);
+				code.add(Exchange);
+				code.add(StoreI);
+				
+				// Store array index in INDEX_TEMP_2
+				ASMCodeFragment offset = removeValueCode(node.child(0));
+				code.append(offset);
+				code.add(PushD, RunTime.INDEX_TEMP_2);
+				code.add(Exchange);
+				code.add(StoreI);
+				
+				// Check index bounds are valid
+				ArrayIndexBoundingSCG scg = new ArrayIndexBoundingSCG();
+				code.addChunk(scg.generate());
+				
+				// Generate Offset
+				// Total Offset = Record + Index
+				code.add(PushD, RunTime.INDEX_TEMP_1);
+				code.add(LoadI);
+				code.add(PushD, RunTime.INDEX_TEMP_1);
+				code.add(LoadI);
+				code.add(PushI, 8);
+				code.add(Add);
+				code.add(LoadI);		// Subtype Size
+				code.add(PushD, RunTime.INDEX_TEMP_2);
+				code.add(LoadI);
+				code.add(Multiply);		// Index Offset = Subtype * Index
+				code.add(PushI, 16);
+				code.add(Add);			// Record Offset
+				code.add(Add);
+			}
+		}		
+		
+		
 		///////////////////////////////////////////////////////////////////////////
 		// statements and declarations
 
@@ -330,6 +378,7 @@ public class ASMCodeGenerator {
 			}
 		}
 		private void visitBooleanOperatorNode(BinaryOperatorNode node) {
+			// TODO: Make into a code generator
 			Object variant = node.getSignature().getVariant();
 			if (variant instanceof ASMOpcode) {
 				ASMOpcode opcode = (ASMOpcode) variant;
@@ -358,6 +407,7 @@ public class ASMCodeGenerator {
 			}
 		}
 		private void visitComparisonOperatorNode(BinaryOperatorNode node, Lextant operator) {
+			// TODO: Make into a code generator
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 			Type type = node.getSignature().paramType();
@@ -458,6 +508,7 @@ public class ASMCodeGenerator {
 			}
 		}
 		private void visitOverOperatorNode(RationalOperatorNode node){
+			// TODO: Make into a code generator
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 
@@ -465,6 +516,7 @@ public class ASMCodeGenerator {
 			code.append(arg2);
 		}
 		private void visitExpressOverOperatorNode(RationalOperatorNode node) {
+			// TODO: Make into a code generator
 			assert node.nChildren() == 2;
 			
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
@@ -479,14 +531,19 @@ public class ASMCodeGenerator {
 				code.add(FMultiply);
 				code.add(ConvertI);
 			} else if (type == PrimitiveType.RATIONAL) {
-				code.add(Exchange);
+				// TODO: double check functionality
+//				code.add(Exchange);
+//				code.append(arg2);
+//				code.add(Multiply);
+//				code.add(Exchange);
+//				code.add(Divide);
+				code.add(Divide);
 				code.append(arg2);
 				code.add(Multiply);
-				code.add(Exchange);
-				code.add(Divide);
 			}
 		}
 		private void visitRationalizeOperatorNode(RationalOperatorNode node) {
+			// TODO: Make into a code generator
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 			ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VALUE);
@@ -642,11 +699,6 @@ public class ASMCodeGenerator {
 			newValueCode(node);
 			code.add(PushI, node.getValue() ? 1 : 0);
 		}
-		public void visit(IdentifierNode node) {
-			newAddressCode(node);
-			Binding binding = node.getBinding();
-			binding.generateAddress(code);
-		}		
 		public void visit(IntegerConstantNode node) {
 			newValueCode(node);
 			code.add(PushI, node.getValue());
