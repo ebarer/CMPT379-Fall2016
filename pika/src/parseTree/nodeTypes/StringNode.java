@@ -20,6 +20,10 @@ public class StringNode extends ParseNode {
 	public String getValue() {
 		return stringToken().getValue();
 	}
+	
+	public int getLength() {
+		return stringToken().getValue().length();
+	}
 
 	public StringToken stringToken() {
 		return (StringToken)token;

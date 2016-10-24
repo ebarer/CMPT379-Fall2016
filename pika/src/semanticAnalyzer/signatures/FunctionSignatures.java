@@ -120,6 +120,8 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		
 		// Casting Operators
 		new FunctionSignatures(Punctuator.PIPE,
+			new FunctionSignature(1, 						new ArrayType(), 	TypeLiteral.ARRAY, 		new ArrayType()),	// TODO: Variable type not working
+			
 			new FunctionSignature(1, 								CHARACTER, 	TypeLiteral.CHARACTER, 	CHARACTER),
 			new FunctionSignature(new CastToBoolSCG(CHARACTER), 	CHARACTER, 	TypeLiteral.BOOLEAN, 	BOOLEAN),
 			new FunctionSignature(1, 								CHARACTER, 	TypeLiteral.INTEGER, 	INTEGER),
@@ -141,9 +143,7 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		    
 		    new FunctionSignature(1, 								BOOLEAN, 	TypeLiteral.BOOLEAN, 	BOOLEAN),
 		    
-		    new FunctionSignature(1, 								STRING, 	TypeLiteral.STRING, 	STRING),
-		    
-		    new FunctionSignature(1, 						new ArrayType(), 	TypeLiteral.ARRAY, 		new ArrayType())
+		    new FunctionSignature(1, 								STRING, 	TypeLiteral.STRING, 	STRING)
 		);
 		
 		
@@ -173,14 +173,15 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		);
 		
 		new FunctionSignatures(Punctuator.EQUAL,
+			new FunctionSignature(1,	new ArrayType(), 	new ArrayType(), 	BOOLEAN), 	// TODO: Variable type not working
 			new FunctionSignature(1, 	BOOLEAN, 	BOOLEAN, 	BOOLEAN),
 			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
 		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1,	FLOATING, 	FLOATING, 	BOOLEAN),
-		    new FunctionSignature(1,	new ArrayType(), 	new ArrayType(), 	BOOLEAN) 	// TODO: Variable type not working
+		    new FunctionSignature(1,	FLOATING, 	FLOATING, 	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.NOT_EQUAL,
+			new FunctionSignature(1,	new ArrayType(), 	new ArrayType(), 	BOOLEAN), 	// TODO: Variable type not working
 			new FunctionSignature(1,	BOOLEAN, 	BOOLEAN, 	BOOLEAN),
 			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
 		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
@@ -204,7 +205,7 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		
 		// Array Operators
 		new FunctionSignatures(Keyword.LENGTH,
-			new FunctionSignature(1, 	new ArrayType(), 	INTEGER)		// TODO: Variable type not working
+			new FunctionSignature(new ArrayLengthSCG(), 	new ArrayType(), 	INTEGER)		// TODO: Variable type not working
 		);
 		
 		

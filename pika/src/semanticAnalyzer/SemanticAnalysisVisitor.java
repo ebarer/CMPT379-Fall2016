@@ -112,24 +112,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			Type expressionType = expression.getType();
 			
 			// Check for type-match, ignore if both are ArrayType
-			if ((targetType instanceof ArrayType) && (expressionType instanceof ArrayType)) {
-				Type targetSubtype = ((ArrayType)targetType).getSubtype();
-				Type expressionSubtype = ((ArrayType)expressionType).getSubtype();
-				
-				while ((targetSubtype instanceof ArrayType) && (expressionSubtype instanceof ArrayType)) {
-					targetSubtype = ((ArrayType)targetSubtype).getSubtype();
-					expressionSubtype = ((ArrayType)expressionSubtype).getSubtype();
-				}
-				
-				if (targetSubtype instanceof TypeLiteral) {
-					targetSubtype = ((TypeLiteral) targetSubtype).getType();
-				}
-				
-				if (expressionSubtype instanceof TypeLiteral) {
-					expressionSubtype = ((TypeLiteral) expressionSubtype).getType();
-				}
-				
-				if (targetSubtype != expressionSubtype) {
+			if ((targetType instanceof ArrayType) && (expressionType instanceof ArrayType)) {				
+				if (!((ArrayType)targetType).equals(expressionType)) {
 					logError("Cannot assign value of type '" + expressionType.infoString() + "' to type '" + targetType.infoString() + "'");
 				}
 			} else {
@@ -191,15 +175,26 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		List<Type> childTypes = Arrays.asList(left.getType(), right.getType());
 		
 		Lextant operator = operatorFor(node);
-
-		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
-		
-		if (signature.accepts(childTypes)) {
-			node.setSignature(signature);
-			node.setType(signature.resultType());
+		// TODO: Move to FunctionSignature?
+		if ((childTypes.get(0) instanceof ArrayType) && (childTypes.get(1) instanceof ArrayType)) {
+			if (((ArrayType)childTypes.get(0)).equals(childTypes.get(1))) {
+				FunctionSignature signature = FunctionSignatures.signaturesOf(operator).get(0);
+				node.setSignature(signature);		
+				node.setType(signature.resultType());
+			} else {
+				typeCheckError(node, childTypes);
+				node.setType(PrimitiveType.ERROR);
+			}
 		} else {
-			typeCheckError(node, childTypes);
-			node.setType(PrimitiveType.ERROR);
+			FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
+			
+			if (signature.accepts(childTypes)) {
+				node.setSignature(signature);
+				node.setType(signature.resultType());
+			} else {
+				typeCheckError(node, childTypes);
+				node.setType(PrimitiveType.ERROR);
+			}
 		}
 	}
 	private Lextant operatorFor(BinaryOperatorNode node) {
@@ -213,15 +208,26 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		List<Type> childTypes = Arrays.asList(left.getType());
 		
 		Lextant operator = operatorFor(node);
-
-		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
-		
-		if(signature.accepts(childTypes)) {
-			node.setSignature(signature);
-			node.setType(signature.resultType());
+		// TODO: Move to FunctionSignature?
+		if (operator == Keyword.LENGTH) {
+			if (childTypes.get(0) instanceof ArrayType) {
+				FunctionSignature signature = FunctionSignatures.signaturesOf(operator).get(0);
+				node.setSignature(signature);		
+				node.setType(signature.resultType());
+			} else {
+				typeCheckError(node, childTypes);
+				node.setType(PrimitiveType.ERROR);
+			}
 		} else {
-			typeCheckError(node, childTypes);
-			node.setType(PrimitiveType.ERROR);
+			FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
+			
+			if(signature.accepts(childTypes)) {
+				node.setSignature(signature);
+				node.setType(signature.resultType());
+			} else {
+				typeCheckError(node, childTypes);
+				node.setType(PrimitiveType.ERROR);
+			}
 		}
 	}
 	private Lextant operatorFor(UnaryOperatorNode node) {
@@ -233,14 +239,26 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		assert node.nChildren() == 1;
 		List<Type> childTypes = Arrays.asList(node.getExpressionType(), node.getCastType());
 
-		FunctionSignature signature = FunctionSignatures.signature(Punctuator.PIPE, childTypes);
-		
-		if(signature.accepts(childTypes)) {
-			node.setSignature(signature);
-			node.setType(signature.resultType());
+		// TODO: Move to FunctionSignature?
+		if ((childTypes.get(0) instanceof ArrayType) && (childTypes.get(1) instanceof ArrayType)) {
+			if (((ArrayType)childTypes.get(0)).equals(childTypes.get(1))) {
+				FunctionSignature signature = FunctionSignatures.signaturesOf(Punctuator.PIPE).get(0);
+				node.setSignature(signature);		
+				node.setType(childTypes.get(1));
+			} else {
+				logError("cannot cast type '" + childTypes.get(0).infoString() + "' to type '" + childTypes.get(1).infoString() + "'");
+				node.setType(PrimitiveType.ERROR);
+			}
 		} else {
-			logError("cannot cast type '" + childTypes.get(0) + "' to type '" + childTypes.get(1) + "'");
-			node.setType(PrimitiveType.ERROR);
+			FunctionSignature signature = FunctionSignatures.signature(Punctuator.PIPE, childTypes);
+			
+			if(signature.accepts(childTypes)) {
+				node.setSignature(signature);
+				node.setType(signature.resultType());
+			} else {
+				logError("cannot cast type '" + childTypes.get(0) + "' to type '" + childTypes.get(1) + "'");
+				node.setType(PrimitiveType.ERROR);
+			}
 		}
 	}
 	@Override

@@ -113,7 +113,6 @@ public class ASMCodeGenerator {
 			return frag;
 		}
 		
-		
 	    ////////////////////////////////////////////////////////////////////
         // convert code to value-generating code.
 		private void makeFragmentValueCode(ASMCodeFragment code, ParseNode node) {
@@ -152,13 +151,11 @@ public class ASMCodeGenerator {
 			code.markAsValue();
 		}
 		
-		
 	    ////////////////////////////////////////////////////////////////////
         // ensures all types of ParseNode in given AST have at least a visitLeave	
 		public void visitLeave(ParseNode node) {
 			assert false : "node " + node + " not handled in ASMCodeGenerator";
 		}
-		
 		
 		///////////////////////////////////////////////////////////////////////////
 		// constructs larger than statements
@@ -184,7 +181,6 @@ public class ASMCodeGenerator {
 			}
 		}
 
-		
 		///////////////////////////////////////////////////////////////////////////
 		// identifiers	
 		
@@ -229,8 +225,7 @@ public class ASMCodeGenerator {
 				code.add(Add);
 			}
 		}		
-		
-		
+				
 		///////////////////////////////////////////////////////////////////////////
 		// statements and declarations
 
@@ -303,8 +298,7 @@ public class ASMCodeGenerator {
 				assert false: "Type " + type + " unimplemented in opcodeForStore()";
 			}
 		}
-		
-		
+			
 		///////////////////////////////////////////////////////////////////////////
 		// if statements
 		public void visitLeave(IfNode node) {
@@ -333,7 +327,6 @@ public class ASMCodeGenerator {
 			code.add(Label, joinLabel);
 		}
 		
-		
 		///////////////////////////////////////////////////////////////////////////
 		// while statements
 		public void visitLeave(WhileNode node) {
@@ -356,7 +349,6 @@ public class ASMCodeGenerator {
 
 			code.add(Label, joinLabel);
 		}
-
 
 		///////////////////////////////////////////////////////////////////////////
 		// expressions
@@ -531,15 +523,15 @@ public class ASMCodeGenerator {
 				code.add(FMultiply);
 				code.add(ConvertI);
 			} else if (type == PrimitiveType.RATIONAL) {
-				// TODO: double check functionality
-//				code.add(Exchange);
-//				code.append(arg2);
-//				code.add(Multiply);
-//				code.add(Exchange);
-//				code.add(Divide);
-				code.add(Divide);
+				// TODO: Double check functionality
+				code.add(Exchange);
 				code.append(arg2);
 				code.add(Multiply);
+				code.add(Exchange);
+				code.add(Divide);
+//				code.add(Divide);
+//				code.append(arg2);
+//				code.add(Multiply);
 			}
 		}
 		private void visitRationalizeOperatorNode(RationalOperatorNode node) {
@@ -584,8 +576,14 @@ public class ASMCodeGenerator {
 			code.append(arg1);
 			
 			Object variant = node.getSignature().getVariant();
+			
+			if (variant instanceof SimpleCodeGenerator) {
+				SimpleCodeGenerator scg1 = (SimpleCodeGenerator) variant;
+				code.addChunk(scg1.generate());
+			}
+			
 			if (variant instanceof ASMOpcode) {
-				ASMOpcode opcode = (ASMOpcode) variant;
+				ASMOpcode opcode = (ASMOpcode) variant;				
 				code.add(opcode);
 			}
 		}
@@ -692,7 +690,6 @@ public class ASMCodeGenerator {
 			}
 		}
 		
-		
 		///////////////////////////////////////////////////////////////////////////
 		// leaf nodes (ErrorNode not necessary)
 		public void visit(BooleanConstantNode node) {
@@ -724,6 +721,13 @@ public class ASMCodeGenerator {
 			String stringLabel = labeller.newLabel(varName);
 
 			code.add(DLabel, stringLabel);
+			
+			// Configure string header
+			code.add(DataI, 6); 				// String type
+			code.add(DataI, 9); 				// Immutable and permanent
+			code.add(DataI, node.getLength()); 	// Length
+			
+			// Push string characters
 			code.add(DataS, node.getValue());
 			code.add(PushD, stringLabel);
 		}

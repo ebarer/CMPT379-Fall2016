@@ -53,13 +53,17 @@ public class PrintStatementGenerator {
 			Type subType = ((ArrayType) type).getSubtype();
 			code.addChunk(scg.generate(subType));
 		} else {
-			String format = printFormat(type);
-			
 			if (type == PrimitiveType.BOOLEAN) {
 				PrintBooleanSCG scg = new PrintBooleanSCG();
 				code.addChunk(scg.generate());
 			}
+			
+			if (type == PrimitiveType.STRING) {
+				code.add(ASMOpcode.PushI, 12);
+				code.add(ASMOpcode.Add);
+			}
 		
+			String format = printFormat(type);
 			code.add(ASMOpcode.PushD, format);
 			code.add(ASMOpcode.Printf);
 		}

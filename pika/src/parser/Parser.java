@@ -600,8 +600,14 @@ public class Parser {
 			// Cast
 			if (previouslyRead.isLextant(Punctuator.PIPE)) {
 				Token castToken = previouslyRead;
-				TypeLiteral castType = TypeLiteral.withToken(nowReading);
-				readToken();
+				Type castType;
+				
+				if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+					castType = parseArrayType();	
+				} else {
+					castType = TypeLiteral.withToken(nowReading);
+					readToken();
+				}
 				
 				expect(Punctuator.CLOSE_BRACKET);
 				return CastNode.withChildren(castToken, left, castType);
