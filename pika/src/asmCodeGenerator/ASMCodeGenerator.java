@@ -188,23 +188,13 @@ public class ASMCodeGenerator {
 			newAddressCode(node);
 			Binding binding = node.getBinding();
 			binding.generateAddress(code);
-			
-			if (node.isIndexed()) {
-				code.add(ASMOpcode.LoadI);
-				
-				ASMCodeFragment offset = removeValueCode(node.child(0));
-				code.append(offset);
-				
-				ArrayOffsetSCG scg = new ArrayOffsetSCG();
-				code.addChunk(scg.generate());
-			}
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
 		// index	
 		
 		public void visitLeave(IndexNode node) {
-			newValueCode(node);
+			newAddressCode(node);
 			
 			ASMCodeFragment array = removeValueCode(node.child(0));
 			ASMCodeFragment index = removeValueCode(node.child(1));
@@ -214,8 +204,6 @@ public class ASMCodeGenerator {
 								
 			ArrayOffsetSCG scg = new ArrayOffsetSCG();
 			code.addChunk(scg.generate());
-			
-			code.add(LoadI);
 		}		
 				
 		///////////////////////////////////////////////////////////////////////////
@@ -329,8 +317,14 @@ public class ASMCodeGenerator {
 			code.add(ASMOpcode.JumpTrue, joinLabel);
 			
 			// TODO: Check the subtype-is-reference bit (recurse)
-			
-			
+			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
+			code.add(ASMOpcode.LoadI);
+			code.add(ASMOpcode.PushI, 4);
+			code.add(ASMOpcode.Add);
+			code.add(ASMOpcode.LoadI);
+			code.add(ASMOpcode.PushI, 4);
+			code.add(ASMOpcode.BTAnd);
+			code.add(ASMOpcode.JumpTrue, joinLabel);
 
 			// Set is-deleted-status bit
 			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);

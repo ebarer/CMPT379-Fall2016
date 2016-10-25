@@ -663,6 +663,22 @@
         PushI        8                         
         Add                                    %% myArr2
         LoadI                                  
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushI        58                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% myArr2
+        LoadI                                  
         Label        -print-array-8-           
         PushD        $array-temp-1             
         Exchange                               
@@ -858,6 +874,22 @@
         LoadI                                  
         Call         -mem-manager-deallocate   
         Label        -release-stmt-10-join     
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% myArr2
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
+        PushI        58                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-space       
+        Printf                                 
         PushD        $global-memory-block      
         PushI        8                         
         Add                                    %% myArr2

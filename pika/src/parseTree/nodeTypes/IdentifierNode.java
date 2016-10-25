@@ -47,10 +47,6 @@ public class IdentifierNode extends ParseNode {
 		return (binding != null) ? binding.isMutable() : null;
 	}
 	
-	public boolean isIndexed() {
-		return this.nChildren() > 0;
-	}
-	
 	
 ////////////////////////////////////////////////////////////
 // convenience factory

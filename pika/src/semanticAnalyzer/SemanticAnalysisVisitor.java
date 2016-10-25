@@ -86,45 +86,40 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	@Override
 	public void visitLeave(AssignmentNode node) {
-		if (node.child(0) instanceof IdentifierNode) {
-			// Define target
-			IdentifierNode target = (IdentifierNode) node.child(0);
-			target.setBinding(target.findVariableBinding());
-			
-			Type targetType = target.getBinding().getType();
-			if (targetType instanceof ArrayType && target.isIndexed()) {
-				 targetType = ((ArrayType)targetType).getSubtype();
-			}
-			target.setType(targetType);
-			
-			if (target.isMutable() == null) {
-				return;
-			}
-			
-			// Check for immutability
-			if (!target.isMutable() && !target.isIndexed()) {
-				String targetName = target.getToken().getLexeme();
-				logError("Cannot assign to value: '" + targetName + "' is a 'const' constant.");
-				return;
-			}
-			
-			ParseNode expression = node.child(1);
-			Type expressionType = expression.getType();
-			
-			// Check for type-match, ignore if both are ArrayType
-			if ((targetType instanceof ArrayType) && (expressionType instanceof ArrayType)) {				
-				if (!((ArrayType)targetType).equals(expressionType)) {
-					logError("Cannot assign value of type '" + expressionType.infoString() + "' to type '" + targetType.infoString() + "'");
-				}
-			} else {
-				if (targetType != expressionType) {
-					logError("Cannot assign value of type '" + expressionType + "' to type '" + targetType + "'");
-				}
-			}
-			
-			node.setType(expressionType);
-			target.setType(expressionType);
+		// Configure identifier
+		ParseNode temp = node.child(0);
+		while (!(temp instanceof IdentifierNode)) {
+			temp = temp.child(0);
 		}
+		IdentifierNode target = (IdentifierNode)temp;
+		target.setBinding(target.findVariableBinding());
+		target.setType(target.getBinding().getType());
+		
+		// Check for immutability
+		if (target.isMutable() == null) {
+			return;
+		} else if (!target.isMutable()) {
+			String targetName = target.getToken().getLexeme();
+			logError("Cannot assign to value: '" + targetName + "' is a 'const' constant.");
+			return;
+		}
+
+		// Check for type-match
+		Type targetType = node.child(0).getType();
+		ParseNode expression = node.child(1);
+		Type expressionType = expression.getType();
+
+		if ((targetType instanceof ArrayType) && (expressionType instanceof ArrayType)) {				
+			if (!((ArrayType)targetType).equals(expressionType)) {
+				logError("Cannot assign value of type '" + expressionType.infoString() + "' to type '" + targetType.infoString() + "'");
+			}
+		} else {
+			if (targetType != expressionType) {
+				logError("Cannot assign value of type '" + expressionType + "' to type '" + targetType + "'");
+			}
+		}
+		
+		node.setType(expressionType);
 	}
 	@Override
 	public void visitLeave(ReleaseNode node) {
@@ -355,12 +350,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visitLeave(IdentifierNode node) {
 		if(!isBeingDeclared(node) && !isBeingAssigned(node)) {		
 			node.setBinding(node.findVariableBinding());
-			
-			Type type = node.getBinding().getType();
-			if (type instanceof ArrayType && node.isIndexed()) {
-				type = ((ArrayType)type).getSubtype();
-			}
-			node.setType(type);
+			node.setType(node.getBinding().getType());
 		}
 		// else parent DeclarationNode does the processing.
 	}
@@ -394,6 +384,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
 		}
 
+		// TODO: Check before calling subtype()
 		Type subtype = ((ArrayType)node.child(0).getType()).getSubtype();
 		if (subtype instanceof TypeLiteral) {
 			subtype = ((TypeLiteral) subtype).getType();
