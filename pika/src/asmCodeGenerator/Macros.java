@@ -2,7 +2,6 @@ package asmCodeGenerator;
 
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
-import asmCodeGenerator.runtime.RunTime;
 
 public class Macros {
 	

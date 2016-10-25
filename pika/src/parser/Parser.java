@@ -531,21 +531,14 @@ public class Parser {
 			
 			expect(Punctuator.OPEN_BRACKET);
 			
+			ParseNode node = null;
 			ParseNode left = parseExpression();
 			
 			expect(Punctuator.PIPE, Punctuator.SEPARATOR, Punctuator.CLOSE_BRACKET);
 			
 			// Array
 			if (previouslyRead.isLextant(Punctuator.SEPARATOR, Punctuator.CLOSE_BRACKET)) {
-				ParseNode node = parseArrayExpression(left);
-				
-				if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
-					ParseNode index = parseIndex();
-					((ArrayNode)node).setIndex(index);
-					return node;
-				} else {
-					return node;
-				}
+				node = parseArrayExpression(left);
 			}
 			
 			// Cast
@@ -561,10 +554,19 @@ public class Parser {
 				}
 				
 				expect(Punctuator.CLOSE_BRACKET);
-				return CastNode.withChildren(castToken, left, castType);
+				node = CastNode.withChildren(castToken, left, castType);
 			}
 			
-			return syntaxErrorNode(nowReading.getLexeme());
+			if (node == null) {
+				return syntaxErrorNode(nowReading.getLexeme());
+			}
+			
+			if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+				ParseNode index = parseIndex();
+				return IndexNode.withChildren(previouslyRead, node, index);
+			} else {
+				return node;
+			}
 		}
 		
 		return parseLiteral();

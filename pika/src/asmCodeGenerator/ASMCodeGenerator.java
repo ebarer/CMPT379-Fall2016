@@ -198,6 +198,24 @@ public class ASMCodeGenerator {
 				ArrayOffsetSCG scg = new ArrayOffsetSCG();
 				code.addChunk(scg.generate());
 			}
+		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		// index	
+		
+		public void visitLeave(IndexNode node) {
+			newValueCode(node);
+			
+			ASMCodeFragment array = removeValueCode(node.child(0));
+			ASMCodeFragment index = removeValueCode(node.child(1));
+			
+			code.append(array);
+			code.append(index);
+								
+			ArrayOffsetSCG scg = new ArrayOffsetSCG();
+			code.addChunk(scg.generate());
+			
+			code.add(LoadI);
 		}		
 				
 		///////////////////////////////////////////////////////////////////////////
@@ -704,16 +722,6 @@ public class ASMCodeGenerator {
 					}
 				}
 				code.add(ASMOpcode.Label, endChildrenLabel);
-				
-				if (node.isIndexed()) {
-					ASMCodeFragment index = removeValueCode(node.getIndex());
-					code.append(index);
-										
-					ArrayOffsetSCG scg = new ArrayOffsetSCG();
-					code.addChunk(scg.generate());
-					
-					code.add(LoadI);
-				}
 			}
 			
 			if (operator == Keyword.CLONE) {				

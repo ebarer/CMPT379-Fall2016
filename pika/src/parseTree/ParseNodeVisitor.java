@@ -20,6 +20,9 @@ public interface ParseNodeVisitor {
 	
 	void visitEnter(IdentifierNode node);
 	void visitLeave(IdentifierNode node);
+	
+	void visitEnter(IndexNode node);
+	void visitLeave(IndexNode node);
 
 	void visitEnter(DeclarationNode node);
 	void visitLeave(DeclarationNode node);
@@ -110,6 +113,12 @@ public interface ParseNodeVisitor {
 			defaultVisitForLeaf(node);
 		}
 		public void visitLeave(IdentifierNode node) {
+			defaultVisitForLeaf(node);
+		}
+		public void visitEnter(IndexNode node) {
+			defaultVisitForLeaf(node);
+		}
+		public void visitLeave(IndexNode node) {
 			defaultVisitForLeaf(node);
 		}
 		

@@ -10,7 +10,6 @@ import semanticAnalyzer.types.*;
 
 public class ArrayNode extends ParseNode {
 	boolean isEmpty = false;
-	ParseNode index = null;
 	
 	public ArrayNode(Token token) {
 		super(token);
@@ -36,23 +35,9 @@ public class ArrayNode extends ParseNode {
 		super.setType(type);		
 	}
 	public Type getSubtype() {
-		if (this.isIndexed()) {
-			return super.getType();
-		} else {
-			return ((ArrayType)super.getType()).getSubtype();
-		}
+		return ((ArrayType)super.getType()).getSubtype();
 	}
-	
-	public void setIndex(ParseNode node){
-		this.index = node;
-	}
-	public ParseNode getIndex() {
-		return index;
-	}
-	public boolean isIndexed() {
-		return this.index != null;
-	}
-	
+
 	public void setIsEmpty(boolean isEmpty) {
 		this.isEmpty = isEmpty;
 	}
@@ -98,12 +83,7 @@ public class ArrayNode extends ParseNode {
 			
 	public void accept(ParseNodeVisitor visitor) {
 		visitor.visitEnter(this);
-		visitChildren(visitor);
-		
-		if (this.isIndexed()) {
-			index.accept(visitor);
-		}
-		
+		visitChildren(visitor);		
 		visitor.visitLeave(this);
 	}
 }

@@ -266,21 +266,14 @@
         Return                                 
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        8                         
+        DataZ        16                        
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% x
-        PushI        1000                      
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        4                         
-        Add                                    %% i
-        PushI        2                         
-        StoreI                                 
+        Add                                    %% myArr
         Label        -array-1-                 
-        PushI        3                         
-        PushI        3                         
+        PushI        4                         
+        PushI        4                         
         PushI        4                         
         Multiply                               
         PushI        16                        
@@ -318,60 +311,712 @@
         Duplicate                              
         PushI        16                        
         Add                                    
-        PushD        $global-memory-block      
-        PushI        0                         
-        Add                                    %% x
-        LoadI                                  
+        PushI        1                         
         StoreI                                 
         Duplicate                              
         PushI        20                        
         Add                                    
-        PushI        2000                      
+        PushI        2                         
         StoreI                                 
         Duplicate                              
         PushI        24                        
         Add                                    
-        PushI        3000                      
+        PushI        3                         
+        StoreI                                 
+        Duplicate                              
+        PushI        28                        
+        Add                                    
+        PushI        4                         
         StoreI                                 
         Label        -array-1-end-store-children 
+        StoreI                                 
+        PushD        $global-memory-block      
         PushI        0                         
-        PushI        1                         
-        Add                                    
-        PushD        $index-temp-2             
-        Exchange                               
-        StoreI                                 
-        PushD        $index-temp-1             
-        Exchange                               
-        StoreI                                 
-        PushD        $index-temp-2             
+        Add                                    %% myArr
         LoadI                                  
-        JumpNeg      $$bad-index               
-        PushD        $index-temp-1             
+        Label        -print-array-2-           
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
         LoadI                                  
         PushI        12                        
         Add                                    
         LoadI                                  
-        PushI        1                         
-        Subtract                               
-        PushD        $index-temp-2             
-        LoadI                                  
-        Subtract                               
-        JumpNeg      $$bad-index               
-        PushD        $index-temp-1             
-        LoadI                                  
-        PushD        $index-temp-1             
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
         LoadI                                  
         PushI        8                         
         Add                                    
         LoadI                                  
-        PushD        $index-temp-2             
-        LoadI                                  
-        Multiply                               
+        PushD        $print-temp-2             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-3             
         PushI        16                        
-        Add                                    
+        StoreI                                 
+        PushI        91                        
+        PushD        $print-format-character   
+        Printf                                 
+        Label        -print-array-2-loop       
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-2-join       
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushD        $print-temp-3             
+        LoadI                                  
         Add                                    
         LoadI                                  
         PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-temp-3             
+        LoadI                                  
+        PushD        $print-temp-2             
+        LoadI                                  
+        Add                                    
+        PushD        $print-temp-3             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        PushI        1                         
+        Subtract                               
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-2-join       
+        PushI        44                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushI        0                         
+        PushD        $print-format-character   
+        Printf                                 
+        Jump         -print-array-2-loop       
+        Label        -print-array-2-join       
+        PushI        93                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        Label        -release-stmt-3-          
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% myArr
+        LoadI                                  
+        PushD        $release-temp-1           
+        Exchange                               
+        StoreI                                 
+        PushD        $release-temp-1           
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        LoadI                                  
+        PushI        1                         
+        BTAnd                                  
+        JumpTrue     -release-stmt-3-join      
+        PushD        $release-temp-1           
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        LoadI                                  
+        PushI        2                         
+        BTAnd                                  
+        JumpTrue     -release-stmt-3-join      
+        PushD        $release-temp-1           
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        Duplicate                              
+        LoadI                                  
+        PushI        2                         
+        BTOr                                   
+        StoreI                                 
+        PushD        $release-temp-1           
+        LoadI                                  
+        Call         -mem-manager-deallocate   
+        Label        -release-stmt-3-join      
+        PushD        $global-memory-block      
+        PushI        0                         
+        Add                                    %% myArr
+        LoadI                                  
+        Label        -print-array-4-           
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        8                         
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-2             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-3             
+        PushI        16                        
+        StoreI                                 
+        PushI        91                        
+        PushD        $print-format-character   
+        Printf                                 
+        Label        -print-array-4-loop       
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-4-join       
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushD        $print-temp-3             
+        LoadI                                  
+        Add                                    
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-temp-3             
+        LoadI                                  
+        PushD        $print-temp-2             
+        LoadI                                  
+        Add                                    
+        PushD        $print-temp-3             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        PushI        1                         
+        Subtract                               
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-4-join       
+        PushI        44                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushI        0                         
+        PushD        $print-format-character   
+        Printf                                 
+        Jump         -print-array-4-loop       
+        Label        -print-array-4-join       
+        PushI        93                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% myArr2
+        Label        -array-7-                 
+        PushI        2                         
+        PushI        2                         
+        PushI        8                         
+        Multiply                               
+        PushI        16                        
+        Add                                    
+        Call         -mem-manager-allocate     
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        Label        -array-7-create-record    
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        7                         
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        PushI        4                         
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        8                         
+        Add                                    
+        PushI        8                         
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        Label        -array-7-start-store-children 
+        Duplicate                              
+        PushI        16                        
+        Add                                    
+        Label        -array-5-                 
+        PushI        2                         
+        PushI        2                         
+        PushI        4                         
+        Multiply                               
+        PushI        16                        
+        Add                                    
+        Call         -mem-manager-allocate     
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        Label        -array-5-create-record    
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        7                         
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        PushI        0                         
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        8                         
+        Add                                    
+        PushI        4                         
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        Label        -array-5-start-store-children 
+        Duplicate                              
+        PushI        16                        
+        Add                                    
+        PushI        1                         
+        StoreI                                 
+        Duplicate                              
+        PushI        20                        
+        Add                                    
+        PushI        2                         
+        StoreI                                 
+        Label        -array-5-end-store-children 
+        StoreI                                 
+        Duplicate                              
+        PushI        24                        
+        Add                                    
+        Label        -array-6-                 
+        PushI        2                         
+        PushI        2                         
+        PushI        4                         
+        Multiply                               
+        PushI        16                        
+        Add                                    
+        Call         -mem-manager-allocate     
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        Label        -array-6-create-record    
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        7                         
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        PushI        0                         
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        8                         
+        Add                                    
+        PushI        4                         
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        Label        -array-6-start-store-children 
+        Duplicate                              
+        PushI        16                        
+        Add                                    
+        PushI        3                         
+        StoreI                                 
+        Duplicate                              
+        PushI        20                        
+        Add                                    
+        PushI        4                         
+        StoreI                                 
+        Label        -array-6-end-store-children 
+        StoreI                                 
+        Label        -array-7-end-store-children 
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% myArr2
+        LoadI                                  
+        Label        -print-array-8-           
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        8                         
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-2             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-3             
+        PushI        16                        
+        StoreI                                 
+        PushI        91                        
+        PushD        $print-format-character   
+        Printf                                 
+        Label        -print-array-8-loop       
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-8-join       
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushD        $print-temp-3             
+        LoadI                                  
+        Add                                    
+        PushD        $array-temp-1             
+        LoadI                                  
+        Exchange                               
+        PushD        $print-temp-1             
+        LoadI                                  
+        Exchange                               
+        PushD        $print-temp-2             
+        LoadI                                  
+        Exchange                               
+        PushD        $print-temp-3             
+        LoadI                                  
+        Exchange                               
+        LoadI                                  
+        Label        -print-array-9-           
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        8                         
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-2             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-3             
+        PushI        16                        
+        StoreI                                 
+        PushI        91                        
+        PushD        $print-format-character   
+        Printf                                 
+        Label        -print-array-9-loop       
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-9-join       
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushD        $print-temp-3             
+        LoadI                                  
+        Add                                    
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-temp-3             
+        LoadI                                  
+        PushD        $print-temp-2             
+        LoadI                                  
+        Add                                    
+        PushD        $print-temp-3             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        PushI        1                         
+        Subtract                               
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-9-join       
+        PushI        44                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushI        0                         
+        PushD        $print-format-character   
+        Printf                                 
+        Jump         -print-array-9-loop       
+        Label        -print-array-9-join       
+        PushI        93                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-temp-3             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-2             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-3             
+        LoadI                                  
+        PushD        $print-temp-2             
+        LoadI                                  
+        Add                                    
+        PushD        $print-temp-3             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        PushI        1                         
+        Subtract                               
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-8-join       
+        PushI        44                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushI        0                         
+        PushD        $print-format-character   
+        Printf                                 
+        Jump         -print-array-8-loop       
+        Label        -print-array-8-join       
+        PushI        93                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-format-newline     
+        Printf                                 
+        Label        -release-stmt-10-         
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% myArr2
+        LoadI                                  
+        PushD        $release-temp-1           
+        Exchange                               
+        StoreI                                 
+        PushD        $release-temp-1           
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        LoadI                                  
+        PushI        1                         
+        BTAnd                                  
+        JumpTrue     -release-stmt-10-join     
+        PushD        $release-temp-1           
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        LoadI                                  
+        PushI        2                         
+        BTAnd                                  
+        JumpTrue     -release-stmt-10-join     
+        PushD        $release-temp-1           
+        LoadI                                  
+        PushI        4                         
+        Add                                    
+        Duplicate                              
+        LoadI                                  
+        PushI        2                         
+        BTOr                                   
+        StoreI                                 
+        PushD        $release-temp-1           
+        LoadI                                  
+        Call         -mem-manager-deallocate   
+        Label        -release-stmt-10-join     
+        PushD        $global-memory-block      
+        PushI        8                         
+        Add                                    %% myArr2
+        LoadI                                  
+        Label        -print-array-11-          
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        8                         
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-2             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-3             
+        PushI        16                        
+        StoreI                                 
+        PushI        91                        
+        PushD        $print-format-character   
+        Printf                                 
+        Label        -print-array-11-loop      
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-11-join      
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushD        $print-temp-3             
+        LoadI                                  
+        Add                                    
+        PushD        $array-temp-1             
+        LoadI                                  
+        Exchange                               
+        PushD        $print-temp-1             
+        LoadI                                  
+        Exchange                               
+        PushD        $print-temp-2             
+        LoadI                                  
+        Exchange                               
+        PushD        $print-temp-3             
+        LoadI                                  
+        Exchange                               
+        LoadI                                  
+        Label        -print-array-12-          
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        8                         
+        Add                                    
+        LoadI                                  
+        PushD        $print-temp-2             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-3             
+        PushI        16                        
+        StoreI                                 
+        PushI        91                        
+        PushD        $print-format-character   
+        Printf                                 
+        Label        -print-array-12-loop      
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-12-join      
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushD        $print-temp-3             
+        LoadI                                  
+        Add                                    
+        LoadI                                  
+        PushD        $print-format-integer     
+        Printf                                 
+        PushD        $print-temp-3             
+        LoadI                                  
+        PushD        $print-temp-2             
+        LoadI                                  
+        Add                                    
+        PushD        $print-temp-3             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        PushI        1                         
+        Subtract                               
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-12-join      
+        PushI        44                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushI        0                         
+        PushD        $print-format-character   
+        Printf                                 
+        Jump         -print-array-12-loop      
+        Label        -print-array-12-join      
+        PushI        93                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushD        $print-temp-3             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-2             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-3             
+        LoadI                                  
+        PushD        $print-temp-2             
+        LoadI                                  
+        Add                                    
+        PushD        $print-temp-3             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        PushI        1                         
+        Subtract                               
+        PushD        $print-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $print-temp-1             
+        LoadI                                  
+        JumpFalse    -print-array-11-join      
+        PushI        44                        
+        PushD        $print-format-character   
+        Printf                                 
+        PushI        0                         
+        PushD        $print-format-character   
+        Printf                                 
+        Jump         -print-array-11-loop      
+        Label        -print-array-11-join      
+        PushI        93                        
+        PushD        $print-format-character   
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 

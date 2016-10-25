@@ -93,7 +93,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			
 			Type targetType = target.getBinding().getType();
 			if (targetType instanceof ArrayType && target.isIndexed()) {
-				targetType = ((ArrayType)targetType).getSubtype();
+				 targetType = ((ArrayType)targetType).getSubtype();
 			}
 			target.setType(targetType);
 			
@@ -216,7 +216,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		List<Type> childTypes = Arrays.asList(left.getType());
 		
 		Lextant operator = operatorFor(node);
-		// TODO: Move to FunctionSignature?
+		// TODO: Move to FunctionSignature for ArrayType()
 		if (operator == Keyword.LENGTH) {
 			if (childTypes.get(0) instanceof ArrayType) {
 				FunctionSignature signature = FunctionSignatures.signaturesOf(operator).get(0);
@@ -247,7 +247,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		assert node.nChildren() == 1;
 		List<Type> childTypes = Arrays.asList(node.getExpressionType(), node.getCastType());
 
-		// TODO: Move to FunctionSignature?
+		// TODO: Move to FunctionSignature for ArrayType()
 		if ((childTypes.get(0) instanceof ArrayType) && (childTypes.get(1) instanceof ArrayType)) {
 			if (((ArrayType)childTypes.get(0)).equals(childTypes.get(1))) {
 				FunctionSignature signature = FunctionSignatures.signaturesOf(Punctuator.PIPE).get(0);
@@ -289,13 +289,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				}
 			
 				// Set type
-				Type targetType = childTypes.get(0);
-				if (node.isIndexed()) {
-					node.setType(targetType);
-					node.getIndex().setType(PrimitiveType.INTEGER);
-				} else {
-					node.setSubtype(targetType);
-				}
+				node.setSubtype(childTypes.get(0));
 			} else {
 				if (childTypes.get(0) != PrimitiveType.INTEGER) {
 					typeCheckError(node, childTypes);
@@ -385,6 +379,27 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		identifierNode.setBinding(binding);
 	}
 	
+	
+	///////////////////////////////////////////////////////////////////////////
+	// IndexNode
+	@Override
+	public void visitLeave(IndexNode node) {
+		assert node.nChildren() >= 2;
+
+		if (!(node.child(0).getType() instanceof ArrayType)) {
+			typeCheckError(node, Arrays.asList(node.child(0).getType()));
+		}
+		
+		if (node.child(1).getType() != PrimitiveType.INTEGER) {
+			typeCheckError(node, Arrays.asList(node.child(0).getType()));
+		}
+
+		Type subtype = ((ArrayType)node.child(0).getType()).getSubtype();
+		if (subtype instanceof TypeLiteral) {
+			subtype = ((TypeLiteral) subtype).getType();
+		}
+		node.setType(subtype);
+	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	// error logging/printing

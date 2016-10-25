@@ -1,1 +1,1 @@
-exec {    #var myArr := [1, 2, 3, 4].    #var myArr := [[1, 2], [3, 4]].    #print myArr, _n_.#var a := [100, 200, 300][2].#print a, _n_.    var x := 1000.    var i := 2.#print b.    print [x, 2000, 3000][0 + 1], _n_.    #release myArr.    #print myArr, _n_.}
+exec {    # Test releasing array    var myArr := [1, 2, 3, 4].    print myArr, _n_.    release myArr.    print myArr, _n_.    # Test releasing multi-dim array    var myArr2 := [[1, 2], [3, 4]].    print myArr2, _n_.    release myArr2.    print myArr2, _n_.}
