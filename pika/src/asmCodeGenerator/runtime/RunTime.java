@@ -28,6 +28,8 @@ public class RunTime {
 	public static final String RATIONAL_TEMP_NUMERATOR_2 	= "$rational-temp-numerator-2";
 	public static final String RATIONAL_TEMP_DENOMINATOR_2 	= "$rational-temp-denominator-2";
 	
+	public static final String RELEASE_TEMP_1				= "$release-temp-1";
+	
 	public static final String INDEX_TEMP_1					= "$index-temp-1";
 	public static final String INDEX_TEMP_2					= "$index-temp-2";
 
@@ -151,6 +153,9 @@ public class RunTime {
 	
 	private ASMCodeFragment temporaryStorage() {
 		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
+		
+		frag.add(DLabel, RELEASE_TEMP_1);
+		frag.add(DataI, 0);
 		
 		frag.add(DLabel, INDEX_TEMP_1);
 		frag.add(DataI, 0);

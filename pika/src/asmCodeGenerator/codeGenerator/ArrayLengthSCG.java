@@ -1,7 +1,6 @@
 package asmCodeGenerator.codeGenerator;
 
 import asmCodeGenerator.codeStorage.*;
-import asmCodeGenerator.runtime.RunTime;
 
 public class ArrayLengthSCG implements SimpleCodeGenerator {
 	

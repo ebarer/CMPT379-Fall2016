@@ -1,1 +1,1 @@
-exec {    var test := 5 // 10.    print test, _n_.    var myString := "Hello, world!".    print myString, _n_.    var myString1 := "Hello, Elliot.".    print myString1, _n_.}
+exec {    # Test releasing array    var myArr := [1, 2, 3, 4].    print myArr, _n_.    release myArr.    print myArr, _n_.    # Test releasing multi-dim array    var myArr2 := [[1, 2], [3, 4]].    print myArr2, _n_.    release myArr2.    print myArr2, _n_.}

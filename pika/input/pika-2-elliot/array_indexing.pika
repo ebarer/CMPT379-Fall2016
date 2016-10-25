@@ -1,0 +1,1 @@
+exec {    # Other tests    var a := [100, 200, 300].    print a, _n_.    a[0] := 500.    print a, _n_.    var i := 2.    print a[i], _n_.    print [100, 200, 300][i*2 - 2];.    print [1000, 2000, 3000][0 + 1], _n_.}

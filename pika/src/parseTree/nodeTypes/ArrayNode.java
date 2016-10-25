@@ -34,11 +34,10 @@ public class ArrayNode extends ParseNode {
 		type.setSubtype(subtype);
 		super.setType(type);		
 	}
-	
 	public Type getSubtype() {
 		return ((ArrayType)super.getType()).getSubtype();
 	}
-	
+
 	public void setIsEmpty(boolean isEmpty) {
 		this.isEmpty = isEmpty;
 	}
@@ -53,7 +52,6 @@ public class ArrayNode extends ParseNode {
 		int size = headerSize + (typeSize * arraySize);
 		return size;
 	}
-	
 	public int getOffset(int i) {
 		int headerSize = 16;
 		int typeSize = this.getSubtype().getSize();
@@ -85,7 +83,7 @@ public class ArrayNode extends ParseNode {
 			
 	public void accept(ParseNodeVisitor visitor) {
 		visitor.visitEnter(this);
-		visitChildren(visitor);
+		visitChildren(visitor);		
 		visitor.visitLeave(this);
 	}
 }

@@ -8,7 +8,6 @@ import tokens.LextantToken;
 import tokens.Token;
 import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.Type;
-import semanticAnalyzer.types.TypeLiteral;
 
 public class CastNode extends ParseNode {
 	protected Type castType;
