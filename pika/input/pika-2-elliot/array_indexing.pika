@@ -1,1 +1,27 @@
-exec {    # Other tests    var a := [100, 200, 300].    print a, _n_.    a[0] := 500.    print a, _n_.    var i := 2.    print a[i], _n_.    print [100, 200, 300][i*2 - 2];.    print [1000, 2000, 3000][0 + 1], _n_.}
+exec {
+    var a := [100, 200, 300].
+    print a, _n_.
+    a[0] := 500.
+    print a, _n_.
+    print a[0], _n_, _n_.
+
+    var b := [100, 200].
+    print b, _n_.
+    b[0] := 99.
+    print b, _n_.
+    print b[0], _n_, _n_.
+
+    var c := [[100, 200], [300, 400]].
+    print c, _n_.
+    print c[0], _n_.
+    print c[0][0], _n_.
+    c[0][0] := 99.
+    print c[0][0], _n_.
+    print c[0], _n_.
+    print c, _n_.
+    print length c[0], _n_, _n_.
+
+    var i := 2.
+    print [100, 200, 300][i*2 - 2], _n_.
+    print [1000, 2000, 3000][0 + 1], _n_.
+}

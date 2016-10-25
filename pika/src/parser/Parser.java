@@ -562,11 +562,13 @@ public class Parser {
 			}
 			
 			if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
-				ParseNode index = parseIndex();
-				return IndexNode.withChildren(previouslyRead, node, index);
-			} else {
-				return node;
+				while (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+					ParseNode index = parseIndex();
+					node = IndexNode.withChildren(node.getToken(), node, index);
+				}
 			}
+				
+			return node;
 		}
 		
 		return parseLiteral();
@@ -749,12 +751,16 @@ public class Parser {
 		Token identifier = nowReading;
 		readToken();
 		
+		ParseNode node = new IdentifierNode(identifier);
+		
 		if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
-			ParseNode index = parseIndex();
-			return IdentifierNode.withChildren(identifier, index);
-		} else {
-			return new IdentifierNode(identifier);
+			while (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+				ParseNode index = parseIndex();
+				node = IndexNode.withChildren(node.getToken(), node, index);
+			}
 		}
+			
+		return node;
 	}
 	private boolean startsIdentifier(Token token) {
 		return token instanceof IdentifierToken;

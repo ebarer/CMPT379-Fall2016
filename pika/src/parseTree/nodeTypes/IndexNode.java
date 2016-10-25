@@ -10,7 +10,6 @@ public class IndexNode extends ParseNode {
 
 	public IndexNode(Token token) {
 		super(token);
-		assert(token instanceof LextantToken);
 	}
 
 	public IndexNode(ParseNode node) {
