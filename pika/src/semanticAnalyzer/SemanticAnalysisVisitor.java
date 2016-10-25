@@ -127,6 +127,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 	@Override
+	public void visitLeave(ReleaseNode node) {
+		assert node.nChildren() == 1;
+		Type type = node.child(0).getType();
+		if (type != PrimitiveType.STRING && !(type instanceof ArrayType)) {
+			typeCheckError(node, Arrays.asList(node.child(0).getType()));
+		}
+	}
+	@Override
 	public void visitLeave(IfNode node) {
 		assert node.nChildren() >= 2;
 		if (node.child(0).getType() != PrimitiveType.BOOLEAN) {
@@ -281,7 +289,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				}
 			
 				// Set type
-				node.setSubtype(childTypes.get(0));
+				Type targetType = childTypes.get(0);
+				if (node.isIndexed()) {
+					node.setType(targetType);
+					node.getIndex().setType(PrimitiveType.INTEGER);
+				} else {
+					node.setSubtype(targetType);
+				}
 			} else {
 				if (childTypes.get(0) != PrimitiveType.INTEGER) {
 					typeCheckError(node, childTypes);

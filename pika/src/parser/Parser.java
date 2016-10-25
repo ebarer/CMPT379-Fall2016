@@ -121,6 +121,9 @@ public class Parser {
 		if(startsAssignment(nowReading)) {
 			return parseAssignment();
 		}
+		if(startsReleaseStatement(nowReading)) {
+			return parseReleaseStatement();
+		}
 		if(startsIfStatement(nowReading)) {
 			return parseIfStatement();
 		}
@@ -135,6 +138,7 @@ public class Parser {
 	private boolean startsStatement(Token token) {
 		return startsDeclaration(token) ||
 			   startsAssignment(token) ||
+			   startsReleaseStatement(token) || 
 			   startsIfStatement(token) ||
 			   startsWhileStatement(token) ||
 			   startsPrintStatement(token) ||
@@ -146,6 +150,7 @@ public class Parser {
 		if(!startsDeclaration(nowReading)) {
 			return syntaxErrorNode("declaration");
 		}
+		
 		Token declarationToken = nowReading;
 		readToken();
 		
@@ -195,6 +200,25 @@ public class Parser {
 				startsParenthetical(token));
 	}
 	
+	///////////////////////////////////////////////////////////
+	// releaseSmt -> RELEASE expression
+	private ParseNode parseReleaseStatement() {
+		if(!startsReleaseStatement(nowReading)) {
+			return syntaxErrorNode("release");
+		}
+		
+		Token releaseToken = nowReading;
+		readToken();
+		
+		ParseNode identifier = parseIdentifier();
+		
+		expect(Punctuator.TERMINATOR);
+		
+		return ReleaseNode.withChild(releaseToken, identifier);
+	}
+	private boolean startsReleaseStatement(Token token){
+		return token.isLextant(Keyword.RELEASE);
+	}
 	
 	///////////////////////////////////////////////////////////
 	// control structures
@@ -246,84 +270,6 @@ public class Parser {
 	private boolean startsWhileStatement(Token token) {
 		return token.isLextant(Keyword.WHILE);
 	}
-
-	
-	///////////////////////////////////////////////////////////
-	// arrayExpression -> new arrayType (expression)
-	//	   			   -> clone expression 
-	private ParseNode parseArrayExpression() {
-		expect(Keyword.NEW, Keyword.CLONE);
-		
-		if (previouslyRead.isLextant(Keyword.NEW)) {
-			Token token = previouslyRead;
-			
-			ArrayType type = parseArrayType();
-			
-			expect(Punctuator.OPEN_PARENTHESIS);
-			ParseNode size = parseExpression();
-			expect(Punctuator.CLOSE_PARENTHESIS);
-			
-			boolean isEmpty = true;
-			return ArrayNode.withChildren(token, type, size, isEmpty);
-		}
-		
-		if (previouslyRead.isLextant(Keyword.CLONE)) {
-			Token token = previouslyRead;
-			ParseNode cloneNode = parseExpression();
-			return ArrayNode.withChildren(token, cloneNode, false);
-		}
-		
-		return syntaxErrorNode(nowReading.getLexeme());
-	}
-	private ArrayType parseArrayType() {
-		expect(Punctuator.OPEN_BRACKET);
-		ArrayType type = new ArrayType();
-		
-		TypeLiteral subtype = TypeLiteral.withToken(nowReading);
-		if (subtype == TypeLiteral.ARRAY) {
-			type.setSubtype(parseArrayType());	
-		} else {
-			type.setSubtype(subtype);
-			readToken();
-		}
-		
-		expect(Punctuator.CLOSE_BRACKET);
-		
-		return type;
-	}
-	// arrayExpression -> [expressionList] 
-	private ParseNode parseArrayExpression(ParseNode val) {
-		if (previouslyRead.isLextant(Punctuator.SEPARATOR, Punctuator.CLOSE_BRACKET)) {
-			Token token = Keyword.NEW.prototype();
-			ArrayNode result = ArrayNode.withChildren(token, val, false);
-
-			if (!previouslyRead.isLextant(Punctuator.CLOSE_BRACKET)) {
-				result = parseArrayExpressionList(result);
-				expect(Punctuator.CLOSE_BRACKET);
-			}
-			
-			return result;
-		}
-		
-		return syntaxErrorNode(nowReading.getLexeme());
-	}
-	private boolean startsArrayExpressionUniquely(Token token) {
-		return token.isLextant(Keyword.NEW, Keyword.CLONE);
-	}
-	private ArrayNode parseArrayExpressionList(ArrayNode parent) {
-		while(startsExpression(nowReading) || nowReading.isLextant(Punctuator.SEPARATOR)) {
-			if (startsExpression(nowReading)) {
-				ParseNode child = parseExpression();
-				parent.appendChild(child);
-			}
-			
-			if (nowReading.isLextant(Punctuator.SEPARATOR)) {
-				readToken();
-			}
-		}
-		return parent;
-	}
-
 	
 	///////////////////////////////////////////////////////////
 	// printStmt -> PRINT printExpressionList .
@@ -353,10 +299,8 @@ public class Parser {
 		return parent;
 	}
 	
-
 	// This adds the printExpression it parses to the children of the given parent
 	// printExpression -> (expr | nl)?     (nullable)
-	
 	private void parsePrintExpression(PrintStatementNode parent) {
 		if(startsExpression(nowReading)) {
 			ParseNode child = parseExpression();
@@ -377,11 +321,9 @@ public class Parser {
 	private boolean startsPrintExpression(Token token) {
 		return startsExpression(token) || token.isLextant(Keyword.TAB) || token.isLextant(Keyword.NEWLINE) ;
 	}
-	
-	
+
 	// This adds the printExpression it parses to the children of the given parent
 	// printExpression -> expr? ,? nl? 
-	
 	private void parsePrintSeparator(PrintStatementNode parent) {
 		if(!startsPrintSeparator(nowReading) && !nowReading.isLextant(Punctuator.TERMINATOR)) {
 			ParseNode child = syntaxErrorNode("print separator");
@@ -405,7 +347,8 @@ public class Parser {
 	private boolean startsPrintSeparator(Token token) {
 		return token.isLextant(Punctuator.SEPARATOR, Punctuator.SPACE);
 	}
-
+	
+	
 
 	///////////////////////////////////////////////////////////
 	// expressions
@@ -594,7 +537,15 @@ public class Parser {
 			
 			// Array
 			if (previouslyRead.isLextant(Punctuator.SEPARATOR, Punctuator.CLOSE_BRACKET)) {
-				return parseArrayExpression(left);
+				ParseNode node = parseArrayExpression(left);
+				
+				if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+					ParseNode index = parseIndex();
+					((ArrayNode)node).setIndex(index);
+					return node;
+				} else {
+					return node;
+				}
 			}
 			
 			// Cast
@@ -628,11 +579,85 @@ public class Parser {
 	private boolean startsCastOrArray(Token token) {
 		return token.isLextant(Punctuator.OPEN_BRACKET) || startsArrayExpressionUniquely(token);
 	}
-	
 	private boolean startsParenthetical(Token token) {
 		return token.isLextant(Punctuator.OPEN_PARENTHESIS); 
 	}
 
+	///////////////////////////////////////////////////////////
+	// arrayExpression -> new arrayType (expression)
+	//	   			   -> clone expression
+	//				   -> [expressionList]
+	private ParseNode parseArrayExpression() {
+		expect(Keyword.NEW, Keyword.CLONE);
+		
+		if (previouslyRead.isLextant(Keyword.NEW)) {
+			Token token = previouslyRead;
+			
+			ArrayType type = parseArrayType();
+			
+			expect(Punctuator.OPEN_PARENTHESIS);
+			ParseNode size = parseExpression();
+			expect(Punctuator.CLOSE_PARENTHESIS);
+			
+			boolean isEmpty = true;
+			return ArrayNode.withChildren(token, type, size, isEmpty);
+		}
+		
+		if (previouslyRead.isLextant(Keyword.CLONE)) {
+			Token token = previouslyRead;
+			ParseNode cloneNode = parseExpression();
+			return ArrayNode.withChildren(token, cloneNode, false);
+		}
+		
+		return syntaxErrorNode(nowReading.getLexeme());
+	}
+	private ParseNode parseArrayExpression(ParseNode val) {
+		if (previouslyRead.isLextant(Punctuator.SEPARATOR, Punctuator.CLOSE_BRACKET)) {
+			Token token = Keyword.NEW.prototype();
+			ArrayNode result = ArrayNode.withChildren(token, val, false);
+
+			if (!previouslyRead.isLextant(Punctuator.CLOSE_BRACKET)) {
+				result = parseArrayExpressionList(result);
+				expect(Punctuator.CLOSE_BRACKET);
+			}
+			
+			return result;
+		}
+		
+		return syntaxErrorNode(nowReading.getLexeme());
+	}
+	private ArrayNode parseArrayExpressionList(ArrayNode parent) {
+		while(startsExpression(nowReading) || nowReading.isLextant(Punctuator.SEPARATOR)) {
+			if (startsExpression(nowReading)) {
+				ParseNode child = parseExpression();
+				parent.appendChild(child);
+			}
+			
+			if (nowReading.isLextant(Punctuator.SEPARATOR)) {
+				readToken();
+			}
+		}
+		return parent;
+	}	
+	private ArrayType parseArrayType() {
+		expect(Punctuator.OPEN_BRACKET);
+		ArrayType type = new ArrayType();
+		
+		TypeLiteral subtype = TypeLiteral.withToken(nowReading);
+		if (subtype == TypeLiteral.ARRAY) {
+			type.setSubtype(parseArrayType());	
+		} else {
+			type.setSubtype(subtype);
+			readToken();
+		}
+		
+		expect(Punctuator.CLOSE_BRACKET);
+		
+		return type;
+	}
+	private boolean startsArrayExpressionUniquely(Token token) {
+		return token.isLextant(Keyword.NEW, Keyword.CLONE);
+	}
 	
 	// literal -> number | identifier | booleanConstant
 	private ParseNode parseLiteral() {

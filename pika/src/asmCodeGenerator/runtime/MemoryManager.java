@@ -426,7 +426,8 @@ public class MemoryManager {
 		// convert user block to mmgr block
 		frag.add(PushI, MMGR_TAG_SIZE_IN_BYTES);		// [... usableBlock tagsize]
 		frag.add(Subtract);								// [... block]
-		storeITo(frag, MMGR_DEALLOC_BLOCK);				// [...]
+		storeITo(frag, MMGR_DEALLOC_BLOCK);				// [...]		
+		
 		
 		// firstFree.prev = block
 		loadIFrom(frag, MMGR_DEALLOC_BLOCK);
@@ -461,6 +462,7 @@ public class MemoryManager {
 		
 		// return
 		loadIFrom(frag, MMGR_DEALLOC_RETURN_ADDRESS);
+		
 		frag.add(Return);
 		return frag;
 	}

@@ -167,6 +167,8 @@
         Label        $$bad-index               
         PushD        $errors-bad-index         
         Jump         $$general-runtime-error   
+        DLabel       $release-temp-1           
+        DataI        0                         
         DLabel       $index-temp-1             
         DataI        0                         
         DLabel       $index-temp-2             
@@ -264,173 +266,112 @@
         Return                                 
         DLabel       $usable-memory-start      
         DLabel       $global-memory-block      
-        DataZ        16                        
+        DataZ        8                         
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% test
-        PushI        5                         
-        PushI        10                        
-        PushD        $rational-temp-denominator-1 
+        Add                                    %% x
+        PushI        1000                      
+        StoreI                                 
+        PushD        $global-memory-block      
+        PushI        4                         
+        Add                                    %% i
+        PushI        2                         
+        StoreI                                 
+        Label        -array-1-                 
+        PushI        3                         
+        PushI        3                         
+        PushI        4                         
+        Multiply                               
+        PushI        16                        
+        Add                                    
+        Call         -mem-manager-allocate     
+        PushD        $array-temp-1             
         Exchange                               
         StoreI                                 
-        PushD        $rational-temp-numerator-1 
-        Exchange                               
+        Label        -array-1-create-record    
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        7                         
         StoreI                                 
-        Call         $sub-rational-find-gcd    
-        Duplicate                              
+        PushD        $array-temp-1             
+        LoadI                                  
         PushI        4                         
         Add                                    
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
+        PushI        0                         
         StoreI                                 
-        PushD        $rational-temp-numerator-1 
+        PushD        $array-temp-1             
         LoadI                                  
+        PushI        8                         
+        Add                                    
+        PushI        4                         
         StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        PushI        12                        
+        Add                                    
+        Exchange                               
+        StoreI                                 
+        PushD        $array-temp-1             
+        LoadI                                  
+        Label        -array-1-start-store-children 
+        Duplicate                              
+        PushI        16                        
+        Add                                    
         PushD        $global-memory-block      
         PushI        0                         
-        Add                                    %% test
+        Add                                    %% x
+        LoadI                                  
+        StoreI                                 
         Duplicate                              
-        PushI        4                         
+        PushI        20                        
+        Add                                    
+        PushI        2000                      
+        StoreI                                 
+        Duplicate                              
+        PushI        24                        
+        Add                                    
+        PushI        3000                      
+        StoreI                                 
+        Label        -array-1-end-store-children 
+        PushI        0                         
+        PushI        1                         
+        Add                                    
+        PushD        $index-temp-2             
+        Exchange                               
+        StoreI                                 
+        PushD        $index-temp-1             
+        Exchange                               
+        StoreI                                 
+        PushD        $index-temp-2             
+        LoadI                                  
+        JumpNeg      $$bad-index               
+        PushD        $index-temp-1             
+        LoadI                                  
+        PushI        12                        
         Add                                    
         LoadI                                  
-        Exchange                               
+        PushI        1                         
+        Subtract                               
+        PushD        $index-temp-2             
         LoadI                                  
-        Exchange                               
-        PushD        $rational-temp-denominator-1 
-        Exchange                               
-        StoreI                                 
-        PushD        $rational-temp-numerator-1 
-        Exchange                               
-        StoreI                                 
-        Label        -print-rational-1-        
-        PushD        $rational-temp-numerator-1 
+        Subtract                               
+        JumpNeg      $$bad-index               
+        PushD        $index-temp-1             
         LoadI                                  
-        PushD        $rational-temp-denominator-1 
+        PushD        $index-temp-1             
         LoadI                                  
-        Duplicate                              
-        JumpFalse    $$divide-by-zero          
-        Divide                                 
-        PushD        $print-rational-temp-1    
-        Exchange                               
-        StoreI                                 
-        PushD        $rational-temp-numerator-1 
+        PushI        8                         
+        Add                                    
         LoadI                                  
-        PushD        $rational-temp-denominator-1 
+        PushD        $index-temp-2             
         LoadI                                  
-        Remainder                              
-        PushD        $print-rational-temp-2    
-        Exchange                               
-        StoreI                                 
-        PushD        $rational-temp-denominator-1 
-        LoadI                                  
-        PushD        $print-rational-temp-3    
-        Exchange                               
-        StoreI                                 
-        PushD        $print-rational-temp-2    
-        LoadI                                  
-        JumpFalse    -print-rational-1-skip-fraction 
-        PushD        $print-rational-temp-1    
-        LoadI                                  
-        JumpFalse    -print-rational-1-skip-whole 
-        PushD        $print-rational-temp-3    
-        LoadI                                  
-        PushD        $print-rational-temp-2    
-        LoadI                                  
-        Duplicate                              
-        JumpPos      -print-rational-1-skip-negate 
-        Negate                                 
-        Label        -print-rational-1-skip-negate 
-        PushD        $print-rational-temp-1    
-        LoadI                                  
-        PushD        $print-format-rational    
-        Jump         -print-rational-1-join    
-        Label        -print-rational-1-skip-fraction 
-        PushD        $print-rational-temp-1    
+        Multiply                               
+        PushI        16                        
+        Add                                    
+        Add                                    
         LoadI                                  
         PushD        $print-format-integer     
-        Jump         -print-rational-1-join    
-        Label        -print-rational-1-skip-whole 
-        PushD        $print-rational-temp-3    
-        LoadI                                  
-        PushD        $print-rational-temp-2    
-        LoadI                                  
-        Duplicate                              
-        JumpPos      -print-rational-1-skip-fraction-negate 
-        Negate                                 
-        PushD        $print-format-rational-neg-fraction 
-        Jump         -print-rational-1-join    
-        Label        -print-rational-1-skip-fraction-negate 
-        PushD        $print-format-rational-fraction 
-        Jump         -print-rational-1-join    
-        Label        -print-rational-1-join    
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% myString
-        DLabel       -stringConstant-2-myString 
-        DataI        6                         
-        DataI        9                         
-        DataI        13                        
-        DataC        72                        %% "Hello, world!"
-        DataC        101                       
-        DataC        108                       
-        DataC        108                       
-        DataC        111                       
-        DataC        44                        
-        DataC        32                        
-        DataC        119                       
-        DataC        111                       
-        DataC        114                       
-        DataC        108                       
-        DataC        100                       
-        DataC        33                        
-        DataC        0                         
-        PushD        -stringConstant-2-myString 
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        8                         
-        Add                                    %% myString
-        LoadI                                  
-        PushI        12                        
-        Add                                    
-        PushD        $print-format-string      
-        Printf                                 
-        PushD        $print-format-newline     
-        Printf                                 
-        PushD        $global-memory-block      
-        PushI        12                        
-        Add                                    %% myString1
-        DLabel       -stringConstant-3-myString1 
-        DataI        6                         
-        DataI        9                         
-        DataI        14                        
-        DataC        72                        %% "Hello, Elliot."
-        DataC        101                       
-        DataC        108                       
-        DataC        108                       
-        DataC        111                       
-        DataC        44                        
-        DataC        32                        
-        DataC        69                        
-        DataC        108                       
-        DataC        108                       
-        DataC        105                       
-        DataC        111                       
-        DataC        116                       
-        DataC        46                        
-        DataC        0                         
-        PushD        -stringConstant-3-myString1 
-        StoreI                                 
-        PushD        $global-memory-block      
-        PushI        12                        
-        Add                                    %% myString1
-        LoadI                                  
-        PushI        12                        
-        Add                                    
-        PushD        $print-format-string      
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 

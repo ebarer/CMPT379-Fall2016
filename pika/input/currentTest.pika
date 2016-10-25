@@ -1,1 +1,1 @@
-exec {    var test := 5 // 10.    print test, _n_.    var myString := "Hello, world!".    print myString, _n_.    var myString1 := "Hello, Elliot.".    print myString1, _n_.}
+exec {    #var myArr := [1, 2, 3, 4].    #var myArr := [[1, 2], [3, 4]].    #print myArr, _n_.#var a := [100, 200, 300][2].#print a, _n_.    var x := 1000.    var i := 2.#print b.    print [x, 2000, 3000][0 + 1], _n_.    #release myArr.    #print myArr, _n_.}

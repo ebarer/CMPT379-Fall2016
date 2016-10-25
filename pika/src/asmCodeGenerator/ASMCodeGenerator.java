@@ -190,39 +190,13 @@ public class ASMCodeGenerator {
 			binding.generateAddress(code);
 			
 			if (node.isIndexed()) {
-				// TODO: Make into a code generator
-				// Store array base in INDEX_TEMP_1
-				code.add(LoadI);
-				code.add(PushD, RunTime.INDEX_TEMP_1);
-				code.add(Exchange);
-				code.add(StoreI);
+				code.add(ASMOpcode.LoadI);
 				
-				// Store array index in INDEX_TEMP_2
 				ASMCodeFragment offset = removeValueCode(node.child(0));
 				code.append(offset);
-				code.add(PushD, RunTime.INDEX_TEMP_2);
-				code.add(Exchange);
-				code.add(StoreI);
 				
-				// Check index bounds are valid
-				ArrayIndexBoundingSCG scg = new ArrayIndexBoundingSCG();
+				ArrayOffsetSCG scg = new ArrayOffsetSCG();
 				code.addChunk(scg.generate());
-				
-				// Generate Offset
-				// Total Offset = Record + Index
-				code.add(PushD, RunTime.INDEX_TEMP_1);
-				code.add(LoadI);
-				code.add(PushD, RunTime.INDEX_TEMP_1);
-				code.add(LoadI);
-				code.add(PushI, 8);
-				code.add(Add);
-				code.add(LoadI);		// Subtype Size
-				code.add(PushD, RunTime.INDEX_TEMP_2);
-				code.add(LoadI);
-				code.add(Multiply);		// Index Offset = Subtype * Index
-				code.add(PushI, 16);
-				code.add(Add);			// Record Offset
-				code.add(Add);
 			}
 		}		
 				
@@ -298,7 +272,67 @@ public class ASMCodeGenerator {
 				assert false: "Type " + type + " unimplemented in opcodeForStore()";
 			}
 		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		// if statements
+		public void visitLeave(ReleaseNode node) {
+			newVoidCode(node);
 			
+			Labeller labeller = new Labeller("release-stmt");
+			String startLabel = labeller.newLabel("");
+			String joinLabel  = labeller.newLabel("join");
+			
+			code.add(ASMOpcode.Label, startLabel);
+			
+			ASMCodeFragment arg1 = removeValueCode(node.child(0));
+			code.append(arg1);
+			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
+			code.add(ASMOpcode.Exchange);
+			code.add(ASMOpcode.StoreI);
+			
+			// Check permanent-status bit
+			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
+			code.add(ASMOpcode.LoadI);
+			code.add(ASMOpcode.PushI, 4);
+			code.add(ASMOpcode.Add);
+			code.add(ASMOpcode.LoadI);
+			code.add(ASMOpcode.PushI, 1);
+			code.add(ASMOpcode.BTAnd);
+			code.add(ASMOpcode.JumpTrue, joinLabel);
+			
+			// Check is-deleted-status bit
+			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
+			code.add(ASMOpcode.LoadI);
+			code.add(ASMOpcode.PushI, 4);
+			code.add(ASMOpcode.Add);
+			code.add(ASMOpcode.LoadI);
+			code.add(ASMOpcode.PushI, 2);
+			code.add(ASMOpcode.BTAnd);
+			code.add(ASMOpcode.JumpTrue, joinLabel);
+			
+			// TODO: Check the subtype-is-reference bit (recurse)
+			
+			
+
+			// Set is-deleted-status bit
+			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
+			code.add(ASMOpcode.LoadI);
+			code.add(ASMOpcode.PushI, 4);
+			code.add(ASMOpcode.Add);
+			code.add(ASMOpcode.Duplicate);
+			code.add(ASMOpcode.LoadI);
+			code.add(ASMOpcode.PushI, 2);
+			code.add(ASMOpcode.BTOr);
+			code.add(ASMOpcode.StoreI);
+			
+			// Deallocate memory
+			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
+			code.add(ASMOpcode.LoadI);
+			code.add(ASMOpcode.Call, MemoryManager.MEM_MANAGER_DEALLOCATE);
+			
+			code.add(ASMOpcode.Label, joinLabel);
+		}
+		
 		///////////////////////////////////////////////////////////////////////////
 		// if statements
 		public void visitLeave(IfNode node) {
@@ -617,7 +651,8 @@ public class ASMCodeGenerator {
 			String endChildrenLabel  = labeller.newLabel("end-store-children");
 			code.add(ASMOpcode.Label, startLabel);
 			
-			Lextant operator = node.getOperator();			
+			Lextant operator = node.getOperator();
+			
 			if (operator == Keyword.NEW) {
 				ASMCodeChunk subtypeChunk = new ASMCodeChunk();
 				
@@ -669,6 +704,16 @@ public class ASMCodeGenerator {
 					}
 				}
 				code.add(ASMOpcode.Label, endChildrenLabel);
+				
+				if (node.isIndexed()) {
+					ASMCodeFragment index = removeValueCode(node.getIndex());
+					code.append(index);
+										
+					ArrayOffsetSCG scg = new ArrayOffsetSCG();
+					code.addChunk(scg.generate());
+					
+					code.add(LoadI);
+				}
 			}
 			
 			if (operator == Keyword.CLONE) {				
