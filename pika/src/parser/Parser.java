@@ -486,6 +486,10 @@ public class Parser {
 			return syntaxErrorNode("unaryExpression");
 		}
 		
+		if (nowReading.isLextant(Keyword.CLONE)) {
+			return parseArrayExpression();
+		}
+		
 		if (startsNegation(nowReading) || startsLength(nowReading)) {
 			expect(Punctuator.NOT, Keyword.LENGTH);
 			Token token = previouslyRead;
@@ -498,7 +502,7 @@ public class Parser {
 		return parseAtomicExpression();
 	}
 	private boolean startsUnaryExpression(Token token) {
-		if (startsNegation(token) || startsLength(token)) {
+		if (startsNegation(token) || startsLength(token) || startsClone(token)) {
 			return true;
 		} else {
 			return startsAtomicExpression(token);
@@ -510,6 +514,10 @@ public class Parser {
 	private boolean startsLength(Token token) {
 		return token.isLextant(Keyword.LENGTH); 
 	}
+	private boolean startsClone(Token token) {
+		return token.isLextant(Keyword.CLONE); 
+	}
+	
 	
 	// atomicExpression -> literal
 	private ParseNode parseAtomicExpression() {
@@ -525,7 +533,7 @@ public class Parser {
 		}
 		
 		if (startsCastOrArray(nowReading)){
-			if (startsArrayExpressionUniquely(nowReading)) {
+			if (nowReading.isLextant(Keyword.NEW)) {
 				return parseArrayExpression();
 			}
 			
@@ -561,6 +569,7 @@ public class Parser {
 				return syntaxErrorNode(nowReading.getLexeme());
 			}
 			
+			// Check for index
 			if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
 				while (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
 					ParseNode index = parseIndex();
@@ -581,7 +590,13 @@ public class Parser {
 		}
 	}
 	private boolean startsCastOrArray(Token token) {
-		return token.isLextant(Punctuator.OPEN_BRACKET) || startsArrayExpressionUniquely(token);
+		return startsCast(token) || startsNewArray(token);
+	}
+	private boolean startsCast(Token token) {
+		return token.isLextant(Punctuator.OPEN_BRACKET); 
+	}
+	private boolean startsNewArray(Token token) {
+		return token.isLextant(Keyword.NEW); 
 	}
 	private boolean startsParenthetical(Token token) {
 		return token.isLextant(Punctuator.OPEN_PARENTHESIS); 
@@ -659,9 +674,7 @@ public class Parser {
 		
 		return type;
 	}
-	private boolean startsArrayExpressionUniquely(Token token) {
-		return token.isLextant(Keyword.NEW, Keyword.CLONE);
-	}
+
 	
 	// literal -> number | identifier | booleanConstant
 	private ParseNode parseLiteral() {

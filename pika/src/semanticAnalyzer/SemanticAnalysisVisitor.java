@@ -11,6 +11,7 @@ import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import parseTree.nodeTypes.*;
+import promoter.Promoter;
 import semanticAnalyzer.signatures.*;
 import semanticAnalyzer.types.*;
 import symbolTable.Binding;
@@ -19,6 +20,8 @@ import tokens.LextantToken;
 import tokens.Token;
 
 class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
+	public Promoter promoter = new Promoter();
+	
 	@Override
 	public void visitLeave(ParseNode node) {
 		throw new RuntimeException("Node class unimplemented in SemanticAnalysisVisitor: " + node.getClass());
@@ -98,7 +101,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		// Check for immutability
 		if (target.isMutable() == null) {
 			return;
-		} else if (!target.isMutable()) {
+		} else if (!target.isMutable() && !(node.child(0) instanceof IndexNode)) {
 			String targetName = target.getToken().getLexeme();
 			logError("Cannot assign to value: '" + targetName + "' is a 'const' constant.");
 			return;
@@ -163,7 +166,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			node.setType(signature.resultType());
 		} else {
 			typeCheckError(node, childTypes);
-			node.setType(PrimitiveType.ERROR);
 		}
 	}
 	private Lextant operatorFor(RationalOperatorNode node) {
@@ -186,7 +188,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				node.setType(signature.resultType());
 			} else {
 				typeCheckError(node, childTypes);
-				node.setType(PrimitiveType.ERROR);
 			}
 		} else {
 			FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
@@ -196,7 +197,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				node.setType(signature.resultType());
 			} else {
 				typeCheckError(node, childTypes);
-				node.setType(PrimitiveType.ERROR);
 			}
 		}
 	}
@@ -219,7 +219,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				node.setType(signature.resultType());
 			} else {
 				typeCheckError(node, childTypes);
-				node.setType(PrimitiveType.ERROR);
 			}
 		} else {
 			FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
@@ -229,7 +228,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				node.setType(signature.resultType());
 			} else {
 				typeCheckError(node, childTypes);
-				node.setType(PrimitiveType.ERROR);
 			}
 		}
 	}
@@ -272,23 +270,18 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		Lextant operator = operatorFor(node);
 		
 		if (operator == Keyword.NEW) {
-			if (!node.isEmpty()) {
-				// TODO: Perform promotions
-				
+			if (!node.isEmpty()) {				
 				// Check that all values are of same type
 				Type t = childTypes.get(0);
 				int numType = Collections.frequency(childTypes, t);
 				if (!(t instanceof ArrayType) && numType != node.nChildren()) {
 					typeCheckError(node, childTypes);
-					node.setType(PrimitiveType.ERROR);
+				} else {
+					node.setSubtype(childTypes.get(0));
 				}
-			
-				// Set type
-				node.setSubtype(childTypes.get(0));
 			} else {
 				if (childTypes.get(0) != PrimitiveType.INTEGER) {
 					typeCheckError(node, childTypes);
-					node.setType(PrimitiveType.ERROR);
 				}
 			}
 		}
@@ -298,7 +291,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 			if (!(childTypes.get(0) instanceof ArrayType)) {
 				typeCheckError(node, childTypes);
-				node.setType(PrimitiveType.ERROR);
 			}
 
 			node.setType(childTypes.get(0));
@@ -397,8 +389,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private void typeCheckError(ParseNode node, List<Type> operandTypes) {
 		Token token = node.getToken();
 		
+		// Check promotion
+		if (node instanceof OperatorNode && promoter.promotable((OperatorNode)node)) return;
+		if (node instanceof ArrayNode && promoter.promotable((ArrayNode)node)) return;
+		
 		logError("operator " + token.getLexeme() + " not defined for types " 
-				 + operandTypes  + " at " + token.getLocation());	
+				 + operandTypes  + " at " + token.getLocation());
+		
+		node.setType(PrimitiveType.ERROR);
 	}
 	private void logError(String message) {
 		PikaLogger log = PikaLogger.getLogger("compiler.semanticAnalyzer");

@@ -1,16 +1,2 @@
 exec {
-    # Test releasing array
-    var myArr := [1, 2, 3, 4].
-    print myArr, _n_.
-    release myArr.
-    print myArr, _n_.
-
-    # Test releasing multi-dim array
-    var myArr2 := [[1, 2], [3, 4]].
-    print myArr2, _n_.
-    release myArr2.
-    print myArr2, _n_.
-    print myArr2[0][1], _n_.
-
-    print length myArr2.
-}
+    # Test releasing array    var myArr := [1, 2, 3, 4].    release myArr.    # Test releasing multi-dim array    var myArr2 := [[1, 2], [3, 4]].    release myArr2.    release myArr2.}

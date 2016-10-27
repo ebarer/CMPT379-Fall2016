@@ -22,6 +22,8 @@ public class RunTime {
 	public static final String SPACE_PRINT_FORMAT     		= "$print-format-space";
 	public static final String BOOLEAN_TRUE_STRING    		= "$boolean-true-string";
 	public static final String BOOLEAN_FALSE_STRING   		= "$boolean-false-string";
+	public static final String ARRAY_ALREADY_RELEASED		= "$array-released";
+	public static final String ARRAY_RECURSE_RELEASED   	= "$array-recurse-released";
 	
 	public static final String RATIONAL_TEMP_NUMERATOR_1	= "$rational-temp-numerator-1";
 	public static final String RATIONAL_TEMP_DENOMINATOR_1 	= "$rational-temp-denominator-1";
@@ -29,6 +31,9 @@ public class RunTime {
 	public static final String RATIONAL_TEMP_DENOMINATOR_2 	= "$rational-temp-denominator-2";
 	
 	public static final String RELEASE_TEMP_1				= "$release-temp-1";
+	public static final String RELEASE_TEMP_2				= "$release-temp-2";
+	public static final String RELEASE_TEMP_3				= "$release-temp-3";
+	public static final String RELEASE_TEMP_4				= "$release-temp-4";
 	
 	public static final String INDEX_TEMP_1					= "$index-temp-1";
 	public static final String INDEX_TEMP_2					= "$index-temp-2";
@@ -106,6 +111,11 @@ public class RunTime {
 		frag.add(DLabel, BOOLEAN_FALSE_STRING);
 		frag.add(DataS, "false");
 		
+		frag.add(DLabel, ARRAY_RECURSE_RELEASED);
+		frag.add(DataS, "Array recursively released\n");
+		frag.add(DLabel, ARRAY_ALREADY_RELEASED);
+		frag.add(DataS, "Array already released\n");
+		
 		return frag;
 	}
 	
@@ -154,9 +164,6 @@ public class RunTime {
 	private ASMCodeFragment temporaryStorage() {
 		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
 		
-		frag.add(DLabel, RELEASE_TEMP_1);
-		frag.add(DataI, 0);
-		
 		frag.add(DLabel, INDEX_TEMP_1);
 		frag.add(DataI, 0);
 		frag.add(DLabel, INDEX_TEMP_2);
@@ -171,6 +178,15 @@ public class RunTime {
 		frag.add(DLabel, ARRAY_TEMP_4);
 		frag.add(DataI, 0);
 		frag.add(DLabel, ARRAY_TEMP_5);
+		frag.add(DataI, 0);
+		
+		frag.add(DLabel, RELEASE_TEMP_1);
+		frag.add(DataI, 0);
+		frag.add(DLabel, RELEASE_TEMP_2);
+		frag.add(DataI, 0);
+		frag.add(DLabel, RELEASE_TEMP_3);
+		frag.add(DataI, 0);
+		frag.add(DLabel, RELEASE_TEMP_4);
 		frag.add(DataI, 0);
 		
 		frag.add(DLabel, RATIONAL_TEMP_NUMERATOR_1);

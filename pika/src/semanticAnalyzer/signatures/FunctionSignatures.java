@@ -76,29 +76,29 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		new FunctionSignatures(Punctuator.ADD,
 		    new FunctionSignature(ASMOpcode.Add, 		INTEGER, 	INTEGER, 	INTEGER),
 		    new FunctionSignature(ASMOpcode.FAdd, 		FLOATING, 	FLOATING, 	FLOATING),
-		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.ADD, FLOATING),
-		    						RATIONAL,	RATIONAL, 	RATIONAL)
+		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.ADD),
+		    											RATIONAL,	RATIONAL, 	RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.SUBTRACT,
 		    new FunctionSignature(ASMOpcode.Subtract, 	INTEGER, 	INTEGER, 	INTEGER),
 		    new FunctionSignature(ASMOpcode.FSubtract, 	FLOATING, 	FLOATING, 	FLOATING),
-		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.SUBTRACT, FLOATING), 
-		    						RATIONAL, 	RATIONAL,	RATIONAL)
+		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.SUBTRACT), 
+		    											RATIONAL, 	RATIONAL,	RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.MULTIPLY,
 		    new FunctionSignature(ASMOpcode.Multiply, 	INTEGER, 	INTEGER, 	INTEGER),
 		    new FunctionSignature(ASMOpcode.FMultiply, 	FLOATING, 	FLOATING, 	FLOATING),
-		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.MULTIPLY, FLOATING), 
-		    						RATIONAL, 	RATIONAL, 	RATIONAL)
+		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.MULTIPLY), 
+		    											RATIONAL, 	RATIONAL, 	RATIONAL)
 		);
 		
 		new FunctionSignatures(Punctuator.DIVISION,
 		    new FunctionSignature(ASMOpcode.Divide, 	INTEGER, 	INTEGER, 	INTEGER),
 		    new FunctionSignature(ASMOpcode.FDivide, 	FLOATING, 	FLOATING, 	FLOATING),
-		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.DIVISION, FLOATING),
-		    						RATIONAL, 	RATIONAL, 	RATIONAL)
+		    new FunctionSignature(new RationalBinaryOperatorSCG(Punctuator.DIVISION),
+		    											RATIONAL, 	RATIONAL, 	RATIONAL)
 		);
 		
 		
@@ -149,43 +149,55 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		
 		// Comparison Operators
 		new FunctionSignatures(Punctuator.LESS_OR_EQUAL,
-			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+			new FunctionSignature(1, 	CHARACTER, 	CHARACTER, 	BOOLEAN),
 		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN),
+		    new FunctionSignature(new RationalComparisonOperatorSCG(), 
+										RATIONAL, 	RATIONAL,	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.LESS,
-			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+			new FunctionSignature(1, 	CHARACTER, 	CHARACTER, 	BOOLEAN),
 		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN),
+		    new FunctionSignature(new RationalComparisonOperatorSCG(), 
+					RATIONAL, 	RATIONAL,	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.GREATER,
-			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+			new FunctionSignature(1, 	CHARACTER, 	CHARACTER, 	BOOLEAN),
 		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN),
+		    new FunctionSignature(new RationalComparisonOperatorSCG(), 
+					RATIONAL, 	RATIONAL,	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.GREATER_OR_EQUAL,
-			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+			new FunctionSignature(1, 	CHARACTER, 	CHARACTER, 	BOOLEAN),
 		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN),
+		    new FunctionSignature(new RationalComparisonOperatorSCG(), 
+					RATIONAL, 	RATIONAL,	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.EQUAL,
 			new FunctionSignature(1,	new ArrayType(), 	new ArrayType(), 	BOOLEAN), 	// TODO: Variable type not working
 			new FunctionSignature(1, 	BOOLEAN, 	BOOLEAN, 	BOOLEAN),
-			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+			new FunctionSignature(1, 	CHARACTER, 	CHARACTER, 	BOOLEAN),
 		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1,	FLOATING, 	FLOATING, 	BOOLEAN)
+		    new FunctionSignature(1,	FLOATING, 	FLOATING, 	BOOLEAN),
+		    new FunctionSignature(new RationalComparisonOperatorSCG(), 
+					RATIONAL, 	RATIONAL,	BOOLEAN)
 		);
 		
 		new FunctionSignatures(Punctuator.NOT_EQUAL,
 			new FunctionSignature(1,	new ArrayType(), 	new ArrayType(), 	BOOLEAN), 	// TODO: Variable type not working
 			new FunctionSignature(1,	BOOLEAN, 	BOOLEAN, 	BOOLEAN),
-			new FunctionSignature(1, 	CHARACTER, CHARACTER, 	BOOLEAN),
+			new FunctionSignature(1, 	CHARACTER, 	CHARACTER, 	BOOLEAN),
 		    new FunctionSignature(1, 	INTEGER, 	INTEGER, 	BOOLEAN),
-		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN)
+		    new FunctionSignature(1, 	FLOATING, 	FLOATING, 	BOOLEAN),
+		    new FunctionSignature(new RationalComparisonOperatorSCG(), 
+					RATIONAL, 	RATIONAL,	BOOLEAN)
 		);
 		
 		
@@ -207,13 +219,6 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		new FunctionSignatures(Keyword.LENGTH,
 			new FunctionSignature(new ArrayLengthSCG(), 	new ArrayType(), 	INTEGER)		// TODO: Variable type not working
 		);
-		
-		
-		// Array Constructors
-//		new FunctionSignatures(Keyword.CLONE,
-//			new FunctionSignature(1, 	ArrayType.ARRAY),
-//			new FunctionSignature(1,	ArrayType.ARRAY,	ArrayType.ARRAY)
-//		);
 
 	}
 

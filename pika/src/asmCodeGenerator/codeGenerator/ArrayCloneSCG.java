@@ -166,10 +166,6 @@ public class ArrayCloneSCG implements SimpleCodeGenerator {
 		else if(type == PrimitiveType.RATIONAL || type == TypeLiteral.RATIONAL) {
 			RationalMemToStackSCG scg8 = new RationalMemToStackSCG();
 			chunk.append(scg8.generate());
-			
-			RationalStackToTempSCG scg = new RationalStackToTempSCG();
-			chunk.append(scg.generate());
-			chunk.add(ASMOpcode.Call, RunTime.SUB_RATIONAL_FIND_GCD);
 		}
 		else if(type == PrimitiveType.BOOLEAN || type == TypeLiteral.BOOLEAN) {
 			chunk.add(ASMOpcode.LoadC);
@@ -196,7 +192,10 @@ public class ArrayCloneSCG implements SimpleCodeGenerator {
 			chunk.add(ASMOpcode.StoreF);
 		}
 		else if(type == PrimitiveType.RATIONAL || type == TypeLiteral.RATIONAL) {
-			chunk.add(ASMOpcode.Exchange);
+			RationalStackToTempSCG scg = new RationalStackToTempSCG();
+			chunk.append(scg.generate());
+			chunk.add(ASMOpcode.Call, RunTime.SUB_RATIONAL_FIND_GCD);
+			
 			RationalTempToRationalSCG scg2 = new RationalTempToRationalSCG();
 			chunk.append(scg2.generate());
 		}

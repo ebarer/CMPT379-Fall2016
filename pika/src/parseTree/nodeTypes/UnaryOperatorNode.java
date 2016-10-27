@@ -8,7 +8,7 @@ import tokens.LextantToken;
 import tokens.Token;
 import semanticAnalyzer.signatures.FunctionSignature;
 
-public class UnaryOperatorNode extends ParseNode {
+public class UnaryOperatorNode extends OperatorNode {
 	protected FunctionSignature signature;
 
 	public UnaryOperatorNode(Token token) {

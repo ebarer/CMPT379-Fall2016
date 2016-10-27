@@ -7,11 +7,9 @@ import semanticAnalyzer.types.*;
 
 public class RationalBinaryOperatorSCG implements SimpleCodeGenerator {
 	public Punctuator punctuator;
-	public Type type;
 	
-	public RationalBinaryOperatorSCG(Punctuator p, Type t) {
+	public RationalBinaryOperatorSCG(Punctuator p) {
 		punctuator = p;
-		type = t;
 	}
 	
 	@Override

@@ -81,20 +81,6 @@ public class FunctionSignature {
 	public static FunctionSignature nullInstance() {
 		return neverMatchedSignature;
 	}
-	
-	// the switch here is ugly compared to polymorphism.  This should perhaps be a method on Lextant.
-//	public static FunctionSignature signatureOf(Lextant lextant) {
-//		assert(lextant instanceof Punctuator);	
-//		Punctuator punctuator = (Punctuator)lextant;
-//		
-//		switch(punctuator) {
-//		case ADD:		return addSignature;
-//		case MULTIPLY:	return multiplySignature;
-//		case GREATER:	return greaterSignature;
-//
-//		default:
-//			return neverMatchedSignature;
-//		}
-//	}
+
 
 }

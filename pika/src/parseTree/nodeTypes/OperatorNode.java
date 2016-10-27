@@ -7,15 +7,15 @@ import tokens.LextantToken;
 import tokens.Token;
 import semanticAnalyzer.signatures.FunctionSignature;
 
-public class RationalOperatorNode extends OperatorNode {
+public class OperatorNode extends ParseNode {
 	protected FunctionSignature signature;
 
-	public RationalOperatorNode(Token token) {
+	public OperatorNode(Token token) {
 		super(token);
 		assert(token instanceof LextantToken);
 	}
 
-	public RationalOperatorNode(ParseNode node) {
+	public OperatorNode(ParseNode node) {
 		super(node);
 	}
 	
@@ -35,17 +35,6 @@ public class RationalOperatorNode extends OperatorNode {
 	}
 	public FunctionSignature getSignature() {
 		return signature;
-	}
-
-	
-	////////////////////////////////////////////////////////////
-	// convenience factory
-	
-	public static RationalOperatorNode withChildren(Token token, ParseNode left, ParseNode right) {
-		RationalOperatorNode node = new RationalOperatorNode(token);
-		node.appendChild(left);
-		node.appendChild(right);
-		return node;
 	}
 	
 	

@@ -33,7 +33,6 @@ public class PrintArraySCG implements SimpleCodeGenerator {
 		ArrayStackToTempSCG scg1 = new ArrayStackToTempSCG();
 		chunk.append(scg1.generate());
 		
-		
 		// Get array length
 		chunk.add(ASMOpcode.PushD, RunTime.ARRAY_TEMP_1);
 		chunk.add(ASMOpcode.LoadI);

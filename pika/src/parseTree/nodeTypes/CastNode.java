@@ -12,7 +12,7 @@ import semanticAnalyzer.types.Type;
 public class CastNode extends ParseNode {
 	protected Type castType;
 	protected FunctionSignature signature;
-
+	
 	public CastNode(Token token) {
 		super(token);
 		assert(token.isLextant(Punctuator.PIPE));

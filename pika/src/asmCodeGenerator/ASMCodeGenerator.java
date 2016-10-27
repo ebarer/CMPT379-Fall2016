@@ -280,69 +280,23 @@ public class ASMCodeGenerator {
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
-		// if statements
+		// release statement
 		public void visitLeave(ReleaseNode node) {
 			newVoidCode(node);
 			
-			Labeller labeller = new Labeller("release-stmt");
-			String startLabel = labeller.newLabel("");
-			String joinLabel  = labeller.newLabel("join");
-			
-			code.add(ASMOpcode.Label, startLabel);
-			
+			Type type = node.child(0).getType();
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			code.append(arg1);
-			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
-			code.add(ASMOpcode.Exchange);
-			code.add(ASMOpcode.StoreI);
 			
-			// Check permanent-status bit
-			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
-			code.add(ASMOpcode.LoadI);
-			code.add(ASMOpcode.PushI, 4);
-			code.add(ASMOpcode.Add);
-			code.add(ASMOpcode.LoadI);
-			code.add(ASMOpcode.PushI, 1);
-			code.add(ASMOpcode.BTAnd);
-			code.add(ASMOpcode.JumpTrue, joinLabel);
+			if (type instanceof ArrayType) {
+				ArrayReleaseSCG arrayRelease = new ArrayReleaseSCG();
+				code.addChunk(arrayRelease.generate(type));
+			}
 			
-			// Check is-deleted-status bit
-			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
-			code.add(ASMOpcode.LoadI);
-			code.add(ASMOpcode.PushI, 4);
-			code.add(ASMOpcode.Add);
-			code.add(ASMOpcode.LoadI);
-			code.add(ASMOpcode.PushI, 2);
-			code.add(ASMOpcode.BTAnd);
-			code.add(ASMOpcode.JumpTrue, joinLabel);
-			
-			// TODO: Check the subtype-is-reference bit (recurse)
-			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
-			code.add(ASMOpcode.LoadI);
-			code.add(ASMOpcode.PushI, 4);
-			code.add(ASMOpcode.Add);
-			code.add(ASMOpcode.LoadI);
-			code.add(ASMOpcode.PushI, 4);
-			code.add(ASMOpcode.BTAnd);
-			code.add(ASMOpcode.JumpTrue, joinLabel);
-
-			// Set is-deleted-status bit
-			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
-			code.add(ASMOpcode.LoadI);
-			code.add(ASMOpcode.PushI, 4);
-			code.add(ASMOpcode.Add);
-			code.add(ASMOpcode.Duplicate);
-			code.add(ASMOpcode.LoadI);
-			code.add(ASMOpcode.PushI, 2);
-			code.add(ASMOpcode.BTOr);
-			code.add(ASMOpcode.StoreI);
-			
-			// Deallocate memory
-			code.add(ASMOpcode.PushD, RunTime.RELEASE_TEMP_1);
-			code.add(ASMOpcode.LoadI);
-			code.add(ASMOpcode.Call, MemoryManager.MEM_MANAGER_DEALLOCATE);
-			
-			code.add(ASMOpcode.Label, joinLabel);
+			if (type == PrimitiveType.STRING) {
+				StringReleaseSCG stringRelease = new StringReleaseSCG();
+				code.addChunk(stringRelease.generate(type));
+			}
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
@@ -451,19 +405,23 @@ public class ASMCodeGenerator {
 			Type type = node.getSignature().paramType();
 			
 			Labeller labeller = new Labeller("compare");
-			String startLabel = labeller.newLabel("arg1");
-			String arg2Label  = labeller.newLabel("arg2");
-			String subLabel   = labeller.newLabel("sub");
 			String trueLabel  = labeller.newLabel("true");
 			String falseLabel = labeller.newLabel("false");
 			String joinLabel  = labeller.newLabel("join");
 			
-			code.add(Label, startLabel);
 			code.append(arg1);
-			code.add(Label, arg2Label);
 			code.append(arg2);
-			code.add(Label, subLabel);
-			code.add((type == PrimitiveType.FLOATING) ? FSubtract : Subtract);
+
+			Object variant = node.getSignature().getVariant();
+			
+			if (variant instanceof SimpleCodeGenerator) {
+				SimpleCodeGenerator scg1 = (SimpleCodeGenerator) variant;
+				code.addChunk(scg1.generate());
+			}
+			
+			if (variant instanceof Integer) {
+				code.add((type == PrimitiveType.FLOATING) ? FSubtract : Subtract);
+			}
 			
 			Punctuator comparator = (Punctuator) operator;
 			switch(comparator) {
@@ -565,6 +523,8 @@ public class ASMCodeGenerator {
 			Type type = node.child(0).getType();
 			if (type == PrimitiveType.FLOATING) {
 				code.append(arg2);
+				DivisionByZeroSCG divZero = new DivisionByZeroSCG(type);
+				code.addChunk(divZero.generate());
 				code.add(ConvertF);
 				code.add(FMultiply);
 				code.add(ConvertI);
@@ -572,6 +532,8 @@ public class ASMCodeGenerator {
 				// TODO: Double check functionality
 				code.add(Exchange);
 				code.append(arg2);
+				DivisionByZeroSCG divZero = new DivisionByZeroSCG(type);
+				code.addChunk(divZero.generate());
 				code.add(Multiply);
 				code.add(Exchange);
 				code.add(Divide);
@@ -592,12 +554,16 @@ public class ASMCodeGenerator {
 			if (type == PrimitiveType.FLOATING) {
 				code.append(arg2);
 				frag.add(ConvertF);
+				DivisionByZeroSCG divZero = new DivisionByZeroSCG(type);
+				code.addChunk(divZero.generate());
 				frag.add(FMultiply);
 				frag.add(ConvertI);
 				code.append(frag);
 			} else if (type == PrimitiveType.RATIONAL) {
 				code.add(Exchange);
 				code.append(arg2);
+				DivisionByZeroSCG divZero = new DivisionByZeroSCG(type);
+				code.addChunk(divZero.generate());
 				frag.add(Multiply);
 				frag.add(Exchange);
 				frag.add(Divide);
@@ -714,6 +680,9 @@ public class ASMCodeGenerator {
 						
 						opcodeForStore(node.getSubtype());
 					}
+				} else {
+					ArrayPopulateSCG scg4 = new ArrayPopulateSCG();
+					code.addChunk(scg4.generate(node.getSubtype()));
 				}
 				code.add(ASMOpcode.Label, endChildrenLabel);
 			}
