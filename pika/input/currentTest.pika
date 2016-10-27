@@ -1,1 +1,1 @@
-exec {    const width := 4.    const height := 7.    const matrix := new [[float]](width).    var x := 0.    while(x < width) {    matrix[x] := new[float](height).    x := x + 1.    }    print matrix.}
+exec {    const str1 := "Hello, world!".    var str2 := "Hello, world!".    var str3 := "What's new world?".    print str1, _n_.    print str2, _n_.    print str3, _n_.}

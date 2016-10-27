@@ -10,6 +10,9 @@ public class ASMCodeChunk {
 	public ASMCodeChunk() {
 		instructions = new LinkedList<ASMInstruction>();
 	}
+	public void add(ASMInstruction instruction) {
+		instructions.add(instruction);
+	}
 	public void add(ASMOpcode opcode, int operand, String comment) {
 		ASMInstruction instruction = new ASMInstruction(opcode, operand, comment);
 		instructions.add(instruction);

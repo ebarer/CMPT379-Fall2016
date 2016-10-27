@@ -54,6 +54,10 @@ public class ASMCodeFragment {
 		chunks.addAll(fragment.chunks);
 	}
 	
+	public void add(ASMInstruction instruction){
+		lastChunk().add(instruction);
+	}
+	
 	public void add(ASMOpcode opcode, int operand, String comment) {
 		lastChunk().add(opcode, operand, comment);
 	}

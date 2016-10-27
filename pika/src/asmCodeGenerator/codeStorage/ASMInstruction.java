@@ -74,10 +74,8 @@ public class ASMInstruction {
 		return comment;
 	}
 	public boolean isString() {	
-		return (opcode == ASMOpcode.DLabel &&
-				argument instanceof String &&
-				((String)argument).contains("stringConstant")
-			   );
+		return (opcode == ASMOpcode.DLabel && argument instanceof String &&
+					((String)argument).contains("stringConstant"));
 	}
 
 	
