@@ -44,17 +44,14 @@ public class Optimizer {
 		BasicBlockFragment cfg = blockDivision(fragments[INSTRUCTIONS]);
 		constructControlFlowGraph(cfg);
 		
-		// Remove unreachable code
+		// Manipulate CFG
 		while(removeUnreachableCode(cfg) > 0);
-		
-		// Merge BasicBlocks
 		while(mergeBlocks(cfg));
-		printCFG(cfg);
-		
-		//
+		cloneBlocks(cfg);
 		
 		// Grab optimized instructions from BasicBlocks
 		fragments[INSTRUCTIONS] = replaceInstructions(cfg);
+		while(simplifyJumps(fragments[INSTRUCTIONS]));
 		
 		// Merge fragments
 		returnFragment.append(fragments[HEADER]);
@@ -518,7 +515,9 @@ public class Optimizer {
 		
 		return false;
 	}
-	
+	private void cloneBlocks(BasicBlockFragment fragment){
+		
+	}
 	
 	// Convert CFD into ASMCodeFragment
 	private ASMCodeFragment replaceInstructions(BasicBlockFragment fragment) {
@@ -534,6 +533,100 @@ public class Optimizer {
 		}
 		
 		return newInstructions;
+	}
+	private boolean simplifyJumps(ASMCodeFragment fragment) {
+		List<ASMInstruction> instructions = fragment.getChunk(0).getInstructions();
+		for (int i = 0; i < instructions.size(); i++) {
+			ASMInstruction instruction = instructions.get(i);
+			Object pushValue = instruction.getArgument();
+			
+			if (instruction.getOpcode() == ASMOpcode.PushI) {
+				ASMInstruction jumpInstruction = instructions.get(i+1);
+				ASMOpcode jumpCode = jumpInstruction.getOpcode();
+				Object jumpArgument = jumpInstruction.getArgument();
+				if (jumpCode.isJump()) {
+					ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
+					
+					switch (jumpCode) {
+					case JumpTrue:
+						if ((int)pushValue != 0) {
+							instructions.remove(i);
+							instructions.remove(i);
+							instructions.add(i, newInstruction);
+							return true;
+						}
+						break;
+					case JumpFalse:
+						if ((int)pushValue == 0) {
+							instructions.remove(i);
+							instructions.remove(i);
+							instructions.add(i, newInstruction);
+							return true;
+						}
+						break;	
+					case JumpPos:
+						if ((int)pushValue > 0) {
+							instructions.remove(i);
+							instructions.remove(i);
+							instructions.add(i, newInstruction);
+							return true;
+						}
+						break; 
+					case JumpNeg:
+						if ((int)pushValue < 0) {
+							instructions.remove(i);
+							instructions.remove(i);
+							instructions.add(i, newInstruction);
+							return true;
+						}
+						break;
+					default:
+							break;
+					}
+				}
+			}
+			
+			if (instruction.getOpcode() == ASMOpcode.PushF) {
+				ASMInstruction jumpInstruction = instructions.get(i+1);
+				ASMOpcode jumpCode = jumpInstruction.getOpcode();
+				ASMOpcode jumpArgument = jumpInstruction.getOpcode();
+				if (jumpCode.isJump()) {
+					ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
+					
+					switch (jumpCode) {
+					case JumpFZero:
+						if ((float)pushValue == 0.0) {
+							instructions.remove(i);
+							instructions.remove(i);
+							instructions.add(i, newInstruction);
+							return true;
+						}
+						break;	
+					case JumpFPos:
+						if ((float)pushValue > 0.0) {
+							instructions.remove(i);
+							instructions.remove(i);
+							instructions.add(i, newInstruction);
+							return true;
+						}
+						break; 
+					case JumpFNeg:
+						if ((float)pushValue < 0.0) {
+							instructions.remove(i);
+							instructions.remove(i);
+							instructions.add(i, newInstruction);
+							return true;
+						}
+						break; 
+					default:
+						break;
+					}
+				}
+			}
+			
+		}
+		
+		return false;
 	}
 
 	// CFG print helper function
