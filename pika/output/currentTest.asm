@@ -348,6 +348,7 @@
         DLabel       $mmgr-remove-next         
         DataZ        4                         
         DLabel       $heap-memory              
+        Label        basicBlock-1              
         Label        $$main                    
         PushD        $global-memory-block      
         PushI        0                         
@@ -364,6 +365,7 @@
         Add                                    %% sum
         PushI        0                         
         StoreI                                 
+        Label        basicBlock-2              
         Label        -while-stmt-6-loop        
         PushD        $global-memory-block      
         PushI        0                         
@@ -376,13 +378,17 @@
         Subtract                               
         JumpNeg      -compare-1-true           
         Jump         -compare-1-false          
+        Label        basicBlock-3              
         Label        -compare-1-true           
         PushI        1                         
         Jump         -compare-1-join           
+        Label        basicBlock-4              
         Label        -compare-1-false          
         PushI        0                         
+        Label        basicBlock-5              
         Label        -compare-1-join           
         JumpFalse    -while-stmt-6-join        
+        Label        basicBlock-6              
         PushD        $global-memory-block      
         PushI        12                        
         Add                                    %% j
@@ -393,6 +399,7 @@
         Add                                    %% factorial
         PushI        1                         
         StoreI                                 
+        Label        basicBlock-7              
         Label        -while-stmt-3-loop        
         PushD        $global-memory-block      
         PushI        12                        
@@ -405,13 +412,17 @@
         Subtract                               
         JumpPos      -compare-2-false          
         Jump         -compare-2-true           
+        Label        basicBlock-8              
         Label        -compare-2-true           
         PushI        1                         
         Jump         -compare-2-join           
+        Label        basicBlock-9              
         Label        -compare-2-false          
         PushI        0                         
+        Label        basicBlock-10             
         Label        -compare-2-join           
         JumpFalse    -while-stmt-3-join        
+        Label        basicBlock-11             
         PushD        $global-memory-block      
         PushI        16                        
         Add                                    %% factorial
@@ -436,6 +447,7 @@
         Add                                    
         StoreI                                 
         Jump         -while-stmt-3-loop        
+        Label        basicBlock-12             
         Label        -while-stmt-3-join        
         PushD        $global-memory-block      
         PushI        8                         
@@ -491,6 +503,7 @@
         Add                                    
         StoreI                                 
         Jump         -while-stmt-6-loop        
+        Label        basicBlock-13             
         Label        -while-stmt-6-join        
         PushD        -stringConstant-7-        
         PushI        12                        

@@ -26,4 +26,8 @@ public class Labeller {
 	public String newLabel(String suffix) {
 		return prefix + suffix;
 	}
+	
+	public void resetSequenceNumber() {
+		labelSequenceNumber = 0;
+	}
 }

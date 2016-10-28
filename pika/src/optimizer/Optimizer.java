@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import asmCodeGenerator.Labeller;
 import asmCodeGenerator.codeStorage.ASMCodeChunk;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMInstruction;
@@ -48,6 +50,8 @@ public class Optimizer {
 		// Merge BasicBlocks
 		while(mergeBlocks(cfg));
 		printCFG(cfg);
+		
+		//
 		
 		// Grab optimized instructions from BasicBlocks
 		fragments[INSTRUCTIONS] = replaceInstructions(cfg);
@@ -432,7 +436,7 @@ public class Optimizer {
 		HashMap<String, BasicBlock> labelLookup = fragment.getLabelLookup();
 		
 		for (int j = 0; j < fragment.getBlocks().size(); j++) {
-			BasicBlock block = fragment.getBlocks().get(j);
+			BasicBlock block = fragment.getBlock(j);
 			List<ASMInstruction> instructions = block.getInstructions();
 			
 			for (int i = 0; i < instructions.size(); i++) {
@@ -440,7 +444,7 @@ public class Optimizer {
 				
 				// If first instruction is not a label, connect to previous block
 				if (i == 0 && instruction.getOpcode() != ASMOpcode.Label) {
-					BasicBlock incomingBlock = fragment.getBlocks().get(j-1);
+					BasicBlock incomingBlock = fragment.getBlock(j-1);
 					
 					// Define incoming edge
 					block.addIncomingEdge(ASMOpcode.Nop, incomingBlock);
@@ -464,7 +468,7 @@ public class Optimizer {
 				
 				// If last instruction is not a Jump type or Call, connect to next block
 				if (i == (instructions.size()-1) && !instruction.getOpcode().isJump() && !instruction.getOpcode().isLeave()) {
-					BasicBlock outgoingBlock = fragment.getBlocks().get(j+1);
+					BasicBlock outgoingBlock = fragment.getBlock(j+1);
 					
 					// Define outgoing edge
 					block.addOutgoingEdge(ASMOpcode.Nop, outgoingBlock);
@@ -494,7 +498,7 @@ public class Optimizer {
 	}
 	private boolean mergeBlocks(BasicBlockFragment fragment) {		
 		for (int j = 0; j < fragment.getBlocks().size(); j++) {
-			BasicBlock block = fragment.getBlocks().get(j);
+			BasicBlock block = fragment.getBlock(j);
 			
 			if (block.getOutgoingEdges().size() == 1) {
 				for (BasicBlock target : block.getOutgoingEdges().values()) {
@@ -519,8 +523,11 @@ public class Optimizer {
 	// Convert CFD into ASMCodeFragment
 	private ASMCodeFragment replaceInstructions(BasicBlockFragment fragment) {
 		ASMCodeFragment newInstructions = new ASMCodeFragment(CodeType.GENERATES_VOID);
-		
-		for (BasicBlock block : fragment.getBlocks()) {
+
+		for (int i = 0; i < fragment.getBlocks().size(); i++) {
+			BasicBlock block = fragment.getBlock(i);
+			String labelString = "basicBlock-" + (i+1);
+			newInstructions.add(ASMOpcode.Label, labelString);
 			for (ASMInstruction instruction : block.getInstructions()) {
 				newInstructions.add(instruction);
 			}

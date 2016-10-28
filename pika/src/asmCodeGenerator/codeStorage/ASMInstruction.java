@@ -154,8 +154,8 @@ public class ASMInstruction {
 	
 	private String argumentString() {
 		if(opcode.takesFloat()) {
-			// TODO: Change to %-25g
-            return String.format("%-25f", (Double)argument);
+			// TODO: %-25f for accuracy, %-25g for grading
+            return String.format("%-25g", (Double)argument);
 		}
 		
 		if(opcode.takesInteger()) {
