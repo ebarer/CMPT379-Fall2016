@@ -12,7 +12,7 @@ import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = false;
+	boolean debug = true;
 	
 	private ASMCodeFragment fragment;
 	private static final int HEADER = 0;
@@ -386,7 +386,7 @@ public class Optimizer {
 		}
 	}
 
-	// Divide instructions into BasicBlocks, construct ControlFlowGraph
+	// Divide instructions into BasicBlocks, construct Control Flow Graph (CFG)
 	private BasicBlockFragment blockDivision(ASMCodeFragment fragment) {
 		BasicBlockFragment blocks = new BasicBlockFragment();
 		List<ASMInstruction> instructions = fragment.getChunk(0).getInstructions();
@@ -475,6 +475,8 @@ public class Optimizer {
 			}
 		}
 	}
+	
+	// Manipulate CFG
 	private int removeUnreachableCode(BasicBlockFragment fragment) {
 		int nodesRemoved = fragment.getBlocks().size();
 		
@@ -498,6 +500,11 @@ public class Optimizer {
 				for (BasicBlock target : block.getOutgoingEdges().values()) {
 					if (target.getIncomingEdges().size() == 1) {
 						if (target.getIncomingEdges().containsValue(block)) {
+							block.mergeWith(target);
+							fragment.getBlocks().remove(target);
+							
+							printCFG(fragment);
+							
 							return true;
 						}
 					}					
@@ -507,9 +514,9 @@ public class Optimizer {
 		
 		return false;
 	}
-
 	
 	
+	// Convert CFD into ASMCodeFragment
 	private ASMCodeFragment replaceInstructions(BasicBlockFragment fragment) {
 		ASMCodeFragment newInstructions = new ASMCodeFragment(CodeType.GENERATES_VOID);
 		
@@ -522,6 +529,7 @@ public class Optimizer {
 		return newInstructions;
 	}
 
+	// CFG print helper function
 	private void printCFG(BasicBlockFragment fragment) {
 		if (debug) {
 			StringBuilder stringBuilder = new StringBuilder();

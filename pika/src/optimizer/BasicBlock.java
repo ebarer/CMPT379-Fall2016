@@ -56,6 +56,16 @@ public class BasicBlock {
 		return visited;
 	}
 	
+	public void mergeWith(BasicBlock target) {
+		// Copy across instructions
+		for (ASMInstruction instruction : target.getInstructions()) {
+			this.instructions.add(instruction);
+		}
+		
+		// Set outgoing edges
+		this.outgoingEdges = target.outgoingEdges;
+	}
+	
 /////////////////////////////////////////////////////////////////////////
 // Print helper functions
 	@Override
