@@ -7,6 +7,7 @@ import java.util.Map;
 import asmCodeGenerator.codeGenerator.*;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import semanticAnalyzer.types.ArrayType;
+import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import semanticAnalyzer.types.TypeLiteral;
 import lexicalAnalyzer.Keyword;
@@ -35,6 +36,15 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		return this.key.equals(key);
 	}
 	
+	public int numAcceptingSignature(List<Type> types) {
+		int count = 0;
+		for(FunctionSignature functionSignature: this) {
+			if(functionSignature.accepts(types)) {
+				count++;
+			}
+		}
+		return count;
+	}
 	public FunctionSignature acceptingSignature(List<Type> types) {
 		for(FunctionSignature functionSignature: this) {
 			if(functionSignature.accepts(types)) {
@@ -62,6 +72,10 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 	public static FunctionSignature signature(Object key, List<Type> types) {
 		FunctionSignatures signatures = FunctionSignatures.signaturesOf(key);
 		return signatures.acceptingSignature(types);
+	}
+	public static int numSignature(Object key, List<Type> types) {
+		FunctionSignatures signatures = FunctionSignatures.signaturesOf(key);
+		return signatures.numAcceptingSignature(types);
 	}
 	
 	
@@ -218,6 +232,18 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		// Array Operators
 		new FunctionSignatures(Keyword.LENGTH,
 			new FunctionSignature(new ArrayLengthSCG(), 	new ArrayType(), 	INTEGER)		// TODO: Variable type not working
+		);
+		
+		
+		// Assignment Operators
+		new FunctionSignatures(Punctuator.ASSIGN,
+			new FunctionSignature(1,	BOOLEAN, 	BOOLEAN,	BOOLEAN),
+			new FunctionSignature(1,	CHARACTER, 	CHARACTER,	CHARACTER),
+			new FunctionSignature(1,	STRING, 	STRING,		STRING),
+			new FunctionSignature(1,	INTEGER, 	INTEGER,	INTEGER),
+			new FunctionSignature(1,	FLOATING, 	FLOATING,	FLOATING),
+			new FunctionSignature(1,	RATIONAL, 	RATIONAL,	RATIONAL),
+			new FunctionSignature(1,	ANY, 		ANY,		ANY)
 		);
 
 	}

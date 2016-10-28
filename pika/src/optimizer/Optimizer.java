@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import asmCodeGenerator.codeStorage.ASMCodeChunk;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMInstruction;
@@ -13,6 +12,8 @@ import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
+	boolean debug = false;
+	
 	private ASMCodeFragment fragment;
 	private static final int HEADER = 0;
 	private static final int DATA = 1;
@@ -27,7 +28,7 @@ public class Optimizer {
 	}
 	
 	public ASMCodeFragment optimize() {
-		ASMCodeFragment[] fragments = splitDirectives(fragment);
+		ASMCodeFragment[] fragments = splitDirectives(fragment);		
 		ASMCodeFragment returnFragment = new ASMCodeFragment(CodeType.GENERATES_VOID);
 		
 		// Eliminate duplicate strings
@@ -35,6 +36,21 @@ public class Optimizer {
 		
 		// Constant arithmetic calculations
 		constantFolding(fragments[INSTRUCTIONS]);
+		
+		// Divide instructions into BasicBlocks, construct ControlFlowGraph
+		fragments[INSTRUCTIONS] = flattenFragment(fragments[INSTRUCTIONS]);
+		BasicBlockFragment cfg = blockDivision(fragments[INSTRUCTIONS]);
+		constructControlFlowGraph(cfg);
+		
+		// Remove unreachable code
+		while(removeUnreachableCode(cfg) > 0);
+		
+		// Merge BasicBlocks
+		while(mergeBlocks(cfg));
+		printCFG(cfg);
+		
+		// Grab optimized instructions from BasicBlocks
+		fragments[INSTRUCTIONS] = replaceInstructions(cfg);
 		
 		// Merge fragments
 		returnFragment.append(fragments[HEADER]);
@@ -101,6 +117,18 @@ public class Optimizer {
 		}
 		
 		return fragments;
+	}
+	private ASMCodeFragment flattenFragment(ASMCodeFragment fragment) {
+		ASMCodeFragment flatFragment = new ASMCodeFragment(CodeType.GENERATES_VOID);
+		
+		for (ASMCodeChunk chunk : fragment.getChunks()) {
+			List<ASMInstruction> instructions = chunk.getInstructions();
+			for (int i = 0; i < instructions.size(); i++) {
+				flatFragment.add(instructions.get(i));
+			}
+		}
+		
+		return flatFragment;
 	}
 	
 	// Eliminate duplicate strings
@@ -357,4 +385,156 @@ public class Optimizer {
 			numChanges++;
 		}
 	}
+
+	// Divide instructions into BasicBlocks, construct ControlFlowGraph
+	private BasicBlockFragment blockDivision(ASMCodeFragment fragment) {
+		BasicBlockFragment blocks = new BasicBlockFragment();
+		List<ASMInstruction> instructions = fragment.getChunk(0).getInstructions();
+		
+		for (int i = 0; i < instructions.size(); i++) {
+			ASMInstruction instruction = instructions.get(i);
+			
+			if (instruction.getOpcode() == ASMOpcode.Label) {
+				if (!blocks.lastBlock().isEmpty()) {
+					blocks.newBlock();
+				}
+				
+				blocks.add(instructions.get(i));
+				continue;
+			}
+			
+			if (instruction.getOpcode() == ASMOpcode.Return ||
+				instruction.getOpcode() == ASMOpcode.Halt ||
+				instruction.getOpcode() == ASMOpcode.Call) {
+				
+				blocks.add(instructions.get(i));
+				blocks.newBlock();
+				continue;
+			}
+			
+			if (instruction.getOpcode().isJump()) {
+				while (instruction.getOpcode().isJump()) {
+					blocks.add(instruction);
+					instruction = instructions.get(++i);
+				}
+				
+				i--;
+				blocks.newBlock();
+				continue;
+			}
+			
+			blocks.add(instructions.get(i));
+		}
+		
+		return blocks;
+	}
+	private void constructControlFlowGraph(BasicBlockFragment fragment) {
+		HashMap<String, BasicBlock> labelLookup = fragment.getLabelLookup();
+		
+		for (int j = 0; j < fragment.getBlocks().size(); j++) {
+			BasicBlock block = fragment.getBlocks().get(j);
+			List<ASMInstruction> instructions = block.getInstructions();
+			
+			for (int i = 0; i < instructions.size(); i++) {
+				ASMInstruction instruction = instructions.get(i);
+				
+				// If first instruction is not a label, connect to previous block
+				if (i == 0 && instruction.getOpcode() != ASMOpcode.Label) {
+					BasicBlock incomingBlock = fragment.getBlocks().get(j-1);
+					
+					// Define incoming edge
+					block.addIncomingEdge(ASMOpcode.Nop, incomingBlock);
+					
+					// Define outgoing edge
+					incomingBlock.addOutgoingEdge(ASMOpcode.Nop, block);
+				}
+				
+				// If instruction is a jump, define edges
+				if (instruction.getOpcode().isJump()) {	
+					String label = (String)instruction.getArgument();
+					ASMOpcode opcode = instruction.getOpcode();
+					BasicBlock outgoingBlock = labelLookup.get(label);
+					
+					// Define outgoing edge
+					block.addOutgoingEdge(opcode, outgoingBlock);
+					
+					// Define incoming edge
+					outgoingBlock.addIncomingEdge(opcode, block);
+				}
+				
+				// If last instruction is not a Jump type or Call, connect to next block
+				if (i == (instructions.size()-1) && !instruction.getOpcode().isJump() && !instruction.getOpcode().isLeave()) {
+					BasicBlock outgoingBlock = fragment.getBlocks().get(j+1);
+					
+					// Define outgoing edge
+					block.addOutgoingEdge(ASMOpcode.Nop, outgoingBlock);
+					
+					// Define incoming edge
+					outgoingBlock.addIncomingEdge(ASMOpcode.Nop, block);
+				}
+			}
+		}
+	}
+	private int removeUnreachableCode(BasicBlockFragment fragment) {
+		int nodesRemoved = fragment.getBlocks().size();
+		
+		fragment.traverseTree();
+		fragment.traverseSubroutines();
+		
+		// Remove unvisited nodes
+		fragment.getBlocks().removeIf(block -> !block.wasVisited());
+		nodesRemoved = nodesRemoved - fragment.getBlocks().size();
+		
+		fragment.unvisitAllBlocks();
+		fragment.locateSubroutines();
+		
+		return nodesRemoved;
+	}
+	private boolean mergeBlocks(BasicBlockFragment fragment) {		
+		for (int j = 0; j < fragment.getBlocks().size(); j++) {
+			BasicBlock block = fragment.getBlocks().get(j);
+			
+			if (block.getOutgoingEdges().size() == 1) {
+				for (BasicBlock target : block.getOutgoingEdges().values()) {
+					if (target.getIncomingEdges().size() == 1) {
+						if (target.getIncomingEdges().containsValue(block)) {
+							return true;
+						}
+					}					
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	
+	
+	private ASMCodeFragment replaceInstructions(BasicBlockFragment fragment) {
+		ASMCodeFragment newInstructions = new ASMCodeFragment(CodeType.GENERATES_VOID);
+		
+		for (BasicBlock block : fragment.getBlocks()) {
+			for (ASMInstruction instruction : block.getInstructions()) {
+				newInstructions.add(instruction);
+			}
+		}
+		
+		return newInstructions;
+	}
+
+	private void printCFG(BasicBlockFragment fragment) {
+		if (debug) {
+			StringBuilder stringBuilder = new StringBuilder();
+			int i = 1;
+			for (BasicBlock block : fragment.getBlocks()) {
+				stringBuilder.append("Block #" + (i++) + ":\n");
+				stringBuilder.append("  Incoming Number of Edges: " + block.getIncomingEdges().size() + "\n");
+				stringBuilder.append("  Outgoing Number of Edges: " + block.getOutgoingEdges().size() + "\n\n");
+			    stringBuilder.append(block.toString());
+			    stringBuilder.append("===============================================================\n");
+			}
+			System.out.println(stringBuilder.toString());
+		}
+	}
+
 }

@@ -111,14 +111,19 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		Type targetType = node.child(0).getType();
 		ParseNode expression = node.child(1);
 		Type expressionType = expression.getType();
+		List<Type> childTypes = Arrays.asList(targetType, expressionType);
 
 		if ((targetType instanceof ArrayType) && (expressionType instanceof ArrayType)) {				
 			if (!((ArrayType)targetType).equals(expressionType)) {
-				logError("Cannot assign value of type '" + expressionType.infoString() + "' to type '" + targetType.infoString() + "'");
+				typeCheckError(node, childTypes);
+				return;
+				//logError("Cannot assign value of type '" + expressionType.infoString() + "' to type '" + targetType.infoString() + "'");
 			}
 		} else {
 			if (targetType != expressionType) {
-				logError("Cannot assign value of type '" + expressionType + "' to type '" + targetType + "'");
+				typeCheckError(node, childTypes);
+				return;
+				//logError("Cannot assign value of type '" + expressionType + "' to type '" + targetType + "'");
 			}
 		}
 		
@@ -274,14 +279,18 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				// Check that all values are of same type
 				Type t = childTypes.get(0);
 				int numType = Collections.frequency(childTypes, t);
-				if (!(t instanceof ArrayType) && numType != node.nChildren()) {
+				if (numType != node.nChildren()) {
 					typeCheckError(node, childTypes);
-				} else {
+					return;
+				}
+				
+				if (node instanceof ArrayNode) {
 					node.setSubtype(childTypes.get(0));
 				}
 			} else {
 				if (childTypes.get(0) != PrimitiveType.INTEGER) {
 					typeCheckError(node, childTypes);
+					return;
 				}
 			}
 		}
@@ -291,6 +300,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 			if (!(childTypes.get(0) instanceof ArrayType)) {
 				typeCheckError(node, childTypes);
+				return;
 			}
 
 			node.setType(childTypes.get(0));
@@ -370,10 +380,12 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 		if (!(node.child(0).getType() instanceof ArrayType)) {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
+			return;
 		}
 		
 		if (node.child(1).getType() != PrimitiveType.INTEGER) {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
+			return;
 		}
 
 		// TODO: Check before calling subtype()
@@ -393,8 +405,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		if (node instanceof OperatorNode && promoter.promotable((OperatorNode)node)) return;
 		if (node instanceof ArrayNode && promoter.promotable((ArrayNode)node)) return;
 		
+		List<String> errorTypes = new ArrayList<String>();
+		operandTypes.forEach((child) -> errorTypes.add(child.infoString()));
 		logError("operator " + token.getLexeme() + " not defined for types " 
-				 + operandTypes  + " at " + token.getLocation());
+				 + errorTypes  + " at " + token.getLocation());
 		
 		node.setType(PrimitiveType.ERROR);
 	}

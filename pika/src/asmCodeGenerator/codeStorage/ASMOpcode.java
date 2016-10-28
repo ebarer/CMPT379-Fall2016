@@ -187,4 +187,18 @@ public enum ASMOpcode {
 			   );
 	}
 	
+	public boolean isJump() {
+		return (this == ASMOpcode.Jump 		|| this == ASMOpcode.JumpFalse 	||
+				this == ASMOpcode.JumpFNeg 	|| this == ASMOpcode.JumpFPos 	||
+				this == ASMOpcode.JumpFZero || this == ASMOpcode.JumpNeg 	||
+				this == ASMOpcode.JumpPos 	|| this == ASMOpcode.JumpTrue 	||
+				this == ASMOpcode.JumpV 	|| 
+				this == ASMOpcode.Call		|| this == ASMOpcode.CallV
+			   );
+	}
+	
+	public boolean isLeave() {
+		return (this == ASMOpcode.Return || this == ASMOpcode.Halt);
+	}
+	
 }

@@ -18,6 +18,7 @@ import tokens.Token;
 
 public class Promoter {
 	LinkedHashMap<ParseNode, List<TypeLiteral>> promotions;
+	boolean debug = false;
 	
 	public Promoter() {
 		promotions = new LinkedHashMap<ParseNode, List<TypeLiteral>>();
@@ -41,6 +42,9 @@ public class Promoter {
 		for (int i = 0; i < childTypes.size(); i++) {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.INTEGER);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
 				signature = FunctionSignatures.signature(operator, childTypes);
 				if (signature.isNull()) {
 					childTypes.set(i, PrimitiveType.CHARACTER);
@@ -60,6 +64,9 @@ public class Promoter {
 		for (int i = 0; i < childTypes.size(); i++) {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.FLOATING);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
 				signature = FunctionSignatures.signature(operator, childTypes);
 				if (signature.isNull()) {
 					childTypes.set(i, PrimitiveType.CHARACTER);
@@ -70,6 +77,9 @@ public class Promoter {
 		    
 		    if (childTypes.get(i) == PrimitiveType.INTEGER) {
 		    	childTypes.set(i, PrimitiveType.FLOATING);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
 				signature = FunctionSignatures.signature(operator, childTypes);
 				if (signature.isNull()) {
 					childTypes.set(i, PrimitiveType.INTEGER);
@@ -89,6 +99,9 @@ public class Promoter {
 		for (int i = 0; i < childTypes.size(); i++) {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.RATIONAL);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
 				signature = FunctionSignatures.signature(operator, childTypes);
 				if (signature.isNull()) {
 					childTypes.set(i, PrimitiveType.CHARACTER);
@@ -99,6 +112,9 @@ public class Promoter {
 		    
 		    if (childTypes.get(i) == PrimitiveType.INTEGER) {
 		    	childTypes.set(i, PrimitiveType.RATIONAL);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
 				signature = FunctionSignatures.signature(operator, childTypes);
 				if (signature.isNull()) {
 					childTypes.set(i, PrimitiveType.INTEGER);
@@ -127,7 +143,7 @@ public class Promoter {
 		int totalNum = node.nChildren();
 		
 		// Check for cast to integer
-		for (int i = 0; i < childTypes.size(); i++) {
+		for (int i = 0; i < childTypes.size(); i++) {			
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	castTypes.set(i, PrimitiveType.INTEGER);
 				addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER));
