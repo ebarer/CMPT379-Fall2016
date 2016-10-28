@@ -382,7 +382,16 @@
         PushD        $global-memory-block      
         PushI        0                         
         Add                                    %% a
-        PushF        235.800                   
+        PushI        101                       
+        ConvertF                               
+        PushF        4.20000                   
+        PushI        9                         
+        ConvertF                               
+        FMultiply                              
+        FAdd                                   
+        PushI        97                        
+        ConvertF                               
+        FAdd                                   
         StoreF                                 
         PushD        $global-memory-block      
         PushI        0                         
@@ -395,7 +404,10 @@
         PushD        $global-memory-block      
         PushI        8                         
         Add                                    %% b
-        PushF        105.300                   
+        PushI        101                       
+        ConvertF                               
+        PushF        4.30000                   
+        FAdd                                   
         StoreF                                 
         PushD        $global-memory-block      
         PushI        8                         
@@ -485,7 +497,7 @@
         PushD        $rational-temp-numerator-1 
         Exchange                               
         StoreI                                 
-        Label        -print-rational-1-        
+        Label        -print-rational-234-      
         PushD        $rational-temp-numerator-1 
         LoadI                                  
         PushD        $rational-temp-denominator-1 
@@ -512,56 +524,59 @@
         StoreI                                 
         PushD        $print-rational-temp-2    
         LoadI                                  
-        JumpFalse    -print-rational-1-skip-fraction 
+        JumpFalse    -print-rational-234-skip-fraction 
         Label        basicBlock-13             
         PushD        $print-rational-temp-1    
         LoadI                                  
-        JumpFalse    -print-rational-1-skip-whole 
+        JumpFalse    -print-rational-234-skip-whole 
         Label        basicBlock-14             
         PushD        $print-rational-temp-3    
         LoadI                                  
         PushD        $print-rational-temp-2    
         LoadI                                  
         Duplicate                              
-        JumpPos      -print-rational-1-skip-negate 
+        JumpPos      -print-rational-234-skip-negate 
         Label        basicBlock-15             
         Negate                                 
         Label        basicBlock-16             
-        Label        -print-rational-1-skip-negate 
+        Label        -print-rational-234-skip-negate 
         PushD        $print-rational-temp-1    
         LoadI                                  
         PushD        $print-format-rational    
-        Jump         -print-rational-1-join    
+        Jump         -print-rational-234-join  
         Label        basicBlock-17             
-        Label        -print-rational-1-skip-fraction 
+        Label        -print-rational-234-skip-fraction 
         PushD        $print-rational-temp-1    
         LoadI                                  
         PushD        $print-format-integer     
-        Jump         -print-rational-1-join    
+        Jump         -print-rational-234-join  
         Label        basicBlock-18             
-        Label        -print-rational-1-skip-whole 
+        Label        -print-rational-234-skip-whole 
         PushD        $print-rational-temp-3    
         LoadI                                  
         PushD        $print-rational-temp-2    
         LoadI                                  
         Duplicate                              
-        JumpPos      -print-rational-1-skip-fraction-negate 
+        JumpPos      -print-rational-234-skip-fraction-negate 
         Label        basicBlock-19             
         Negate                                 
         PushD        $print-format-rational-neg-fraction 
-        Jump         -print-rational-1-join    
+        Jump         -print-rational-234-join  
         Label        basicBlock-20             
-        Label        -print-rational-1-skip-fraction-negate 
+        Label        -print-rational-234-skip-fraction-negate 
         PushD        $print-format-rational-fraction 
-        Jump         -print-rational-1-join    
-        Label        -print-rational-1-join    
+        Jump         -print-rational-234-join  
+        Label        -print-rational-234-join  
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 
         PushD        $global-memory-block      
         PushI        24                        
         Add                                    %% d
-        PushF        9.30000                   
+        PushI        5                         
+        ConvertF                               
+        PushF        4.30000                   
+        FAdd                                   
         StoreF                                 
         PushD        $global-memory-block      
         PushI        24                        
@@ -651,7 +666,7 @@
         PushD        $rational-temp-numerator-1 
         Exchange                               
         StoreI                                 
-        Label        -print-rational-2-        
+        Label        -print-rational-235-      
         PushD        $rational-temp-numerator-1 
         LoadI                                  
         PushD        $rational-temp-denominator-1 
@@ -678,49 +693,49 @@
         StoreI                                 
         PushD        $print-rational-temp-2    
         LoadI                                  
-        JumpFalse    -print-rational-2-skip-fraction 
+        JumpFalse    -print-rational-235-skip-fraction 
         Label        basicBlock-24             
         PushD        $print-rational-temp-1    
         LoadI                                  
-        JumpFalse    -print-rational-2-skip-whole 
+        JumpFalse    -print-rational-235-skip-whole 
         Label        basicBlock-25             
         PushD        $print-rational-temp-3    
         LoadI                                  
         PushD        $print-rational-temp-2    
         LoadI                                  
         Duplicate                              
-        JumpPos      -print-rational-2-skip-negate 
+        JumpPos      -print-rational-235-skip-negate 
         Label        basicBlock-26             
         Negate                                 
         Label        basicBlock-27             
-        Label        -print-rational-2-skip-negate 
+        Label        -print-rational-235-skip-negate 
         PushD        $print-rational-temp-1    
         LoadI                                  
         PushD        $print-format-rational    
-        Jump         -print-rational-2-join    
+        Jump         -print-rational-235-join  
         Label        basicBlock-28             
-        Label        -print-rational-2-skip-fraction 
+        Label        -print-rational-235-skip-fraction 
         PushD        $print-rational-temp-1    
         LoadI                                  
         PushD        $print-format-integer     
-        Jump         -print-rational-2-join    
+        Jump         -print-rational-235-join  
         Label        basicBlock-29             
-        Label        -print-rational-2-skip-whole 
+        Label        -print-rational-235-skip-whole 
         PushD        $print-rational-temp-3    
         LoadI                                  
         PushD        $print-rational-temp-2    
         LoadI                                  
         Duplicate                              
-        JumpPos      -print-rational-2-skip-fraction-negate 
+        JumpPos      -print-rational-235-skip-fraction-negate 
         Label        basicBlock-30             
         Negate                                 
         PushD        $print-format-rational-neg-fraction 
-        Jump         -print-rational-2-join    
+        Jump         -print-rational-235-join  
         Label        basicBlock-31             
-        Label        -print-rational-2-skip-fraction-negate 
+        Label        -print-rational-235-skip-fraction-negate 
         PushD        $print-format-rational-fraction 
-        Jump         -print-rational-2-join    
-        Label        -print-rational-2-join    
+        Jump         -print-rational-235-join  
+        Label        -print-rational-235-join  
         Printf                                 
         PushD        $print-format-newline     
         Printf                                 
