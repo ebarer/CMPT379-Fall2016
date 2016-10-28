@@ -502,10 +502,7 @@ public class Optimizer {
 					if (target.getIncomingEdges().size() == 1) {
 						if (target.getIncomingEdges().containsValue(block)) {
 							block.mergeWith(target);
-							fragment.getBlocks().remove(target);
-							
-							printCFG(fragment);
-							
+							fragment.getBlocks().remove(target);							
 							return true;
 						}
 					}					

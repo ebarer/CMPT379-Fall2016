@@ -278,10 +278,18 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			if (!node.isEmpty()) {				
 				// Check that all values are of same type
 				Type t = childTypes.get(0);
-				int numType = Collections.frequency(childTypes, t);
-				if (numType != node.nChildren()) {
-					typeCheckError(node, childTypes);
-					return;
+				for (ParseNode childNode : node.getChildren()) {
+					if (t instanceof ArrayType && childNode.getType() instanceof ArrayType) {
+						if (!((ArrayType)childNode.getType()).equals((ArrayType)t)) {
+							typeCheckError(node, childTypes);
+							return;
+						}
+					} else {
+						if (childNode.getType() != t){
+							typeCheckError(node, childTypes);
+							return;							
+						}
+					}
 				}
 				
 				if (node instanceof ArrayNode) {
