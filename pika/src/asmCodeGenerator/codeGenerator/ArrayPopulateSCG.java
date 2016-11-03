@@ -103,7 +103,7 @@ public class ArrayPopulateSCG implements SimpleCodeGenerator {
 	
 	private void opcodeForPopulate(Type type) {
 		if(type == PrimitiveType.INTEGER || type == TypeLiteral.INTEGER) {
-			chunk.add(ASMOpcode.PushF, 0.0);
+			chunk.add(ASMOpcode.PushI, 0);
 		}
 		else if(type == PrimitiveType.FLOATING || type == TypeLiteral.FLOATING) {
 			chunk.add(ASMOpcode.PushF, 0.0);
