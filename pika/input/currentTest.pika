@@ -1,1 +1,1 @@
-exec {    var a := 0.    while (a < 10) {           a := a + 1.         	    	if (a == 5) {    		continue.    	}    	    	if (a == 8) {    		break.    	}    	    	print a;.    }        print _n_, a.}
+func weight<int numHydrogen, int numOxygen> -> float {	const g := 6.02E23.	const hy := 1.008.	const ox := 15.999.		const molecularWeight := hy * [numHydrogen | float] + ox * [numOxygen | float].		return molecularWeight * g.}exec {	var a := 1.	print a.        #print weight(2, 1).}

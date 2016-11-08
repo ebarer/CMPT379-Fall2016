@@ -329,7 +329,8 @@ public class Optimizer {
 			Double argument = (Double)left / (Double)right;
 			
 			if (opcode == ASMOpcode.PushF) {
-				ASMInstruction instr = new ASMInstruction(opcode, argument.floatValue());
+				// TODO: make sure doubleValue() not floatValue()
+				ASMInstruction instr = new ASMInstruction(opcode, argument.doubleValue());
 				instructions.add(loc, instr);				
 			} else if (opcode == ASMOpcode.PushI) {
 				ASMInstruction instr = new ASMInstruction(opcode, argument.intValue());
@@ -585,13 +586,13 @@ public class Optimizer {
 			if (instruction.getOpcode() == ASMOpcode.PushF) {
 				ASMInstruction jumpInstruction = instructions.get(i+1);
 				ASMOpcode jumpCode = jumpInstruction.getOpcode();
-				ASMOpcode jumpArgument = jumpInstruction.getOpcode();
+				Object jumpArgument = jumpInstruction.getArgument();
 				if (jumpCode.isJump()) {
 					ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
 					
 					switch (jumpCode) {
 					case JumpFZero:
-						if ((float)pushValue == 0.0) {
+						if ((double)pushValue == 0.0) {
 							instructions.remove(i);
 							instructions.remove(i);
 							instructions.add(i, newInstruction);
@@ -599,7 +600,7 @@ public class Optimizer {
 						}
 						break;	
 					case JumpFPos:
-						if ((float)pushValue > 0.0) {
+						if ((double)pushValue > 0.0) {
 							instructions.remove(i);
 							instructions.remove(i);
 							instructions.add(i, newInstruction);
@@ -607,7 +608,7 @@ public class Optimizer {
 						}
 						break; 
 					case JumpFNeg:
-						if ((float)pushValue < 0.0) {
+						if ((double)pushValue < 0.0) {
 							instructions.remove(i);
 							instructions.remove(i);
 							instructions.add(i, newInstruction);

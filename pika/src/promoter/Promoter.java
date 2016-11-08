@@ -39,7 +39,7 @@ public class Promoter {
 		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
 		
 		// Check for cast to integer
-		for (int i = 0; i < childTypes.size(); i++) {
+		for (int i = 1; i < childTypes.size(); i++) {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.INTEGER);
 		    	if (debug) {
@@ -61,7 +61,7 @@ public class Promoter {
 		}
 		
 		// Check for cast to float
-		for (int i = 0; i < childTypes.size(); i++) {
+		for (int i = 1; i < childTypes.size(); i++) {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.FLOATING);
 		    	if (debug) {
@@ -96,7 +96,7 @@ public class Promoter {
 		}
 		
 		// Check for cast to rational
-		for (int i = 0; i < childTypes.size(); i++) {
+		for (int i = 1; i < childTypes.size(); i++) {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.RATIONAL);
 		    	if (debug) {

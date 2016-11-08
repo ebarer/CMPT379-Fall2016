@@ -1,0 +1,17 @@
+#checkout
+svn checkout https://punch.cs.sfu.ca/svn/CMPT379-Fall2016/
+
+#setup framework
+GOPATH=~/.gocode
+mkdir ~/.gocode
+export GOPATH=~/.gocode
+go get github.com/liefswanson/gtr
+
+#convert line endings
+find ./ -type f -exec unix2dos {} \;
+
+#commands
+gtr init (in test directory)
+gtr test -compile
+gtr accept -all
+gtr view -test-set=compiler <-test> -build -run <name>

@@ -1,0 +1,67 @@
+<project name="pika build script" basedir="." default="deploy.local">
+    <!--  Load properties  -->
+    <property file="build.properties"/>
+    <!--  Load task definitions e.g. FTP  -->
+    <path id="class.path">
+<!--        <fileset dir="lib" includes="*.jar"/>-->
+    </path>
+    <taskdef file="task.properties" classpathref="class.path"/>
+    <!--  Set variables for build directories  -->
+    <property name="build.dir" value="bin"/>
+    <property name="src.dir" value="src"/>
+    <property name="export.dir" value="jars"/>
+    <property name="compiler.main" 	value= "applications.PikaCompiler"/>
+	<property name="compiler.jar" 	value= "pika-compiler.jar"/>
+    <property name="codegen.main" 	value= "applications.PikaCodeGenerator"/>
+	<property name="codegen.jar" 	value= "pika-codegen.jar"/>
+	<property name="optimizer.main" value= "applications.PikaStandaloneOptimizerBatchVariant"/>
+	<property name="optimizer.jar" 	value= "pika-optimizer.jar"/>
+	<!--<property name="excluded.files" value= "src/applications/test/**,
+    										src/applications/PikaTokenPrinter.class,
+    										src/applications/PikaAbstractSyntaxTree.class,
+    										src/applications/PikaSemanticChecker.class"/> -->
+    <!--
+    set variable for external lib directory
+    (typically set up as external project within project) -->
+<!--    <property name="lib.dir" value="lib"/>-->
+<!--    <target name="-init">-->
+<!--        <echo>Creating temporary folders...</echo>-->
+<!--        <mkdir dir="${build.dir}"/>-->
+<!--    </target>-->
+<!---->
+<!--    <target name="compile" depends="-init">-->
+<!--        <javac srcdir="${src.dir}" destdir="${build.dir}"/>-->
+<!--    </target>-->
+
+    <target name="build" description="Build project">
+        <echo>Building executable jars...</echo>
+        <jar destfile="${export.dir}/${compiler.jar}" basedir="${build.dir}" compress="true">
+            <manifest>
+                <attribute name="Main-Class" value="${compiler.main}"/>
+            </manifest>
+        </jar>
+
+        <jar destfile="${export.dir}/${optimizer.jar}" basedir="${build.dir}" compress="true">
+            <manifest>
+                <attribute name="Main-Class" value="${optimizer.main}"/>
+            </manifest>
+        </jar>
+
+        <jar destfile="${export.dir}/${codegen.jar}" basedir="${build.dir}" compress="true">
+             <manifest>
+                <attribute name="Main-Class" value="${codegen.main}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="deploy.local" depends="build" description="Deploy to local webserver">
+        <echo>Deleting old jars in ${deploy.dir.local}...</echo>
+        <delete>
+            <fileset dir="${deploy.dir.local}" excludes="**/**.exe"/>
+        </delete>
+        <echo>Exporting new jars to ${deploy.dir.local}...</echo>
+        <move todir="${deploy.dir.local}">
+            <fileset dir="${export.dir}"/>
+        </move>
+    </target>
+</project>

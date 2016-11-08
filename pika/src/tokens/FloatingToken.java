@@ -3,7 +3,7 @@ package tokens;
 import inputHandler.TextLocation;
 
 public class FloatingToken extends TokenImp {
-	protected float value;
+	protected double value;
 	
 	protected FloatingToken(TextLocation location, String lexeme) {
 		super(location, lexeme);
@@ -11,7 +11,7 @@ public class FloatingToken extends TokenImp {
 	protected void setValue(float value) {
 		this.value = value;
 	}
-	public float getValue() {
+	public double getValue() {
 		return value;
 	}
 	

@@ -1,8 +1,4 @@
-
-pika/Questions.txt
-
-pika/SCG.txt
-
 pika/src/.DS_Store
-
+pika/output/
+tests/
 *.class
