@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import asmCodeGenerator.Labeller;
 import asmCodeGenerator.codeStorage.ASMCodeChunk;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMInstruction;
@@ -14,7 +12,7 @@ import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = true;
+	boolean debug = false;
 	
 	private ASMCodeFragment fragment;
 	private static final int HEADER = 0;
@@ -43,6 +41,7 @@ public class Optimizer {
 		fragments[INSTRUCTIONS] = flattenFragment(fragments[INSTRUCTIONS]);
 		BasicBlockFragment cfg = blockDivision(fragments[INSTRUCTIONS]);
 		constructControlFlowGraph(cfg);
+		printCFG(cfg);
 		
 		// Manipulate CFG
 		while(removeUnreachableCode(cfg) > 0);
@@ -228,7 +227,7 @@ public class Optimizer {
 					if (op1 == ASMOpcode.PushI) {
 						switch (op2) {
 						case PushI:
-							if (op3.isArithmetic() || op3 == ASMOpcode.Duplicate) {
+							if (op3.isArithmetic()) {
 								foldArithmetic(i, instructions, op1);
 							}
 							break;
@@ -244,7 +243,7 @@ public class Optimizer {
 					} else if (op1 == ASMOpcode.PushF) {
 						switch (op2) {
 						case PushF:
-							if (op3.isArithmetic() || op3 == ASMOpcode.Duplicate) {
+							if (op3.isArithmetic()) {
 								foldArithmetic(i, instructions, op1);
 							}
 							break;

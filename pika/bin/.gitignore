@@ -1,4 +1,3 @@
-/applications/
 /asmCodeGenerator/
 /inputHandler/
 /lexicalAnalyzer/
@@ -6,8 +5,8 @@
 /optimizer/
 /parseTree/
 /parser/
+/promoter/
 /semanticAnalyzer/
 /symbolTable/
 /tests/
 /tokens/
-/promoter/
