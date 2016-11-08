@@ -39,6 +39,9 @@ public interface ParseNodeVisitor {
 	void visitEnter(WhileNode node);
 	void visitLeave(WhileNode node);
 	
+	void visitEnter(ControlNode node);
+	void visitLeave(ControlNode node);
+	
 	void visitEnter(BinaryOperatorNode node);
 	void visitLeave(BinaryOperatorNode node);
 	
@@ -151,6 +154,12 @@ public interface ParseNodeVisitor {
 			defaultVisitEnter(node);
 		}
 		public void visitLeave(WhileNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(ControlNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(ControlNode node) {
 			defaultVisitLeave(node);
 		}
 		public void visitEnter(BinaryOperatorNode node) {

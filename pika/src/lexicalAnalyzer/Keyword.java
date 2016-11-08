@@ -6,19 +6,8 @@ import tokens.Token;
 
 public enum Keyword implements Lextant {
 	EXEC("exec"),
-
-	CONST("const"),
-	VAR("var"),
-
-	NEW("new"),
-	CLONE("clone"),
-	RELEASE("release"),
-	LENGTH("length"),
 	
-	IF("if"),
-	ELSE("else"),
-	WHILE("while"),
-	
+	// PRIMITIVE TYPES
 	BOOL("bool"),
 	TRUE("_true_"),
 	FALSE("_false_"),
@@ -28,6 +17,24 @@ public enum Keyword implements Lextant {
 	FLOAT("float"),
 	RATIONAL("rat"),
 	
+	// VARIABLE DECLARATION
+	CONST("const"),
+	VAR("var"),
+
+	// ARRAY METHODS
+	NEW("new"),
+	CLONE("clone"),
+	RELEASE("release"),
+	LENGTH("length"),
+	
+	// CONTROL STRUCTURES
+	IF("if"),
+	ELSE("else"),
+	WHILE("while"),
+	CONTINUE("continue"),
+	BREAK("break"),
+	
+	// PRINT
 	PRINT("print"),
 	NEWLINE("_n_"),
 	TAB("_t_"),

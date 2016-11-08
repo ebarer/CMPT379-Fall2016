@@ -2,12 +2,15 @@ package parseTree.nodeTypes;
 
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import asmCodeGenerator.Labeller;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import tokens.LextantToken;
 import tokens.Token;
 
 public class WhileNode extends ParseNode {
+	String loopLabel;
+	String joinLabel;
 	
 	public WhileNode(Token token) {
 		super(token);
@@ -36,6 +39,17 @@ public class WhileNode extends ParseNode {
 	}
 	public LextantToken lextantToken() {
 		return (LextantToken)token;
+	}
+	
+	public void setLabels(String loop, String join) {
+		this.loopLabel = loop;
+		this.joinLabel = join;
+	}
+	public String getLoopLabel() {
+		return this.loopLabel;
+	}
+	public String getJoinLabel() {
+		return this.joinLabel;
 	}
 	
 	

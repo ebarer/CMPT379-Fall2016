@@ -130,6 +130,9 @@ public class Parser {
 		if(startsWhileStatement(nowReading)) {
 			return parseWhileStatement();
 		}
+		if(startsControlStatement(nowReading)) {
+			return parseControlStatement();
+		}
 		if(startsPrintStatement(nowReading)) {
 			return parsePrintStatement();
 		}
@@ -141,6 +144,7 @@ public class Parser {
 			   startsReleaseStatement(token) || 
 			   startsIfStatement(token) ||
 			   startsWhileStatement(token) ||
+			   startsControlStatement(token) ||
 			   startsPrintStatement(token) ||
 			   startsBlockStatement(token);
 	}
@@ -269,6 +273,24 @@ public class Parser {
 	}
 	private boolean startsWhileStatement(Token token) {
 		return token.isLextant(Keyword.WHILE);
+	}
+	
+	///////////////////////////////////////////////////////////
+	// controlSmt -> CONTINUE or BREAK.
+	private ParseNode parseControlStatement() {
+		if(!startsControlStatement(nowReading)) {
+			return syntaxErrorNode("release");
+		}
+		
+		Token controlToken = nowReading;
+		readToken();
+		
+		expect(Punctuator.TERMINATOR);
+		
+		return ControlNode.withChild(controlToken);
+	}
+	private boolean startsControlStatement(Token token){
+		return token.isLextant(Keyword.CONTINUE, Keyword.BREAK);
 	}
 	
 	///////////////////////////////////////////////////////////

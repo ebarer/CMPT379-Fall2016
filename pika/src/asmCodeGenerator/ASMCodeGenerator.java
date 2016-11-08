@@ -329,25 +329,49 @@ public class ASMCodeGenerator {
 		
 		///////////////////////////////////////////////////////////////////////////
 		// while statements
-		public void visitLeave(WhileNode node) {
-			newVoidCode(node);
-			
+		public void visitEnter(WhileNode node){
 			Labeller labeller = new Labeller("while-stmt");
 			String loopLabel  = labeller.newLabel("loop");
 			String joinLabel  = labeller.newLabel("join");
 			
-			code.add(Label, loopLabel);
+			node.setLabels(loopLabel, joinLabel);
+		}
+		public void visitLeave(WhileNode node) {
+			newVoidCode(node);
+			
+			code.add(Label, node.getLoopLabel());
 			
 			ASMCodeFragment conditionCode = removeValueCode(node.child(0));
 			code.append(conditionCode);
-			code.add(JumpFalse, joinLabel);
+			code.add(JumpFalse, node.getJoinLabel());
 
 			ASMCodeFragment blockCode = removeVoidCode(node.child(1));
 			code.append(blockCode);
 
-			code.add(Jump, loopLabel);
+			code.add(Jump, node.getLoopLabel());
 
-			code.add(Label, joinLabel);
+			code.add(Label, node.getJoinLabel());
+		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		// control statements
+		public void visitLeave(ControlNode node) {
+			newVoidCode(node);
+			
+			ParseNode pNode = node.getParent();
+			while (!(pNode instanceof WhileNode)) {
+				pNode = pNode.getParent();
+			}
+			
+			WhileNode parent = (WhileNode) pNode;
+			
+			if (node.getToken().isLextant(Keyword.CONTINUE)) {
+				code.add(Jump, parent.getLoopLabel());
+			}
+			
+			if (node.getToken().isLextant(Keyword.BREAK)) {
+				code.add(Jump, parent.getJoinLabel());
+			}
 		}
 
 		///////////////////////////////////////////////////////////////////////////
