@@ -16,6 +16,7 @@ public enum Keyword implements Lextant {
 	INT("int"),
 	FLOAT("float"),
 	RATIONAL("rat"),
+	VOID("void"),
 	
 	// VARIABLE DECLARATION
 	CONST("const"),
@@ -26,6 +27,11 @@ public enum Keyword implements Lextant {
 	CLONE("clone"),
 	RELEASE("release"),
 	LENGTH("length"),
+	
+	// FUNCTION METHODS
+	FUNCTION("func"),
+	CALL("call"),
+	RETURN("return"),
 	
 	// CONTROL STRUCTURES
 	IF("if"),
@@ -65,6 +71,11 @@ public enum Keyword implements Lextant {
 	}
 	public static boolean isAKeyword(String lexeme) {
 		return forLexeme(lexeme) != NULL_KEYWORD;
+	}
+	
+	public static Lextant[] getTypeLiteral() {
+		Lextant[] literals = { BOOL, CHAR, STRING, INT, FLOAT, RATIONAL, VOID };
+		return literals;
 	}
 	
 	/*   the following hashtable lookup can replace the serial-search implementation of forLexeme() above. It is faster but less clear. 

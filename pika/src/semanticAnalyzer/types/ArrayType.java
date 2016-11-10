@@ -31,7 +31,9 @@ public class ArrayType implements Type {
 // HELPER FUNCTIONS
 	
 	public boolean equals(Type type2) {
-		assert type2 instanceof ArrayType;
+		if (!(type2 instanceof ArrayType)) {
+			return false;
+		}
 		
 		Type subtype1 = this.getSubtype();
 		Type subtype2 = ((ArrayType)type2).getSubtype();

@@ -7,7 +7,6 @@ import java.util.Map;
 import asmCodeGenerator.codeGenerator.*;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import semanticAnalyzer.types.ArrayType;
-import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import semanticAnalyzer.types.TypeLiteral;
 import lexicalAnalyzer.Keyword;

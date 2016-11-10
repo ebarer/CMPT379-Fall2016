@@ -2,8 +2,6 @@ package asmCodeGenerator.codeGenerator;
 
 import asmCodeGenerator.codeStorage.*;
 import asmCodeGenerator.runtime.*;
-import lexicalAnalyzer.*;
-import semanticAnalyzer.types.*;
 
 public class RationalComparisonOperatorSCG implements SimpleCodeGenerator {	
 	@Override

@@ -14,7 +14,6 @@ import parseTree.nodeTypes.OperatorNode;
 import semanticAnalyzer.signatures.*;
 import semanticAnalyzer.types.*;
 import tokens.LextantToken;
-import tokens.Token;
 
 public class Promoter {
 	LinkedHashMap<ParseNode, List<TypeLiteral>> promotions;

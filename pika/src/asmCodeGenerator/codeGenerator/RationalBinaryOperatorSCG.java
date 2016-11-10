@@ -3,7 +3,6 @@ package asmCodeGenerator.codeGenerator;
 import asmCodeGenerator.codeStorage.*;
 import asmCodeGenerator.runtime.*;
 import lexicalAnalyzer.*;
-import semanticAnalyzer.types.*;
 
 public class RationalBinaryOperatorSCG implements SimpleCodeGenerator {
 	public Punctuator punctuator;

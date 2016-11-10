@@ -10,6 +10,8 @@ public enum TypeLiteral implements Type {
 	FLOATING(8, PrimitiveType.FLOATING),
 	RATIONAL(8, PrimitiveType.RATIONAL),
 	ARRAY(8, new ArrayType()),
+	LAMBDA(8, new LambdaType()),
+	VOID(0, PrimitiveType.VOID),
 	
 	ERROR(0, PrimitiveType.ERROR),				// use as a value when a syntax error has occurred
 	NO_TYPE(0, PrimitiveType.NO_TYPE, "");		// use as a value when no type has been assigned.
@@ -56,6 +58,8 @@ public enum TypeLiteral implements Type {
 			return TypeLiteral.FLOATING;
 		case "rat":
 			return TypeLiteral.RATIONAL;
+		case "void":
+			return TypeLiteral.VOID;
 		case "[":
 			return TypeLiteral.ARRAY;
 		default:
