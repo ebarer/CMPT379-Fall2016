@@ -155,34 +155,41 @@ public class Optimizer {
 			List<ASMInstruction> instructions = chunk.getInstructions();
 			HashMap<Object, Integer> stringLegend = new HashMap<>();
 			
+			int removedInstrCount = 0;
 			LinkedHashMap<Integer, Object> strings = locateStrings(fragment);
 			for (Map.Entry<Integer, Object> stringEntry : strings.entrySet()) {
 				int loc = stringEntry.getKey();
+				loc -= removedInstrCount; // Compensate for deleted instructions				
 				int stringStart = loc + stringRecordOffset;
 				
 				ASMInstruction dLabel = instructions.get(loc);
 				ASMOpcode opcode = instructions.get(stringStart).getOpcode();
 				String stringData = getString(instructions, stringStart);
 				
-				if (stringLegend.containsKey(stringData)) {					
+				if (stringLegend.containsKey(stringData)) {
+					int addLoc = stringLegend.get(stringData) + 1;
+					
 					// Remove string label and record
 					for (int l = loc; l < stringStart; l++) {
-						instructions.remove(loc);	
+						instructions.remove(loc);
+						removedInstrCount++;
 					}
 					
 					// Remove DataS or DataI directives
 					if (opcode == ASMOpcode.DataS) {
 						instructions.remove(loc);
+						removedInstrCount++;
 					} else if (opcode == ASMOpcode.DataC) {
 						while (loc < instructions.size() - 1 && opcode == ASMOpcode.DataC) {
-							instructions.remove(loc++);
+							instructions.remove(loc);
+							removedInstrCount++;
 							opcode = instructions.get(loc).getOpcode();
 						}
 					}
 					
 					// Insert DLabel at location of first instance of string
-					int addLoc = stringLegend.get(stringData) + 1;
 					instructions.add(addLoc, dLabel);
+					removedInstrCount--;
 				} else {
 					stringLegend.put(stringData, loc);				
 				}

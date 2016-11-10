@@ -153,6 +153,8 @@ public class PrintArraySCG implements SimpleCodeGenerator {
 		}
 		else if(type == PrimitiveType.STRING || type == TypeLiteral.STRING) {
 			innerChunk.add(ASMOpcode.LoadI);
+			innerChunk.add(ASMOpcode.PushI, 12);
+			innerChunk.add(ASMOpcode.Add);
 			innerChunk.add(ASMOpcode.PushD, RunTime.STRING_PRINT_FORMAT);
 			innerChunk.add(ASMOpcode.Printf);
 		}
