@@ -22,6 +22,11 @@ public class FunctionSignature {
 		resultType = types[types.length-1];
 		this.whichVariant = whichVariant;
 	}
+	public FunctionSignature(Object whichVariant, List<Type> paramTypes, Type returnType) {
+		this.paramTypes = paramTypes.toArray(new Type[0]);
+		resultType = returnType;
+		this.whichVariant = whichVariant;
+	}
 	private void storeParamTypes(Type[] types) {
 		paramTypes = new Type[types.length-1];
 		for(int i=0; i<types.length-1; i++) {

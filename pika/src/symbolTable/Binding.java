@@ -30,6 +30,9 @@ public class Binding {
 	public String getLexeme() {
 		return lexeme;
 	}
+	public void setType(Type type) {
+		this.type = type;
+	}
 	public Type getType() {
 		return type;
 	}

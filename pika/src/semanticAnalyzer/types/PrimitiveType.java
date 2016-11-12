@@ -30,4 +30,25 @@ public enum PrimitiveType implements Type {
 	public String infoString() {
 		return infoString;
 	}
+	
+	public static PrimitiveType withTypeLiteral(TypeLiteral type) {
+		switch(type) {
+		case BOOLEAN:
+			return PrimitiveType.BOOLEAN;
+		case CHARACTER:
+			return PrimitiveType.CHARACTER;
+		case STRING:
+			return PrimitiveType.STRING;
+		case INTEGER:
+			return PrimitiveType.INTEGER;
+		case FLOATING:
+			return PrimitiveType.FLOATING;
+		case RATIONAL:
+			return PrimitiveType.RATIONAL;
+		case VOID:
+			return PrimitiveType.VOID;
+		default:
+			return PrimitiveType.ERROR;
+		}
+	}
 }

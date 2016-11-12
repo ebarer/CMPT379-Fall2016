@@ -14,7 +14,6 @@ public class LambdaTypeNode extends ParseNode {
 
 	public LambdaTypeNode(ParseNode node) {
 		super(node);
-		initChildren();
 	}
 
 	
@@ -31,14 +30,11 @@ public class LambdaTypeNode extends ParseNode {
 		((LambdaType)this.getType()).addType(type);
 	}
 	
-	
 	///////////////////////////////////////////////////////////
-	// boilerplate for visitors
-		
+	//accept a visitor
+	
 	public void accept(ParseNodeVisitor visitor) {
-		visitor.visitEnter(this);
-		visitChildren(visitor);
-		visitor.visitLeave(this);
+		visitor.visit(this);
 	}
 
 }

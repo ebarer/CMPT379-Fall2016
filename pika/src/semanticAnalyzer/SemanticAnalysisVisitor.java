@@ -31,7 +31,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	// constructs larger than statements
 	@Override
 	public void visitEnter(ProgramNode node) {
-		enterProgramScope(node);
+		enterScope(node);
 	}
 	public void visitLeave(ProgramNode node) {
 		leaveScope(node);
@@ -43,7 +43,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	
 	public void visitEnter(BlockNode node) {
-		enterSubscope(node);
+		createSubscope(node);
+		enterScope(node);
 	}
 	public void visitLeave(BlockNode node) {
 		leaveScope(node);
@@ -52,25 +53,41 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for scoping.
-	private void enterProgramScope(ParseNode node) {
-		Scope scope = Scope.createProgramScope();
-		node.setScope(scope);
-	}
-	private void enterSubscope(ParseNode node) {
+	private void createSubscope(ParseNode node) {
 		Scope baseScope = node.getLocalScope();
 		Scope scope = baseScope.createSubscope();
 		node.setScope(scope);
-	}		
+	}
+	private void enterScope(ParseNode node) {
+		node.getScope().enter();
+	}
 	private void leaveScope(ParseNode node) {
 		node.getScope().leave();
 	}
 	
 	
 	///////////////////////////////////////////////////////////////////////////
-	// statements, declarations, and assignments
+	// functionDefinitions, lambdas, call/return statements
 	@Override
-	public void visitLeave(PrintStatementNode node) {
+	public void visitLeave(CallNode node) {
+		
 	}
+	@Override
+	public void visitLeave(FunctionDefinitionNode node) {
+		
+	}
+	@Override
+	public void visitLeave(LambdaNode node) {
+		
+	}
+	@Override
+	public void visitLeave(ReturnNode node) {
+		
+	}
+
+	
+	///////////////////////////////////////////////////////////////////////////
+	// declarations, and assignments
 	@Override
 	public void visitLeave(DeclarationNode node) {
 		if (node.child(0) instanceof IdentifierNode) {
@@ -136,6 +153,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
 		}
 	}
+	
+	
+	///////////////////////////////////////////////////////////////////////////
+	// control strucutures
 	@Override
 	public void visitLeave(IfNode node) {
 		assert node.nChildren() >= 2;
@@ -357,7 +378,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	// IdentifierNodes, with helper methods
 	@Override
 	public void visitLeave(IdentifierNode node) {
-		if(!isBeingDeclared(node) && !isBeingAssigned(node)) {		
+		if(!isBeingDeclared(node) && !isBeingAssigned(node) &&
+		   !isFunctionIdentifier(node) && !isFunctionParameter(node)) {		
 			node.setBinding(node.findVariableBinding());
 			node.setType(node.getBinding().getType());
 		}
@@ -371,11 +393,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		ParseNode parent = node.getParent();
 		return (parent instanceof AssignmentNode) && (node == parent.child(0));
 	}
-	private void addBinding(IdentifierNode identifierNode, Type type, Boolean mutable) {
-		Scope scope = identifierNode.getLocalScope();
-		Binding binding = scope.createBinding(identifierNode, type);
-		binding.setMutability(mutable);
-		identifierNode.setBinding(binding);
+	private boolean isFunctionIdentifier(IdentifierNode node) {
+		ParseNode parent = node.getParent();
+		return (parent instanceof FunctionDefinitionNode) && (node == parent.child(0));
+	}
+	private boolean isFunctionParameter(IdentifierNode node) {
+		ParseNode parent = node.getParent();
+		return (parent instanceof LambdaParamNode) && (node == parent.child(0));
 	}
 	
 	
@@ -384,7 +408,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visitLeave(IndexNode node) {
 		assert node.nChildren() >= 2;
-
+		
 		if (!(node.child(0).getType() instanceof ArrayType)) {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
 			return;
@@ -394,7 +418,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
 			return;
 		}
-
+		
 		// TODO: Check before calling subtype()
 		Type subtype = ((ArrayType)node.child(0).getType()).getSubtype();
 		if (subtype instanceof TypeLiteral) {
@@ -402,6 +426,17 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		node.setType(subtype);
 	}
+
+	
+	///////////////////////////////////////////////////////////////////////////
+	// helper methods for binding
+	private void addBinding(IdentifierNode identifierNode, Type type, Boolean mutable) {
+		Scope scope = identifierNode.getLocalScope();
+		Binding binding = scope.createBinding(identifierNode, type);
+		binding.setMutability(mutable);
+		identifierNode.setBinding(binding);
+	}
+	
 	
 	///////////////////////////////////////////////////////////////////////////
 	// error logging/printing

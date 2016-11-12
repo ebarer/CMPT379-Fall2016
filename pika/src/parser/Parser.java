@@ -31,7 +31,6 @@ public class Parser {
 	////////////////////////////////////////////////////////////
 	// "program" is the start symbol S
 	// S -> globalDefinition* EXEC mainBlock
-	
 	private ParseNode parseProgram() {
 		if(!startsProgram(nowReading)) {
 			return syntaxErrorNode("program");
@@ -55,6 +54,27 @@ public class Parser {
 	}
 	private boolean startsProgram(Token token) {
 		return token.isLextant(Keyword.FUNCTION) || token.isLextant(Keyword.EXEC);
+	}
+	
+	///////////////////////////////////////////////////////////
+	
+	// functionDefinition -> FUNC identifier lambda
+	private ParseNode parseFunctionDefinition() {
+		if(!startsFunctionDefinition(nowReading)) {
+			return syntaxErrorNode("function definition");
+		}
+		
+		expect(Keyword.FUNCTION);
+		
+		Token definitionToken = previouslyRead;		
+		ParseNode identifier = parseIdentifier();
+		ParseNode lambda = parseLambda();
+		
+		ParseNode functionDefinitionNode = FunctionDefinitionNode.withChildren(definitionToken, identifier, lambda);
+		return functionDefinitionNode;
+	}
+	private boolean startsFunctionDefinition(Token token){
+		return token.isLextant(Keyword.FUNCTION);
 	}
 	
 	///////////////////////////////////////////////////////////	
@@ -169,27 +189,6 @@ public class Parser {
 	
 	///////////////////////////////////////////////////////////
 	
-	// functionDefinition -> FUNC identifier lambda
-	private ParseNode parseFunctionDefinition() {
-		if(!startsFunctionDefinition(nowReading)) {
-			return syntaxErrorNode("function definition");
-		}
-		
-		expect(Keyword.FUNCTION);
-		
-		Token definitionToken = previouslyRead;		
-		ParseNode identifier = parseIdentifier();
-		ParseNode lambda = parseLambda();
-		
-		ParseNode functionDefinitionNode = FunctionDefinitionNode.withChildren(definitionToken, identifier, lambda);
-		return functionDefinitionNode;
-	}
-	private boolean startsFunctionDefinition(Token token){
-		return token.isLextant(Keyword.FUNCTION);
-	}
-	
-	///////////////////////////////////////////////////////////
-	
 	// declarationStmt -> CONST/VAR identifier := expression .
 	private ParseNode parseDeclaration() {
 		if(!startsDeclaration(nowReading)) {
@@ -243,8 +242,7 @@ public class Parser {
 		return AssignmentNode.withChildren(assignmentToken, target, expression);
 	}
 	private boolean startsAssignment(Token token) {
-		return (token instanceof IdentifierToken ||
-				startsParenthetical(token));
+		return (token instanceof IdentifierToken || startsParenthetical(token));
 	}
 	
 	///////////////////////////////////////////////////////////
@@ -677,6 +675,7 @@ public class Parser {
 				
 				expect(Punctuator.CLOSE_BRACKET);
 				node = CastNode.withChildren(castToken, left, castType);
+				node.setType(castType);
 			}
 			
 			if (node == null) {
@@ -814,9 +813,7 @@ public class Parser {
 
 		expect(Punctuator.RETURNS);
 		
-		TypeLiteral returnType = parseTypeLiteral();
-		readToken();
-		
+		Type returnType = parseType();		
 		result.setType(returnType);
 		
 		return result;
@@ -833,6 +830,16 @@ public class Parser {
 				Type type = parseType();
 
 				Token token = nowReading;
+				ParseNode identifier = parseIdentifier();
+				
+				LambdaParamNode child = LambdaParamNode.withChildren(token, type, identifier);
+				parent.appendChild(child);
+			}
+			
+			if(startsCastOrArray(nowReading)) {
+				Token token = nowReading;
+				Type type = parseArrayType();
+				
 				ParseNode identifier = parseIdentifier();
 				
 				LambdaParamNode child = LambdaParamNode.withChildren(token, type, identifier);
@@ -884,8 +891,8 @@ public class Parser {
 		if(startsBooleanConstant(nowReading)) {
 			return parseBooleanConstant();
 		}
-		if(startsLambdaType(nowReading)) {
-			return parseLambdaType();
+		if(startsLambda(nowReading)) {
+			return parseLambda();
 		}
 
 		return syntaxErrorNode("literal");
@@ -893,7 +900,8 @@ public class Parser {
 	private boolean startsLiteral(Token token) {
 		return  startsCharacter(token) || startsString(token) ||
 				startsIntNumber(token) || startsFloatNumber(token) ||
-				startsIdentifier(token) || startsBooleanConstant(token);
+				startsIdentifier(token) || startsBooleanConstant(token) ||
+				startsLambdaType(token);
 	}
 	
 	// number (terminal)

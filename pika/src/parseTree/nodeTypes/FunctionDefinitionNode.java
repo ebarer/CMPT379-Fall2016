@@ -67,10 +67,7 @@ public class FunctionDefinitionNode extends ParseNode {
 	public static FunctionDefinitionNode withChildren(Token token, ParseNode identifier, ParseNode lambda) {
 		FunctionDefinitionNode node = new FunctionDefinitionNode(token);
 		node.appendChild(identifier);
-
-		//lambda.setScope(procedureScope);
 		node.appendChild(lambda);
-		
 		return node;
 	}
 	

@@ -33,6 +33,7 @@ public class LambdaType implements Type {
 	}
 	public void addType(Type type) {
 		typeList.add(type);
+		updateInfoString();
 	}
 	
 	public String infoString() {

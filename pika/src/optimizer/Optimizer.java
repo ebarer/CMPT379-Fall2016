@@ -166,9 +166,7 @@ public class Optimizer {
 				ASMOpcode opcode = instructions.get(stringStart).getOpcode();
 				String stringData = getString(instructions, stringStart);
 				
-				if (stringLegend.containsKey(stringData)) {
-					int addLoc = stringLegend.get(stringData) + 1;
-					
+				if (stringLegend.containsKey(stringData)) {					
 					// Remove string label and record
 					for (int l = loc; l < stringStart; l++) {
 						instructions.remove(loc);
@@ -188,6 +186,7 @@ public class Optimizer {
 					}
 					
 					// Insert DLabel at location of first instance of string
+					int addLoc = stringLegend.get(stringData) + 1;
 					instructions.add(addLoc, dLabel);
 					removedInstrCount--;
 				} else {
