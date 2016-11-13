@@ -57,34 +57,42 @@ public class LambdaType implements Type {
 			return false;
 		}
 		
+		LambdaType compareType = (LambdaType) type2;
+		
+		// Check that number of arguments is the same
+		if (this.typeList.size() != compareType.typeList.size()) {
+			return false;
+		}
+
+		// Check that each argument is the same
+		for (int i = 0; i < this.typeList.size(); i++) {
+			Type t1 = this.typeList.get(i);
+			Type t2 = compareType.typeList.get(i);
+			
+			if (!compare(t1, t2)) {
+				return false;
+			}
+		}
+
+		// Check that return type is the same
+		return compare(this.returnType, compareType.returnType);
+	}
+	private boolean compare(Type t1, Type t2) {
+		if (t1 instanceof ArrayType) {				
+			if (!((ArrayType) t1).equals(t2)) {
+				return false;
+			}
+		} else if (t1 instanceof LambdaType) {
+			if (!((LambdaType) t1).equals(t2)) {
+				return false;
+			}
+		} else {
+			if (t1 != t2) {
+				return false;
+			}
+		}
+		
 		return true;
 	}
-	
-//	public boolean equals(Type type2) {
-//		if (!(type2 instanceof ArrayType)) {
-//			return false;
-//		}
-//		
-//		Type subtype1 = this.getSubtype();
-//		Type subtype2 = ((ArrayType)type2).getSubtype();
-//		
-//		while ((subtype1 instanceof ArrayType) && (subtype2 instanceof ArrayType)) {
-//			subtype1 = ((ArrayType)subtype1).getSubtype();
-//			subtype2 = ((ArrayType)subtype2).getSubtype();
-//		}
-//		
-//		if (subtype1 instanceof TypeLiteral) {
-//			subtype1 = ((TypeLiteral) subtype1).getType();
-//		}
-//		
-//		if (subtype2 instanceof TypeLiteral) {
-//			subtype2 = ((TypeLiteral) subtype2).getType();
-//		}
-//		
-//		if (subtype1 == subtype2) {
-//			return true;
-//		} else {
-//			return false;
-//		}
-//	}
+
 }

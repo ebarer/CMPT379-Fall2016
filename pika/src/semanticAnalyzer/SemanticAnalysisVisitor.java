@@ -160,7 +160,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		node.setType(PrimitiveType.ERROR);
 		
 		Token token = node.getToken();
-		logError("Cannot return type " + returnTypeString + " for Lambda with return type " + lambdaReturnType + " at " + token.getLocation());
+		logError("Cannot return type " + returnTypeString + " for Lambda with return type "
+				 + lambdaReturnType.infoString() + " at " + token.getLocation());
 		return;
 	}
 
@@ -204,21 +205,22 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 		// Check for type-match
 		Type targetType = node.child(0).getType();
-		ParseNode expression = node.child(1);
-		Type expressionType = expression.getType();
-		List<Type> childTypes = Arrays.asList(targetType, expressionType);
+		Type expressionType = node.child(1).getType();
 
 		if ((targetType instanceof ArrayType) && (expressionType instanceof ArrayType)) {				
-			if (!((ArrayType)targetType).equals(expressionType)) {
-				typeCheckError(node, childTypes);
+			if (!((ArrayType) targetType).equals(expressionType)) {
+				typeCheckError(node, Arrays.asList(targetType, expressionType));
 				return;
-				//logError("Cannot assign value of type '" + expressionType.infoString() + "' to type '" + targetType.infoString() + "'");
+			}
+		} else if ((targetType instanceof LambdaType) && (expressionType instanceof LambdaType)) {
+			if (!((LambdaType) targetType).equals(expressionType)) {
+				typeCheckError(node, Arrays.asList(targetType, expressionType));
+				return;
 			}
 		} else {
 			if (targetType != expressionType) {
-				typeCheckError(node, childTypes);
+				typeCheckError(node, Arrays.asList(targetType, expressionType));
 				return;
-				//logError("Cannot assign value of type '" + expressionType + "' to type '" + targetType + "'");
 			}
 		}
 		
