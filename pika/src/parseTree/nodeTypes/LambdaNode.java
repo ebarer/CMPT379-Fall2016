@@ -3,7 +3,7 @@ package parseTree.nodeTypes;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import semanticAnalyzer.signatures.FunctionSignature;
-import lexicalAnalyzer.Lextant;
+import semanticAnalyzer.types.*;
 import tokens.LextantToken;
 import tokens.Token;
 
@@ -23,8 +23,8 @@ public class LambdaNode extends ParseNode {
 	////////////////////////////////////////////////////////////
 	// attributes
 	
-	public Lextant getReturnType() {
-		return lextantToken().getLextant();
+	public Type getReturnType() {
+		return ((LambdaType) this.getType()).getReturnType();
 	}
 	public LextantToken lextantToken() {
 		return (LextantToken)token;

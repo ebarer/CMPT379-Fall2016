@@ -1,8 +1,10 @@
 package semanticAnalyzer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
 import parseTree.nodeTypes.*;
@@ -10,6 +12,7 @@ import semanticAnalyzer.signatures.*;
 import semanticAnalyzer.types.*;
 import symbolTable.Binding;
 import symbolTable.Scope;
+import tokens.Token;
 
 class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	
@@ -104,6 +107,13 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 			IdentifierNode identifier = (IdentifierNode) node.child(0);
 
 			Type paramType = getType(node);
+			if (paramType == PrimitiveType.VOID) {
+				node.setType(PrimitiveType.ERROR);
+				Token token = node.getToken();
+				logError("Parameter cannot be defined as type VOID at " + token.getLocation());
+				return;
+			}
+			
 			addBinding(identifier, paramType);
 		}
 	}
@@ -113,12 +123,15 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	// helper methods for types
 	private Type getType(ParseNode node) {
 		Type t = node.getType();
-		
-		if (t instanceof ArrayType || t instanceof LambdaType) {
+
+		if (t instanceof PrimitiveType) {
 			return t;
 		}
 		if (t instanceof TypeLiteral) {
 			return PrimitiveType.withTypeLiteral((TypeLiteral)t);
+		}
+		if (t instanceof ArrayType || t instanceof LambdaType) {
+			return t;
 		}
 		
 		return PrimitiveType.ERROR;
@@ -132,5 +145,14 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 		Binding binding = scope.createBinding(identifierNode, type);
 		binding.setMutability(false);
 		identifierNode.setBinding(binding);
+	}
+
+	
+	///////////////////////////////////////////////////////////////////////////
+	// error logging/printing
+	private void logError(String message) {
+		PikaLogger log = PikaLogger.getLogger("compiler.semanticAnalyzer");
+		log.severe(message);
+		// TODO: System.exit(0);
 	}
 }

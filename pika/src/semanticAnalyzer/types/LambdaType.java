@@ -9,7 +9,7 @@ public class LambdaType implements Type {
 	private int sizeInBytes = 8;
 	
 	public LambdaType() {
-		returnType = TypeLiteral.VOID;
+		returnType = PrimitiveType.VOID;
 		typeList = new ArrayList<Type>();
 	}
 	public LambdaType(String infoString) {
@@ -59,4 +59,32 @@ public class LambdaType implements Type {
 		
 		return true;
 	}
+	
+//	public boolean equals(Type type2) {
+//		if (!(type2 instanceof ArrayType)) {
+//			return false;
+//		}
+//		
+//		Type subtype1 = this.getSubtype();
+//		Type subtype2 = ((ArrayType)type2).getSubtype();
+//		
+//		while ((subtype1 instanceof ArrayType) && (subtype2 instanceof ArrayType)) {
+//			subtype1 = ((ArrayType)subtype1).getSubtype();
+//			subtype2 = ((ArrayType)subtype2).getSubtype();
+//		}
+//		
+//		if (subtype1 instanceof TypeLiteral) {
+//			subtype1 = ((TypeLiteral) subtype1).getType();
+//		}
+//		
+//		if (subtype2 instanceof TypeLiteral) {
+//			subtype2 = ((TypeLiteral) subtype2).getType();
+//		}
+//		
+//		if (subtype1 == subtype2) {
+//			return true;
+//		} else {
+//			return false;
+//		}
+//	}
 }

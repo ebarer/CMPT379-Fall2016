@@ -297,6 +297,11 @@ public class Parser {
 		Token returnToken = nowReading;
 		readToken();
 		
+		if (nowReading.isLextant(Punctuator.TERMINATOR)) {
+			readToken();
+			return new ReturnNode(returnToken);
+		}
+		
 		ParseNode returnExpression = parseExpression();
 		
 		expect(Punctuator.TERMINATOR);
@@ -725,7 +730,7 @@ public class Parser {
 		if (previouslyRead.isLextant(Keyword.NEW)) {
 			Token token = previouslyRead;
 			
-			ArrayType type = parseArrayType();
+			Type type = parseArrayType();
 			
 			expect(Punctuator.OPEN_PARENTHESIS);
 			ParseNode size = parseExpression();
@@ -771,14 +776,14 @@ public class Parser {
 		}
 		return parent;
 	}	
-	private ArrayType parseArrayType() {
+	private Type parseArrayType() {
 		expect(Punctuator.OPEN_BRACKET);
 		ArrayType type = new ArrayType();
 		
 		TypeLiteral subtype = parseTypeLiteral();
 		if (subtype == TypeLiteral.ARRAY) {
 			type.setSubtype(parseArrayType());	
-		} else {
+		} else {			
 			type.setSubtype(subtype);
 			readToken();
 		}
@@ -851,8 +856,7 @@ public class Parser {
 				
 				Token token = nowReading;
 				ParseNode identifier = parseIdentifier();
-				
-				TypeLiteral type = TypeLiteral.LAMBDA;
+				Type type = lambda.getType();
 				
 				LambdaParamNode child = LambdaParamNode.withChildren(token, type, identifier, lambda);
 				parent.appendChild(child);
@@ -968,6 +972,8 @@ public class Parser {
 			expect(Punctuator.OPEN_PARENTHESIS);
 			
 			ParseNode node = new FunctionInvocationNode(identifier);
+			node.appendChild(new IdentifierNode(identifier));
+			
 			while (!nowReading.isLextant(Punctuator.CLOSE_PARENTHESIS)) {
 				if (nowReading.isLextant(Punctuator.SEPARATOR)) {
 					readToken();
@@ -1058,7 +1064,7 @@ public class Parser {
 		if(startsTypeLiteral(nowReading)) {
 			TypeLiteral type = parseTypeLiteral();
 			readToken();
-			return type;
+			return PrimitiveType.withTypeLiteral(type);
 		}
 
 		if(startsLambdaType(nowReading)) {
@@ -1071,7 +1077,7 @@ public class Parser {
 			return arrayType;
 		}
 		
-		return TypeLiteral.ERROR;
+		return PrimitiveType.ERROR;
 	}
 
 	
@@ -1081,6 +1087,7 @@ public class Parser {
 		previouslyRead = nowReading;
 		nowReading = scanner.next();
 	}	
+	
 	
 	///////////////////////////////////////////////////////////
 	

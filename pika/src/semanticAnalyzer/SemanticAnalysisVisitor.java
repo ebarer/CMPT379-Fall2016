@@ -69,10 +69,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	///////////////////////////////////////////////////////////////////////////
 	// functionDefinitions, lambdas, call/return statements
 	@Override
-	public void visitLeave(CallNode node) {
-		
-	}
-	@Override
 	public void visitLeave(FunctionDefinitionNode node) {
 		
 	}
@@ -81,8 +77,91 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		
 	}
 	@Override
+	public void visitLeave(CallNode node) {
+		if (!(node.child(0) instanceof FunctionInvocationNode)) {
+			typeCheckError(node, Arrays.asList(node.child(0).getType()));
+		}
+	}
+	@Override
+	public void visitLeave(FunctionInvocationNode node) {
+		if (node.child(0) instanceof IdentifierNode) {
+			IdentifierNode identifier = (IdentifierNode) node.child(0);
+			identifier.setBinding(identifier.findVariableBinding());
+			Type functionType = identifier.getBinding().getType();
+			
+			if (functionType == PrimitiveType.VOID) {
+				ParseNode parent = node.getParent();
+				while (parent != null && !(parent instanceof CallNode)) {
+					parent = parent.getParent();
+				}
+				
+				if (parent == null || !(parent instanceof CallNode)) {
+					Token token = node.getToken();
+					String identifierName = identifier.getToken().getLexeme();
+					logError("Cannot use VOID function \"" + identifierName + "\" as an expression at " + token.getLocation());
+					
+					node.setType(PrimitiveType.ERROR);
+					return;
+				}
+			}
+			
+			node.setType(functionType);
+		}
+	}
+	@Override
 	public void visitLeave(ReturnNode node) {
+		ParseNode parent = node.getParent();
+		while (parent != null && !(parent instanceof LambdaNode)) {
+			parent = parent.getParent();
+		}
 		
+		if (parent == null) {
+			Token token = node.getToken();
+			logError("Cannot call return statement outside of a Lambda at " + token.getLocation());
+			
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		
+		Type lambdaReturnType = ((LambdaNode) parent).getReturnType();
+		Type returnType;
+		String returnTypeString = "";
+		
+		// Handle void return
+		if (node.nChildren() == 0) {
+			returnType = PrimitiveType.VOID;
+		} else {
+			returnType = node.child(0).getType();
+		}
+		
+		if (returnType instanceof ArrayType) {
+			if (((ArrayType)returnType).equals(lambdaReturnType)) {
+				node.setType(returnType);
+				return;
+			}
+			returnTypeString = returnType.infoString();
+		}
+		if (returnType instanceof LambdaType) {
+			returnType = ((LambdaType) returnType).getReturnType();
+			if (returnType == lambdaReturnType) {
+				node.setType(returnType);
+				return;
+			}
+			returnTypeString = returnType.infoString();
+		}
+		if (returnType instanceof PrimitiveType) {
+			if (returnType == lambdaReturnType) {
+				node.setType(returnType);
+				return;
+			}
+			returnTypeString = returnType.infoString();
+		}
+		
+		node.setType(PrimitiveType.ERROR);
+		
+		Token token = node.getToken();
+		logError("Cannot return type " + returnTypeString + " for Lambda with return type " + lambdaReturnType + " at " + token.getLocation());
+		return;
 	}
 
 	
@@ -316,6 +395,16 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 					node.setSubtype(childTypes.get(0));
 				}
 			} else {
+				Type subtype = node.getType();
+				while (subtype instanceof ArrayType) {
+					subtype = ((ArrayType) subtype).getSubtype();
+				}
+				
+				if (subtype == TypeLiteral.VOID) {
+					typeCheckError(node, Arrays.asList(node.getType()));
+					return;
+				}
+				
 				if (childTypes.get(0) != PrimitiveType.INTEGER) {
 					typeCheckError(node, childTypes);
 					return;

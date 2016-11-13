@@ -29,7 +29,6 @@ public class ArrayType implements Type {
 	}
 	
 // HELPER FUNCTIONS
-	
 	public boolean equals(Type type2) {
 		if (!(type2 instanceof ArrayType)) {
 			return false;

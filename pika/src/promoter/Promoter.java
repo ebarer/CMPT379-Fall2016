@@ -132,6 +132,8 @@ public class Promoter {
 		return false;
 	}
 	public boolean promotable(ArrayNode node) {
+		if (node.isEmpty()) return false;
+		
 		List<Type> childTypes = new ArrayList<Type>();
 		List<Type> castTypes = new ArrayList<Type>();
 		
