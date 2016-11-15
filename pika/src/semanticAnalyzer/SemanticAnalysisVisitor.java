@@ -38,12 +38,20 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	
 	public void visitEnter(MainBlockNode node) {
+		createSubscope(node);
+		enterScope(node);
 	}
 	public void visitLeave(MainBlockNode node) {
+		leaveScope(node);
 	}
 	
 	public void visitEnter(BlockNode node) {
-		createSubscope(node);
+		if (node.getParent() instanceof LambdaNode) {
+			createProcedureScope(node);
+		} else {
+			createSubscope(node);
+		}
+		
 		enterScope(node);
 	}
 	public void visitLeave(BlockNode node) {
@@ -53,6 +61,11 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for scoping.
+	private void createProcedureScope(ParseNode node) {
+		Scope baseScope = node.getLocalScope();
+		Scope scope = baseScope.createProcedureScope();
+		node.setScope(scope);
+	}
 	private void createSubscope(ParseNode node) {
 		Scope baseScope = node.getLocalScope();
 		Scope scope = baseScope.createSubscope();
@@ -81,6 +94,24 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		if (!(node.child(0) instanceof FunctionInvocationNode)) {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
 		}
+		
+		// Get the function signature
+		FunctionInvocationNode function = (FunctionInvocationNode) node.child(0);
+		function.setBinding(function.findVariableBinding());
+		
+		List<Type> childTypes = new ArrayList<Type>();
+		function.getChildren().forEach((child) -> childTypes.add(child.getType()));
+		childTypes.remove(0); // Remove identifier node
+		
+		FunctionSignature signature = function.getBinding().getSignature();
+		
+		// Check that number of arguments is the same
+		if (signature.accepts(childTypes)) {
+			//node.setSignature(signature);
+			node.setType(signature.resultType());
+		} else {
+			typeCheckError(function, childTypes);
+		}
 	}
 	@Override
 	public void visitLeave(FunctionInvocationNode node) {
@@ -104,6 +135,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 					return;
 				}
 			}
+			
+			// TODO: Check that function arguments are valid
 			
 			node.setType(functionType);
 		}
@@ -180,7 +213,12 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			
 			Boolean mutable = node.getToken().isLextant(Keyword.VAR);
 			
-			addBinding(identifier, declarationType, mutable);			
+			if (initializer instanceof LambdaNode) {
+				FunctionSignature signature = ((LambdaNode) initializer).getSignature();
+				addBinding(identifier, declarationType, mutable, signature);
+			} else {
+				addBinding(identifier, declarationType, mutable);
+			}
 		}
 	}
 	@Override
@@ -209,6 +247,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 		if ((targetType instanceof ArrayType) && (expressionType instanceof ArrayType)) {				
 			if (!((ArrayType) targetType).equals(expressionType)) {
+				
 				typeCheckError(node, Arrays.asList(targetType, expressionType));
 				return;
 			}
@@ -286,7 +325,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		List<Type> childTypes = Arrays.asList(left.getType(), right.getType());
 		
 		Lextant operator = operatorFor(node);
-		// TODO: Move to FunctionSignature?
 		if ((childTypes.get(0) instanceof ArrayType) && (childTypes.get(1) instanceof ArrayType)) {
 			if (((ArrayType)childTypes.get(0)).equals(childTypes.get(1))) {
 				FunctionSignature signature = FunctionSignatures.signaturesOf(operator).get(0);
@@ -317,7 +355,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		List<Type> childTypes = Arrays.asList(left.getType());
 		
 		Lextant operator = operatorFor(node);
-		// TODO: Move to FunctionSignature for ArrayType()
 		if (operator == Keyword.LENGTH) {
 			if (childTypes.get(0) instanceof ArrayType) {
 				FunctionSignature signature = FunctionSignatures.signaturesOf(operator).get(0);
@@ -346,7 +383,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		assert node.nChildren() == 1;
 		List<Type> childTypes = Arrays.asList(node.getExpressionType(), node.getCastType());
 
-		// TODO: Move to FunctionSignature for ArrayType()
 		if ((childTypes.get(0) instanceof ArrayType) && (childTypes.get(1) instanceof ArrayType)) {
 			if (((ArrayType)childTypes.get(0)).equals(childTypes.get(1))) {
 				FunctionSignature signature = FunctionSignatures.signaturesOf(Punctuator.PIPE).get(0);
@@ -527,6 +563,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		binding.setMutability(mutable);
 		identifierNode.setBinding(binding);
 	}
+	private void addBinding(IdentifierNode identifierNode, Type type, Boolean mutable, FunctionSignature signature) {
+		Scope scope = identifierNode.getLocalScope();
+		Binding binding = scope.createBinding(identifierNode, type);
+		binding.setMutability(mutable);
+		binding.setSignature(signature);
+		identifierNode.setBinding(binding);
+	}
 	
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -535,8 +578,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		Token token = node.getToken();
 		
 		// Check promotion
-		if (node instanceof OperatorNode && promoter.promotable((OperatorNode)node)) return;
-		if (node instanceof ArrayNode && promoter.promotable((ArrayNode)node)) return;
+		if (node instanceof OperatorNode && promoter.promotable((OperatorNode) node)) return;
+		if (node instanceof FunctionInvocationNode && promoter.promotable((FunctionInvocationNode) node)) return;
+		if (node instanceof ArrayNode && promoter.promotable((ArrayNode) node)) return;
 		
 		List<String> errorTypes = new ArrayList<String>();
 		operandTypes.forEach((child) -> errorTypes.add(child.infoString()));
@@ -548,6 +592,5 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private void logError(String message) {
 		PikaLogger log = PikaLogger.getLogger("compiler.semanticAnalyzer");
 		log.severe(message);
-		// TODO: System.exit(0);
 	}
 }

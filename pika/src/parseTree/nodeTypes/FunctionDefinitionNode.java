@@ -15,7 +15,7 @@ public class FunctionDefinitionNode extends ParseNode {
 	protected FunctionSignature signature;
 	private Binding binding;
 	private Scope parameterScope;
-	private Scope procedureScope;
+	String functionLabel;
 	
 	public FunctionDefinitionNode(Token token) {
 		super(token);
@@ -58,6 +58,13 @@ public class FunctionDefinitionNode extends ParseNode {
 	}
 	public FunctionSignature getSignature() {
 		return signature;
+	}
+	
+	public void setLabel(String label) {
+		this.functionLabel = label;
+	}
+	public String getLabel() {
+		return functionLabel;
 	}
 	
 	

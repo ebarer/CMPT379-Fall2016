@@ -3,24 +3,25 @@ package symbolTable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NegativeMemoryAllocator implements MemoryAllocator {
-
+public class ParameterMemoryAllocator implements MemoryAllocator {
 	MemoryAccessMethod accessor;
 	final int startingOffset;
 	int currentOffset;
 	int minOffset;
 	String baseAddress;
 	List<Integer> bookmarks;
+	List<MemoryLocation> memoryLocations;
 	
-	public NegativeMemoryAllocator(MemoryAccessMethod accessor, String baseAddress, int startingOffset) {
+	public ParameterMemoryAllocator(MemoryAccessMethod accessor, String baseAddress, int startingOffset) {
 		this.accessor = accessor;
 		this.baseAddress = baseAddress;
 		this.startingOffset = startingOffset;
 		this.currentOffset = startingOffset;
 		this.minOffset = startingOffset;
 		this.bookmarks = new ArrayList<Integer>();
+		this.memoryLocations = new ArrayList<MemoryLocation>();
 	}
-	public NegativeMemoryAllocator(MemoryAccessMethod accessor,String baseAddress) {
+	public ParameterMemoryAllocator(MemoryAccessMethod accessor,String baseAddress) {
 		this(accessor, baseAddress, 0);
 	}
 
@@ -28,7 +29,11 @@ public class NegativeMemoryAllocator implements MemoryAllocator {
 	public MemoryLocation allocate(int sizeInBytes) {
 		currentOffset -= sizeInBytes;
 		updateMin();
-		return new MemoryLocation(accessor, baseAddress, currentOffset);
+		
+		MemoryLocation mem = new MemoryLocation(accessor, baseAddress, currentOffset);
+		memoryLocations.add(mem);
+		
+		return mem;
 	}
 	private void updateMin() {
 		if(minOffset > currentOffset) {
@@ -55,5 +60,13 @@ public class NegativeMemoryAllocator implements MemoryAllocator {
 		assert bookmarks.size() > 0;
 		int bookmarkIndex = bookmarks.size()-1;
 		currentOffset = (int) bookmarks.remove(bookmarkIndex);
+		
+		// Update assigned memory locations
+		if (bookmarkIndex == 0) {
+			int maxAllocatedSize = getMaxAllocatedSize();
+			for (MemoryLocation mem : memoryLocations) {
+				mem.modifyOffset(maxAllocatedSize);
+			}
+		}
 	}
 }

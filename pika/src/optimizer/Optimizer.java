@@ -12,7 +12,7 @@ import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = false;
+	boolean debug = true;
 	
 	private ASMCodeFragment fragment;
 	private static final int HEADER = 0;
@@ -47,6 +47,7 @@ public class Optimizer {
 		while(removeUnreachableCode(cfg) > 0);
 		while(mergeBlocks(cfg));
 		cloneBlocks(cfg);
+		printCFG(cfg);
 		
 		// Grab optimized instructions from BasicBlocks
 		fragments[INSTRUCTIONS] = replaceInstructions(cfg);
@@ -335,7 +336,6 @@ public class Optimizer {
 			Double argument = (Double)left / (Double)right;
 			
 			if (opcode == ASMOpcode.PushF) {
-				// TODO: make sure doubleValue() not floatValue()
 				ASMInstruction instr = new ASMInstruction(opcode, argument.doubleValue());
 				instructions.add(loc, instr);				
 			} else if (opcode == ASMOpcode.PushI) {
@@ -446,7 +446,7 @@ public class Optimizer {
 				ASMInstruction instruction = instructions.get(i);
 				
 				// If first instruction is not a label, connect to previous block
-				if (i == 0 && instruction.getOpcode() != ASMOpcode.Label) {
+				if ((j > 0) && (i == 0) && (instruction.getOpcode() != ASMOpcode.Label)) {
 					BasicBlock incomingBlock = fragment.getBlock(j-1);
 					
 					// Define incoming edge
@@ -470,7 +470,7 @@ public class Optimizer {
 				}
 				
 				// If last instruction is not a Jump type or Call, connect to next block
-				if (i == (instructions.size()-1) && !instruction.getOpcode().isJump() && !instruction.getOpcode().isLeave()) {
+				if ((j < fragment.getBlocks().size() - 1) && (i == instructions.size() - 1) && (instruction.getOpcode() != ASMOpcode.Jump) && (!instruction.getOpcode().isLeave())) {
 					BasicBlock outgoingBlock = fragment.getBlock(j+1);
 					
 					// Define outgoing edge
@@ -636,6 +636,9 @@ public class Optimizer {
 	private void printCFG(BasicBlockFragment fragment) {
 		if (debug) {
 			StringBuilder stringBuilder = new StringBuilder();
+			
+			stringBuilder.append("<--------------------- CFG Print --------------------->\n");
+			
 			int i = 1;
 			for (BasicBlock block : fragment.getBlocks()) {
 				stringBuilder.append("Block #" + (i++) + ":\n");

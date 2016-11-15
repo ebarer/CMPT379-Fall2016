@@ -34,7 +34,7 @@ public class Parser {
 	private ParseNode parseProgram() {
 		if(!startsProgram(nowReading)) {
 			return syntaxErrorNode("program");
-		}
+		}		
 		ParseNode program = new ProgramNode(nowReading);
 		
 		while (startsFunctionDefinition(nowReading)) {
@@ -1064,7 +1064,7 @@ public class Parser {
 		if(startsTypeLiteral(nowReading)) {
 			TypeLiteral type = parseTypeLiteral();
 			readToken();
-			return PrimitiveType.withTypeLiteral(type);
+			return type.getType();
 		}
 
 		if(startsLambdaType(nowReading)) {
@@ -1112,7 +1112,6 @@ public class Parser {
 	private void error(String message) {
 		PikaLogger log = PikaLogger.getLogger("compiler.Parser");
 		log.severe("syntax error: " + message);
-		//TODO: System.exit(0);
 	}	
 }
 

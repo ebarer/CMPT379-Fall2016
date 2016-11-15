@@ -1,7 +1,6 @@
 package semanticAnalyzer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import logging.PikaLogger;
@@ -37,11 +36,6 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 		Scope scope = Scope.createParameterScope();
 		node.setScope(scope);
 	}
-	private void createProcedureScope(ParseNode node) {
-		Scope baseScope = node.getLocalScope();
-		Scope scope = baseScope.createSubscope();
-		node.setScope(scope);
-	}
 	private void enterScope(ParseNode node) {
 		node.getScope().enter();
 	}
@@ -65,7 +59,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 			node.setType(functionType);
 			identifier.setType(functionType);
 			
-			addBinding(identifier, functionType);			
+			addBinding(identifier, functionType, signature);			
 		}		
 	}
 
@@ -114,7 +108,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 				return;
 			}
 			
-			addBinding(identifier, paramType);
+			addBinding(identifier, paramType, null);
 		}
 	}
 
@@ -128,7 +122,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 			return t;
 		}
 		if (t instanceof TypeLiteral) {
-			return PrimitiveType.withTypeLiteral((TypeLiteral)t);
+			return ((TypeLiteral)t).getType();
 		}
 		if (t instanceof ArrayType || t instanceof LambdaType) {
 			return t;
@@ -140,10 +134,11 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for binding
-	private void addBinding(IdentifierNode identifierNode, Type type) {
+	private void addBinding(IdentifierNode identifierNode, Type type, FunctionSignature signature) {
 		Scope scope = identifierNode.getLocalScope();
 		Binding binding = scope.createBinding(identifierNode, type);
 		binding.setMutability(false);
+		binding.setSignature(signature);
 		identifierNode.setBinding(binding);
 	}
 
@@ -153,6 +148,5 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	private void logError(String message) {
 		PikaLogger log = PikaLogger.getLogger("compiler.semanticAnalyzer");
 		log.severe(message);
-		// TODO: System.exit(0);
 	}
 }

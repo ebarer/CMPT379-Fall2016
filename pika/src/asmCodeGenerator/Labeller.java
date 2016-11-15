@@ -23,6 +23,9 @@ public class Labeller {
 		return "-" + prefix + "-" + labelNumber + "-";
 	}
 
+	public String newLabel() {
+		return prefix;
+	}
 	public String newLabel(String suffix) {
 		return prefix + suffix;
 	}

@@ -10,6 +10,7 @@ import lexicalAnalyzer.*;
 import parseTree.ParseNode;
 import parseTree.nodeTypes.ArrayNode;
 import parseTree.nodeTypes.CastNode;
+import parseTree.nodeTypes.FunctionInvocationNode;
 import parseTree.nodeTypes.OperatorNode;
 import semanticAnalyzer.signatures.*;
 import semanticAnalyzer.types.*;
@@ -125,6 +126,84 @@ public class Promoter {
 		
 		if (signature.accepts(childTypes)) {
 			node.setSignature(signature);
+			node.setType(signature.resultType());
+			return true;
+		}
+		
+		return false;
+	}
+	public boolean promotable(FunctionInvocationNode node) {
+		FunctionSignature signature = node.findVariableBinding().getSignature();
+		
+		List<Type> childTypes = new ArrayList<Type>();
+		node.getChildren().forEach((child) -> childTypes.add(child.getType()));
+		childTypes.remove(0);
+		
+		// Check for cast to integer
+		for (int i = 0; i < childTypes.size(); i++) {
+		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
+		    	childTypes.set(i, PrimitiveType.INTEGER);
+				if (signature.accepts(childTypes)) {
+					addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER));
+				} else {
+					childTypes.set(i, PrimitiveType.CHARACTER);
+				}
+		    }
+		}
+		
+		if (signature.accepts(childTypes)) {
+			node.setType(signature.resultType());
+			return true;
+		}
+		
+		// Check for cast to float
+		for (int i = 0; i < childTypes.size(); i++) {
+		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
+		    	childTypes.set(i, PrimitiveType.FLOATING);
+		    	if (signature.accepts(childTypes)) {
+		    		addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER, TypeLiteral.FLOATING));
+				} else {
+					childTypes.set(i, PrimitiveType.CHARACTER);
+				}
+		    }
+		    
+		    if (childTypes.get(i) == PrimitiveType.INTEGER) {
+		    	childTypes.set(i, PrimitiveType.FLOATING);
+		    	if (signature.accepts(childTypes)) {
+		    		addPromotion(node.child(i), Arrays.asList(TypeLiteral.FLOATING));
+				} else {
+					childTypes.set(i, PrimitiveType.INTEGER);
+				}
+		    }
+		}
+		
+		if (signature.accepts(childTypes)) {
+			node.setType(signature.resultType());
+			return true;
+		}
+		
+		// Check for cast to rational
+		for (int i = 0; i < childTypes.size(); i++) {
+		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
+		    	childTypes.set(i, PrimitiveType.RATIONAL);
+		    	if (signature.accepts(childTypes)) {
+		    		addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER, TypeLiteral.RATIONAL));
+				} else {
+					childTypes.set(i, PrimitiveType.CHARACTER);
+				}
+		    }
+		    
+		    if (childTypes.get(i) == PrimitiveType.INTEGER) {
+		    	childTypes.set(i, PrimitiveType.RATIONAL);
+		    	if (signature.accepts(childTypes)) {
+					childTypes.set(i, PrimitiveType.INTEGER);
+				} else {
+					addPromotion(node.child(i), Arrays.asList(TypeLiteral.RATIONAL));
+				}
+		    }
+		}
+		
+		if (signature.accepts(childTypes)) {
 			node.setType(signature.resultType());
 			return true;
 		}

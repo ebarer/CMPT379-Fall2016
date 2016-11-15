@@ -13,7 +13,6 @@ public class ArrayPopulateSCG implements SimpleCodeGenerator {
 		return null;
 	}
 
-	// TODO: Make into a subroutine and store values on stack instead of using temp?
 	@Override
 	public ASMCodeChunk generate(Object... var) {
 		assert var.length >= 1;

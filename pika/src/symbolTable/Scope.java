@@ -18,7 +18,12 @@ public class Scope {
 		return new Scope(programScopeAllocator(), nullInstance());
 	}
 	public static Scope createParameterScope() {
-		return new Scope(parameterScopeAllocator(), nullInstance());
+		return new Scope(parameterScopeAllocator(), nullInstanceNegative());
+	}
+	public Scope createProcedureScope() {
+		Scope proc = new Scope(procedureScopeAllocator(), this);
+		proc.allocator.allocate(8);
+		return proc;
 	}
 	public Scope createSubscope() {
 		return new Scope(allocator, this);
@@ -31,6 +36,12 @@ public class Scope {
 	}
 	
 	private static MemoryAllocator parameterScopeAllocator() {
+		return new ParameterMemoryAllocator(
+				MemoryAccessMethod.INDIRECT_ACCESS_BASE,
+				MemoryLocation.FRAME_POINTER);
+	}
+	
+	private static MemoryAllocator procedureScopeAllocator() {
 		return new NegativeMemoryAllocator(
 				MemoryAccessMethod.INDIRECT_ACCESS_BASE,
 				MemoryLocation.FRAME_POINTER);
@@ -107,6 +118,29 @@ public class Scope {
 
 		private NullScope() {
 			super(new PositiveMemoryAllocator(MemoryAccessMethod.NULL_ACCESS, "", 0), null);
+		}
+		public String toString() {
+			return "scope: the-null-scope";
+		}
+		@Override
+		public Binding createBinding(IdentifierNode identifierNode, Type type) {
+			unscopedIdentifierError(identifierNode.getToken());
+			return super.createBinding(identifierNode, type);
+		}
+		// subscopes of null scope need their own strategy.  Assumes global block is static.
+		public Scope createSubscope() {
+			return new Scope(programScopeAllocator(), this);
+		}
+	}
+	
+	public static Scope nullInstanceNegative() {
+		return NullScopeNegative.instance;
+	}
+	private static class NullScopeNegative extends Scope {
+		private static NullScope instance = new NullScope();
+
+		private NullScopeNegative() {
+			super(new NegativeMemoryAllocator(MemoryAccessMethod.NULL_ACCESS, "", 0), null);
 		}
 		public String toString() {
 			return "scope: the-null-scope";

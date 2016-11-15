@@ -2,12 +2,14 @@ package symbolTable;
 
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import inputHandler.TextLocation;
+import semanticAnalyzer.signatures.FunctionSignature;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 
 public class Binding {
 	private Type type;
 	private Boolean mutable = null;
+	private FunctionSignature signature = null;
 	private TextLocation textLocation;
 	private MemoryLocation memoryLocation;
 	private String lexeme;
@@ -52,6 +54,14 @@ public class Binding {
 	public Boolean isMutable() {
 		return mutable;
 	}
+
+	public void setSignature(FunctionSignature signature) {
+		this.signature = signature;
+	}
+	public FunctionSignature getSignature() {
+		return signature;
+	}
+	
 	
 ////////////////////////////////////////////////////////////////////////////////////
 //Null Binding object

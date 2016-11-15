@@ -7,12 +7,5 @@ func weight<int numHydrogen, int numOxygen> -> float {
 }
 
 exec {
-	var a := 1.
-	print a.
-	
-	var d := <int a, int b> -> rat { return (a*a) // b. }.
-	call d(1, 2).
-    
-    call weight(2, 1).
     print weight(2, 1).
 }
