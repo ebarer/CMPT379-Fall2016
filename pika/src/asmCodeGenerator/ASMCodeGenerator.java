@@ -30,10 +30,29 @@ public class ASMCodeGenerator {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
 
 		code.append(MemoryManager.codeForInitialization());
+		code.append(callStackBlockASM());
 		code.append(RunTime.getEnvironment());
 		code.append(globalVariableBlockASM());
 		code.append(programASM());
 		code.append(MemoryManager.codeForAfterApplication());
+		
+		return code;
+	}
+	private ASMCodeFragment callStackBlockASM() {		
+		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);		
+		
+		code.add(DLabel, RunTime.STACK_POINTER);
+		code.add(DataZ, 4);
+		code.add(DLabel, RunTime.FRAME_POINTER);
+		code.add(DataZ, 4);
+		
+		code.add(PushD, RunTime.STACK_POINTER);
+		code.add(Memtop);
+		code.add(StoreI);
+		
+		code.add(PushD, RunTime.FRAME_POINTER);
+		code.add(Memtop);
+		code.add(StoreI);
 		
 		return code;
 	}
@@ -43,15 +62,16 @@ public class ASMCodeGenerator {
 		int globalBlockSize = scope.getAllocatedSize();
 		
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
+		
 		code.add(DLabel, RunTime.GLOBAL_MEMORY_BLOCK);
 		code.add(DataZ, globalBlockSize);
+		
 		return code;
 	}
 	private ASMCodeFragment programASM() {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
-		
-		code.add(Label, RunTime.MAIN_PROGRAM_LABEL);
-		code.append( programCode());
+
+		code.append(programCode());
 		code.add(Halt, "", "%% End of Execution");
 		
 		return code;
@@ -161,6 +181,7 @@ public class ASMCodeGenerator {
 		// constructs larger than statements
 		public void visitLeave(ProgramNode node) {
 			newVoidCode(node);
+			
 			for(ParseNode child : node.getChildren()) {
 				ASMCodeFragment childCode = removeVoidCode(child);
 				code.append(childCode);
@@ -168,6 +189,9 @@ public class ASMCodeGenerator {
 		}
 		public void visitLeave(MainBlockNode node) {
 			newVoidCode(node);
+			
+			code.add(Label, RunTime.MAIN_PROGRAM_LABEL);
+			
 			for(ParseNode child : node.getChildren()) {
 				ASMCodeFragment childCode = removeVoidCode(child);
 				code.append(childCode);
@@ -182,7 +206,92 @@ public class ASMCodeGenerator {
 		}
 
 		///////////////////////////////////////////////////////////////////////////
-		// identifiers	
+		// functions and lambdas
+
+		public void visitEnter(FunctionDefinitionNode node) {
+			if (node.child(0) instanceof IdentifierNode) {
+				String functionLabel = "$function-" + node.child(0).getToken().getLexeme();				
+				node.setLabel(functionLabel);
+			}
+		}
+		public void visitLeave(FunctionDefinitionNode node) {
+			newVoidCode(node);
+
+			ASMCodeFragment childCode = removeValueCode(node.child(1));
+			code.add(DLabel, node.getLabel());
+			code.append(childCode);
+		}
+		
+		public void visitLeave(LambdaNode node) {
+			newValueCode(node);
+			
+			if (!(node.getParent() instanceof FunctionDefinitionNode)) {
+				Labeller labeller = new Labeller("lambda");
+				String startLabel = labeller.newLabel();
+				code.add(DLabel, startLabel);
+			}
+			
+			ASMCodeFragment childCode = removeVoidCode(node.child(1));
+			code.append(childCode);
+		}
+		public void visitLeave(ReturnNode node) {
+			newVoidCode(node);
+			
+			// Push the return address onto the accumulator stack
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(PushI, -8);
+			code.add(Add);
+			
+			// Swap the return address with the function return value
+			code.add(Exchange);
+			
+			// Replace the frame pointer with the dynamic link
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(PushI, -4);
+			code.add(Add);
+			code.add(StoreI);
+			
+			code.add(Return);
+		}
+		public void visitLeave(LambdaParamTypeNode node) {
+		}
+		public void visitLeave(LambdaParamNode node) {
+		}
+
+		public void visitLeave(CallNode node) {
+			newVoidCode(node);
+		}
+		public void visitLeave(FunctionInvocationNode node) {
+			newValueCode(node);
+			
+			
+			ASMCodeFragment identifier = removeAddressCode(node.child(0));
+			String functionLabel = "$function-" + node.child(0).getToken().getLexeme();
+			
+//			for() {...}
+//			Type type = node.getType();
+//			ASMCodeFragment rvalue = removeValueCode(node.child(1));
+//			code.append(rvalue);
+//			opcodeForStore(type);
+			
+			
+			code.append(identifier);
+			
+//			code.add(PushD, RunTime.FRAME_POINTER);
+//			code.add(PushD, RunTime.FRAME_POINTER);
+//			code.add(LoadI);
+//			code.add(PushI, -4);
+//			code.add(Add);
+			
+
+			code.add(CallV);
+		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		// identifiers
 		
 		public void visitLeave(IdentifierNode node) {
 			newAddressCode(node);
@@ -272,6 +381,9 @@ public class ASMCodeGenerator {
 				code.add(ASMOpcode.StoreI);
 			}
 			else if(type instanceof ArrayType) {
+				code.add(ASMOpcode.StoreI);
+			}
+			else if(type instanceof LambdaType) {
 				code.add(ASMOpcode.StoreI);
 			}
 			else {
@@ -394,7 +506,6 @@ public class ASMCodeGenerator {
 			}
 		}
 		private void visitBooleanOperatorNode(BinaryOperatorNode node) {
-			// TODO: Make into a code generator
 			Object variant = node.getSignature().getVariant();
 			if (variant instanceof ASMOpcode) {
 				ASMOpcode opcode = (ASMOpcode) variant;
@@ -423,7 +534,6 @@ public class ASMCodeGenerator {
 			}
 		}
 		private void visitComparisonOperatorNode(BinaryOperatorNode node, Lextant operator) {
-			// TODO: Make into a code generator
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 			Type type = node.getSignature().paramType();
@@ -528,7 +638,6 @@ public class ASMCodeGenerator {
 			}
 		}
 		private void visitOverOperatorNode(RationalOperatorNode node){
-			// TODO: Make into a code generator
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 
@@ -536,7 +645,6 @@ public class ASMCodeGenerator {
 			code.append(arg2);
 		}
 		private void visitExpressOverOperatorNode(RationalOperatorNode node) {
-			// TODO: Make into a code generator
 			assert node.nChildren() == 2;
 			
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
@@ -553,7 +661,6 @@ public class ASMCodeGenerator {
 				code.add(FMultiply);
 				code.add(ConvertI);
 			} else if (type == PrimitiveType.RATIONAL) {
-				// TODO: Double check functionality
 				code.add(Exchange);
 				code.append(arg2);
 				DivisionByZeroSCG divZero = new DivisionByZeroSCG(type);
@@ -561,13 +668,9 @@ public class ASMCodeGenerator {
 				code.add(Multiply);
 				code.add(Exchange);
 				code.add(Divide);
-//				code.add(Divide);
-//				code.append(arg2);
-//				code.add(Multiply);
 			}
 		}
 		private void visitRationalizeOperatorNode(RationalOperatorNode node) {
-			// TODO: Make into a code generator
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			ASMCodeFragment arg2 = removeValueCode(node.child(1));
 			ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VALUE);
@@ -770,6 +873,10 @@ public class ASMCodeGenerator {
 			// Push string characters
 			code.add(DataS, node.getValue());
 			code.add(PushD, stringLabel);
+		}
+		public void visit(LambdaTypeNode node) {
+			newValueCode(node);
+			
 		}
 	}
 
