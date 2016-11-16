@@ -95,23 +95,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
 		}
 		
-		// Get the function signature
-		FunctionInvocationNode function = (FunctionInvocationNode) node.child(0);
-		function.setBinding(function.findVariableBinding());
-		
-		List<Type> childTypes = new ArrayList<Type>();
-		function.getChildren().forEach((child) -> childTypes.add(child.getType()));
-		childTypes.remove(0); // Remove identifier node
-		
-		FunctionSignature signature = function.getBinding().getSignature();
-		
-		// Check that number of arguments is the same
-		if (signature.accepts(childTypes)) {
-			//node.setSignature(signature);
-			node.setType(signature.resultType());
-		} else {
-			typeCheckError(function, childTypes);
-		}
+		verifyFunctionArguments(node);
 	}
 	@Override
 	public void visitLeave(FunctionInvocationNode node) {
@@ -135,12 +119,46 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 					return;
 				}
 			}
-			
-			// TODO: Check that function arguments are valid
-			
-			node.setType(functionType);
+
+			verifyFunctionArguments(node);
 		}
 	}
+	private void verifyFunctionArguments(ParseNode node) {
+		FunctionInvocationNode function = null;
+
+		if (node instanceof CallNode) {
+			function = (FunctionInvocationNode) node.child(0);
+		} else if (node instanceof FunctionInvocationNode) {
+			function = (FunctionInvocationNode) node;
+		}
+		
+		assert function != null;
+		
+		// Get the function signature
+		function.setBinding(function.findVariableBinding());
+		FunctionSignature signature = function.getBinding().getSignature();
+		
+		if (signature == null) {
+			Token token = node.getToken();
+			logError("No signature defined for " + token.getLexeme() + " at " + token.getLocation());
+			node.setType(PrimitiveType.ERROR);
+			return;
+		}
+		
+		// Get child types
+		List<Type> childTypes = new ArrayList<Type>();
+		function.getChildren().forEach((child) -> childTypes.add(child.getType()));
+		childTypes.remove(0); // Remove identifier node
+		
+		// Check that number of arguments is the same
+		if (signature.accepts(childTypes)) {
+			//node.setSignature(signature);
+			node.setType(signature.resultType());
+		} else {
+			typeCheckError(function, childTypes);
+		}
+	}
+	
 	@Override
 	public void visitLeave(ReturnNode node) {
 		ParseNode parent = node.getParent();

@@ -59,7 +59,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 			node.setType(functionType);
 			identifier.setType(functionType);
 			
-			addBinding(identifier, functionType, signature);			
+			addBinding(identifier, functionType, signature);		
 		}		
 	}
 
@@ -108,10 +108,20 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 				return;
 			}
 			
-			addBinding(identifier, paramType, null);
+			FunctionSignature signature = null;
+			if (paramType instanceof LambdaType) {
+				signature = ((LambdaType) paramType).getSignature();
+			}
+			
+			addBinding(identifier, paramType, signature);
 		}
 	}
 
+	
+	/////////////////////////////////////////////////////////////////////////
+	// lambdaType
+	public void visit(LambdaTypeNode node) {
+	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for types

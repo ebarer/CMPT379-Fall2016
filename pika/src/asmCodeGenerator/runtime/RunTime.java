@@ -60,6 +60,7 @@ public class RunTime {
 	public static final String GENERAL_RUNTIME_ERROR 			= "$$general-runtime-error";
 	public static final String DIVIDE_BY_ZERO_RUNTIME_ERROR 	= "$$divide-by-zero";
 	public static final String BAD_INDEX_RUNTIME_ERROR 			= "$$bad-index";
+	public static final String FUNCTION_RUNOFF_RUNTIME_ERROR	= "$$function-runoff";
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
@@ -123,6 +124,7 @@ public class RunTime {
 		generalRuntimeError(frag);
 		divideByZeroError(frag);
 		arrayBadIndexError(frag);
+		functionRunoffError(frag);
 		
 		return frag;
 	}
@@ -149,13 +151,23 @@ public class RunTime {
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 	private void arrayBadIndexError(ASMCodeFragment frag) {
-		String divideByZeroMessage = "$errors-bad-index";
+		String badIndexValueMessage = "$errors-bad-index";
 		
-		frag.add(DLabel, divideByZeroMessage);
+		frag.add(DLabel, badIndexValueMessage);
 		frag.add(DataS, "bad index used for array");
 		
 		frag.add(Label, BAD_INDEX_RUNTIME_ERROR);
-		frag.add(PushD, divideByZeroMessage);
+		frag.add(PushD, badIndexValueMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+	private void functionRunoffError(ASMCodeFragment frag) {
+		String functionRunoffMessage = "$errors-function-runoff";
+		
+		frag.add(DLabel, functionRunoffMessage);
+		frag.add(DataS, "code ran off the end of the function");
+		
+		frag.add(Label, FUNCTION_RUNOFF_RUNTIME_ERROR);
+		frag.add(PushD, functionRunoffMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 	

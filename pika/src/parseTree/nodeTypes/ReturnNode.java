@@ -27,6 +27,18 @@ public class ReturnNode extends ParseNode {
 	public LextantToken lextantToken() {
 		return (LextantToken)token;
 	}
+	
+	public ParseNode getLambda() {
+		ParseNode parent = this.getParent();
+		
+		while (parent != null && !(parent instanceof LambdaNode)) {
+			parent = parent.getParent();
+		}
+		
+		assert parent instanceof LambdaNode;
+		
+		return parent;
+	}
 
 	
 	////////////////////////////////////////////////////////////

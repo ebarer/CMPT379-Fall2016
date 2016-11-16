@@ -12,7 +12,7 @@ import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = true;
+	boolean debug = false;
 	
 	private ASMCodeFragment fragment;
 	private static final int HEADER = 0;
@@ -80,7 +80,8 @@ public class Optimizer {
 		if (chunks.size() > 1) {
 			fragments[HEADER].addChunk(chunks.get(0));
 			fragments[HEADER].addChunk(chunks.get(1));
-			currentChunk = 2;
+			fragments[HEADER].addChunk(chunks.get(2));
+			currentChunk = 3;
 		} else {
 			ASMCodeChunk chunk = chunks.get(currentChunk);
 			List<ASMInstruction> instructions = chunk.getInstructions();
@@ -412,7 +413,8 @@ public class Optimizer {
 			
 			if (instruction.getOpcode() == ASMOpcode.Return ||
 				instruction.getOpcode() == ASMOpcode.Halt ||
-				instruction.getOpcode() == ASMOpcode.Call) {
+				instruction.getOpcode() == ASMOpcode.Call ||
+				instruction.getOpcode() == ASMOpcode.CallV) {
 				
 				blocks.add(instructions.get(i));
 				blocks.newBlock();

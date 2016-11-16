@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import asmCodeGenerator.codeGenerator.*;
 import asmCodeGenerator.codeStorage.*;
+import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 import asmCodeGenerator.runtime.*;
 import lexicalAnalyzer.*;
 import parseTree.*;
@@ -42,9 +43,9 @@ public class ASMCodeGenerator {
 		ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);		
 		
 		code.add(DLabel, RunTime.STACK_POINTER);
-		code.add(DataZ, 4);
+		code.add(DataI, 0);
 		code.add(DLabel, RunTime.FRAME_POINTER);
-		code.add(DataZ, 4);
+		code.add(DataI, 0);
 		
 		code.add(PushD, RunTime.STACK_POINTER);
 		code.add(Memtop);
@@ -165,6 +166,9 @@ public class ASMCodeGenerator {
 			else if(node.getType() instanceof ArrayType) {
 				code.add(LoadI);
 			}
+			else if(node.getType() instanceof LambdaType) {
+				code.add(LoadI);
+			}
 			else {
 				assert false : "node " + node;
 			}
@@ -208,53 +212,122 @@ public class ASMCodeGenerator {
 		///////////////////////////////////////////////////////////////////////////
 		// functions and lambdas
 
-		public void visitEnter(FunctionDefinitionNode node) {
-			if (node.child(0) instanceof IdentifierNode) {
-				String functionLabel = "$function-" + node.child(0).getToken().getLexeme();				
-				node.setLabel(functionLabel);
-			}
-		}
 		public void visitLeave(FunctionDefinitionNode node) {
 			newVoidCode(node);
 
-			ASMCodeFragment childCode = removeValueCode(node.child(1));
-			code.add(DLabel, node.getLabel());
-			code.append(childCode);
+			// FIXME: Need to store function in an identifier
+			
+			ASMCodeFragment lambda = removeValueCode(node.child(1));
+			code.append(lambda);
 		}
 		
+		public void visitEnter(LambdaNode node) {
+			node.generateLabels();
+		}
 		public void visitLeave(LambdaNode node) {
 			newValueCode(node);
 			
-			if (!(node.getParent() instanceof FunctionDefinitionNode)) {
-				Labeller labeller = new Labeller("lambda");
-				String startLabel = labeller.newLabel();
-				code.add(DLabel, startLabel);
-			}
+			code.add(Label, node.getStartLabel());
 			
-			ASMCodeFragment childCode = removeVoidCode(node.child(1));
-			code.append(childCode);
-		}
-		public void visitLeave(ReturnNode node) {
-			newVoidCode(node);
-			
-			// Push the return address onto the accumulator stack
-			code.add(PushD, RunTime.FRAME_POINTER);
+			// Put return address on Frame Stack below Dynamic Link
+			code.add(PushD, RunTime.STACK_POINTER, "%% store return addr.");
 			code.add(LoadI);
 			code.add(PushI, -8);
 			code.add(Add);
-			
-			// Swap the return address with the function return value
 			code.add(Exchange);
+			code.add(StoreI);
 			
-			// Replace the frame pointer with the dynamic link
+			// Store Dynamic Link (current value of Frame Pointer) below the Stack Pointer
+			code.add(PushD, RunTime.STACK_POINTER, "%% store dyn. link");
+			code.add(LoadI);
+			code.add(PushI, -4);
+			code.add(Add);
 			code.add(PushD, RunTime.FRAME_POINTER);
+			code.add(LoadI);
+			code.add(StoreI);
+			
+			// Move Frame Pointer to Stack Pointer
+			code.add(PushD, RunTime.FRAME_POINTER, "%% move frame pointer");
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(LoadI);
+			code.add(StoreI);
+			
+			// Move Stack Pointer to end of frame
+			code.add(PushD, RunTime.STACK_POINTER, "%% move stack pointer");
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(LoadI);
+			code.add(PushI, node.getFrameSize());
+			code.add(Subtract);
+			code.add(StoreI);
+
+			
+			// Lambda execution code
+			ASMCodeFragment childCode = removeVoidCode(node.child(1));
+			code.append(childCode);
+
+			
+			// Runoff error handling
+			code.add(Label, node.getExitErrorLabel());
+			code.add(Jump, RunTime.FUNCTION_RUNOFF_RUNTIME_ERROR);
+			
+			// Exit handshake
+			code.add(Label, node.getExitHandshakeLabel());
+		
+			// Push the return address onto the accumulator stack
+			code.add(PushD, RunTime.FRAME_POINTER, "%% get return addr.");
+			code.add(LoadI);
+			code.add(PushI, -8);
+			code.add(Add);
+			code.add(LoadI);
+			
+			// Replace the Frame Pointer with the dynamic link
+			code.add(PushD, RunTime.FRAME_POINTER, "%% restore frame pointer");
 			code.add(PushD, RunTime.FRAME_POINTER);
 			code.add(LoadI);
 			code.add(PushI, -4);
 			code.add(Add);
+			code.add(LoadI);
 			code.add(StoreI);
 			
+			// Move Stack Pointer above current Parameter Scope
+			code.add(PushD, RunTime.STACK_POINTER, "%% pop frame stack");
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(LoadI);
+			code.add(PushI, node.getFrameSize());
+			code.add(Add);
+			code.add(PushI, node.getArgSize());
+			code.add(Add);
+			
+			// Decrease the stack pointer by the return value size
+			Type returnType = node.getReturnType();
+			code.add(PushI, returnType.getSize(), "%% store return val.");
+			code.add(Subtract);
+			code.add(StoreI);
+			
+			// Bring the return value back to the top of the ASM accumulator stack.
+			// (Swap return value with return address)
+			code.add(Exchange);
+			
+			// Store return value
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(LoadI);
+			code.add(Exchange);
+			
+			OpcodeForStoreSCG scg = new OpcodeForStoreSCG(returnType);
+			code.addChunk(scg.generate());
+			
 			code.add(Return);
+		}
+		public void visitLeave(ReturnNode node) {
+			newVoidCode(node);
+			
+			// Get the return value
+			ASMCodeFragment returnValue = removeValueCode(node.child(0));
+			code.append(returnValue);
+			
+			// Jump to exit handshake
+			LambdaNode lambda = (LambdaNode) node.getLambda();
+			code.add(Jump, lambda.getExitHandshakeLabel());
 		}
 		public void visitLeave(LambdaParamTypeNode node) {
 		}
@@ -263,31 +336,62 @@ public class ASMCodeGenerator {
 
 		public void visitLeave(CallNode node) {
 			newVoidCode(node);
+			
+			// FIXME: Implement CallNode ASM
 		}
 		public void visitLeave(FunctionInvocationNode node) {
 			newValueCode(node);
 			
+			// Push arguments onto Frame Stack
+			for (int i = 1; i < node.nChildren(); i++) {
+				Type argType = node.child(i).getType();
+				int argSize = argType.getSize();
+				
+				// Move Stack Pointer
+				ASMCodeFragment argFrag = new ASMCodeFragment(CodeType.GENERATES_VALUE);
+				argFrag.add(PushD, RunTime.STACK_POINTER);
+				argFrag.add(PushD, RunTime.STACK_POINTER);
+				argFrag.add(LoadI);
+				argFrag.add(PushI, argSize);
+				argFrag.add(Subtract);
+				argFrag.add(StoreI);
+				code.append(argFrag);
+				
+				// Put argument value
+				code.add(PushD, RunTime.STACK_POINTER, "%% store arg " + i);
+				code.add(LoadI);
+				ASMCodeFragment argValue = removeValueCode(node.child(i));
+				code.append(argValue);
+				
+				OpcodeForStoreSCG scg1 = new OpcodeForStoreSCG(argType);
+				code.addChunk(scg1.generate());
+			}
 			
-			ASMCodeFragment identifier = removeAddressCode(node.child(0));
-			String functionLabel = "$function-" + node.child(0).getToken().getLexeme();
+			// FIXME: Handle/test all possible function invocations
+			if (node.child(0) instanceof IdentifierNode) {				
+				ASMCodeFragment identifier = removeAddressCode(node.child(0));
+				code.append(identifier);
+				code.add(LoadI);
+			}
 			
-//			for() {...}
-//			Type type = node.getType();
-//			ASMCodeFragment rvalue = removeValueCode(node.child(1));
-//			code.append(rvalue);
-//			opcodeForStore(type);
-			
-			
-			code.append(identifier);
-			
-//			code.add(PushD, RunTime.FRAME_POINTER);
-//			code.add(PushD, RunTime.FRAME_POINTER);
-//			code.add(LoadI);
-//			code.add(PushI, -4);
-//			code.add(Add);
-			
-
+			// Call function
 			code.add(CallV);
+			
+			// Get return value
+			Type returnType = node.getType();
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(LoadI);
+			OpcodeForLoadSCG scg2 = new OpcodeForLoadSCG(returnType);
+			code.addChunk(scg2.generate());
+			
+			// Move the Stack Pointer up by the size of the return value
+			code.add(PushD, RunTime.STACK_POINTER, "%% restore stack pointer");
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(LoadI);
+			code.add(PushI, returnType.getSize());
+			code.add(Add);
+			code.add(StoreI);
+			
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
@@ -354,42 +458,10 @@ public class ASMCodeGenerator {
 			code.append(lvalue);
 			code.append(rvalue);
 			
-			opcodeForStore(type);
+			OpcodeForStoreSCG scg = new OpcodeForStoreSCG(type);
+			code.addChunk(scg.generate());
 		}
-		private void opcodeForStore(Type type) {
-			if(type == PrimitiveType.INTEGER) {
-				code.add(ASMOpcode.StoreI);
-			}
-			else if(type == PrimitiveType.FLOATING) {
-				code.add(ASMOpcode.StoreF);
-			}
-			else if(type == PrimitiveType.RATIONAL) {
-				RationalStackToTempSCG scg = new RationalStackToTempSCG();
-				code.addChunk(scg.generate());
-				code.add(ASMOpcode.Call, RunTime.SUB_RATIONAL_FIND_GCD);
-				
-				RationalTempToRationalSCG scg2 = new RationalTempToRationalSCG();
-				code.addChunk(scg2.generate());
-			}
-			else if(type == PrimitiveType.BOOLEAN) {
-				code.add(ASMOpcode.StoreC);
-			}
-			else if(type == PrimitiveType.CHARACTER) {
-				code.add(ASMOpcode.StoreC);
-			}
-			else if(type == PrimitiveType.STRING) {
-				code.add(ASMOpcode.StoreI);
-			}
-			else if(type instanceof ArrayType) {
-				code.add(ASMOpcode.StoreI);
-			}
-			else if(type instanceof LambdaType) {
-				code.add(ASMOpcode.StoreI);
-			}
-			else {
-				assert false: "Type " + type + " unimplemented in opcodeForStore()";
-			}
-		}
+
 		
 		///////////////////////////////////////////////////////////////////////////
 		// release statement
@@ -805,7 +877,8 @@ public class ASMCodeGenerator {
 						ASMCodeFragment child = removeValueCode(node.child(i));
 						code.append(child);
 						
-						opcodeForStore(node.getSubtype());
+						OpcodeForStoreSCG scg = new OpcodeForStoreSCG(node.getSubtype());
+						code.addChunk(scg.generate());
 					}
 				} else {
 					ArrayPopulateSCG scg4 = new ArrayPopulateSCG();

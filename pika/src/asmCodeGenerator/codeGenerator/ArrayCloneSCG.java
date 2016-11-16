@@ -137,7 +137,8 @@ public class ArrayCloneSCG implements SimpleCodeGenerator {
 			chunk.add(ASMOpcode.PushD, RunTime.ARRAY_TEMP_5);
 			chunk.add(ASMOpcode.LoadI);
 			chunk.add(ASMOpcode.Add);
-			opcodeForLoad(subtype);
+			OpcodeForLoadSCG scg1 = new OpcodeForLoadSCG(subtype);
+			chunk.append(scg1.generate());
 			
 			chunk.add(ASMOpcode.PushD, RunTime.ARRAY_TEMP_1);
 			chunk.add(ASMOpcode.LoadI);
@@ -145,7 +146,8 @@ public class ArrayCloneSCG implements SimpleCodeGenerator {
 			chunk.add(ASMOpcode.LoadI);
 			chunk.add(ASMOpcode.Add);
 			chunk.add(ASMOpcode.Exchange);
-			opcodeForStore(subtype);
+			OpcodeForCloneSCG scg2 = new OpcodeForCloneSCG(subtype);
+			chunk.append(scg2.generate());
 				
 			chunk.add(ASMOpcode.Jump, loopCopyLabel);
 			chunk.add(ASMOpcode.Label, joinCopyLabel);
@@ -154,73 +156,6 @@ public class ArrayCloneSCG implements SimpleCodeGenerator {
 		}
 		
 		return null;
-	}
-
-	private void opcodeForLoad(Type type) {
-		if(type == PrimitiveType.INTEGER || type == TypeLiteral.INTEGER) {
-			chunk.add(ASMOpcode.LoadI);
-		}
-		else if(type == PrimitiveType.FLOATING || type == TypeLiteral.FLOATING) {
-			chunk.add(ASMOpcode.LoadF);
-		}
-		else if(type == PrimitiveType.RATIONAL || type == TypeLiteral.RATIONAL) {
-			RationalMemToStackSCG scg8 = new RationalMemToStackSCG();
-			chunk.append(scg8.generate());
-		}
-		else if(type == PrimitiveType.BOOLEAN || type == TypeLiteral.BOOLEAN) {
-			chunk.add(ASMOpcode.LoadC);
-		}
-		else if(type == PrimitiveType.CHARACTER || type == TypeLiteral.CHARACTER) {
-			chunk.add(ASMOpcode.LoadC);
-		}
-		else if(type == PrimitiveType.STRING || type == TypeLiteral.STRING) {
-			chunk.add(ASMOpcode.LoadI);
-		}
-		else if(type instanceof ArrayType) {
-			chunk.add(ASMOpcode.LoadI);
-		}
-		else {
-			assert false: "Type " + type + " unimplemented in opcodeForLoad()";
-		}
-	}
-	
-	private void opcodeForStore(Type type) {
-		if(type == PrimitiveType.INTEGER || type == TypeLiteral.INTEGER) {
-			chunk.add(ASMOpcode.StoreI);
-		}
-		else if(type == PrimitiveType.FLOATING || type == TypeLiteral.FLOATING) {
-			chunk.add(ASMOpcode.StoreF);
-		}
-		else if(type == PrimitiveType.RATIONAL || type == TypeLiteral.RATIONAL) {
-			chunk.add(ASMOpcode.Exchange);
-			chunk.add(ASMOpcode.PushI, 4);
-			chunk.add(ASMOpcode.Add);
-			chunk.add(ASMOpcode.Exchange);
-			chunk.add(ASMOpcode.StoreI);
-			
-			chunk.add(ASMOpcode.PushD, RunTime.ARRAY_TEMP_1);
-			chunk.add(ASMOpcode.LoadI);
-			chunk.add(ASMOpcode.PushD, RunTime.ARRAY_TEMP_5);
-			chunk.add(ASMOpcode.LoadI);
-			chunk.add(ASMOpcode.Add);
-			chunk.add(ASMOpcode.Exchange);
-			chunk.add(ASMOpcode.StoreI);
-		}
-		else if(type == PrimitiveType.BOOLEAN || type == TypeLiteral.BOOLEAN) {
-			chunk.add(ASMOpcode.StoreC);
-		}
-		else if(type == PrimitiveType.CHARACTER || type == TypeLiteral.CHARACTER) {
-			chunk.add(ASMOpcode.StoreC);
-		}
-		else if(type == PrimitiveType.STRING || type == TypeLiteral.STRING) {
-			chunk.add(ASMOpcode.StoreI);
-		}
-		else if(type instanceof ArrayType) {
-			chunk.add(ASMOpcode.StoreI);
-		}
-		else {
-			assert false: "Type " + type + " unimplemented in opcodeForStore()";
-		}
 	}
 
 }

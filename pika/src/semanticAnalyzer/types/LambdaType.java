@@ -2,6 +2,9 @@ package semanticAnalyzer.types;
 
 import java.util.ArrayList;
 
+import asmCodeGenerator.codeStorage.ASMOpcode;
+import semanticAnalyzer.signatures.FunctionSignature;
+
 public class LambdaType implements Type {	
 	private String infoString;
 	private ArrayList<Type> typeList;
@@ -20,6 +23,11 @@ public class LambdaType implements Type {
 	}
 	
 // ACCESSORS
+	
+	public FunctionSignature getSignature() {
+		return new FunctionSignature(ASMOpcode.Nop, typeList, returnType);
+	}
+	
 	public void setReturnType(Type type) {
 		this.returnType = type;
 		updateInfoString();
@@ -52,7 +60,8 @@ public class LambdaType implements Type {
 	
 // HELPER FUNCTIONS
 	
-	public boolean equals(Type type2) {
+	@Override
+	public boolean equals(Object type2) {
 		if (!(type2 instanceof LambdaType)) {
 			return false;
 		}

@@ -74,7 +74,9 @@ public class PrintArraySCG implements SimpleCodeGenerator {
 			chunk.add(ASMOpcode.PushD, RunTime.PRINT_TEMP_3);
 			chunk.add(ASMOpcode.LoadI);
 			chunk.add(ASMOpcode.Add);
-			chunk.append(opcodesForPrint(type));
+			
+			OpcodeForPrintSCG scg = new OpcodeForPrintSCG(type);
+			chunk.append(scg.generate());
 			
 			// Modify array offset
 			chunk.add(ASMOpcode.PushD, RunTime.PRINT_TEMP_3);
@@ -119,79 +121,4 @@ public class PrintArraySCG implements SimpleCodeGenerator {
 		return chunk;
 	}
 
-	private ASMCodeChunk opcodesForPrint(Type type) {
-		ASMCodeChunk innerChunk = new ASMCodeChunk();
-		
-		if(type == PrimitiveType.INTEGER || type == TypeLiteral.INTEGER) {
-			innerChunk.add(ASMOpcode.LoadI);
-			innerChunk.add(ASMOpcode.PushD, RunTime.INTEGER_PRINT_FORMAT);
-			innerChunk.add(ASMOpcode.Printf);
-		}
-		else if(type == PrimitiveType.FLOATING || type == TypeLiteral.FLOATING) {
-			innerChunk.add(ASMOpcode.LoadF);
-			innerChunk.add(ASMOpcode.PushD, RunTime.FLOATING_PRINT_FORMAT);
-			innerChunk.add(ASMOpcode.Printf);
-		}
-		else if(type == PrimitiveType.RATIONAL || type == TypeLiteral.RATIONAL) {
-			RationalMemToStackSCG ratStack = new RationalMemToStackSCG();
-			innerChunk.append(ratStack.generate());
-			PrintRationalSCG ratPrint = new PrintRationalSCG();
-			innerChunk.append(ratPrint.generate());
-		}
-		else if(type == PrimitiveType.BOOLEAN || type == TypeLiteral.BOOLEAN) {
-			innerChunk.add(ASMOpcode.LoadC);
-			PrintBooleanSCG scg = new PrintBooleanSCG();
-			innerChunk.append(scg.generate());
-			innerChunk.add(ASMOpcode.PushD, RunTime.BOOLEAN_PRINT_FORMAT);
-			innerChunk.add(ASMOpcode.Printf);
-		}
-		else if(type == PrimitiveType.CHARACTER || type == TypeLiteral.CHARACTER) {
-			innerChunk.add(ASMOpcode.LoadC);
-			innerChunk.add(ASMOpcode.PushD, RunTime.CHARACTER_PRINT_FORMAT);
-			innerChunk.add(ASMOpcode.Printf);
-		}
-		else if(type == PrimitiveType.STRING || type == TypeLiteral.STRING) {
-			innerChunk.add(ASMOpcode.LoadI);
-			innerChunk.add(ASMOpcode.PushI, 12);
-			innerChunk.add(ASMOpcode.Add);
-			innerChunk.add(ASMOpcode.PushD, RunTime.STRING_PRINT_FORMAT);
-			innerChunk.add(ASMOpcode.Printf);
-		}
-		else if(type instanceof ArrayType) {
-			innerChunk.add(ASMOpcode.PushD, RunTime.ARRAY_TEMP_1);
-			innerChunk.add(ASMOpcode.LoadI);
-			innerChunk.add(ASMOpcode.Exchange);
-			innerChunk.add(ASMOpcode.PushD, RunTime.PRINT_TEMP_1);
-			innerChunk.add(ASMOpcode.LoadI);
-			innerChunk.add(ASMOpcode.Exchange);
-			innerChunk.add(ASMOpcode.PushD, RunTime.PRINT_TEMP_2);
-			innerChunk.add(ASMOpcode.LoadI);
-			innerChunk.add(ASMOpcode.Exchange);
-			innerChunk.add(ASMOpcode.PushD, RunTime.PRINT_TEMP_3);
-			innerChunk.add(ASMOpcode.LoadI);
-			innerChunk.add(ASMOpcode.Exchange);
-			
-			innerChunk.add(ASMOpcode.LoadI);
-			Type subType = ((ArrayType) type).getSubtype();
-			innerChunk.append(generate(subType));
-
-			innerChunk.add(ASMOpcode.PushD, RunTime.PRINT_TEMP_3);
-			innerChunk.add(ASMOpcode.Exchange);
-			innerChunk.add(ASMOpcode.StoreI);
-			innerChunk.add(ASMOpcode.PushD, RunTime.PRINT_TEMP_2);
-			innerChunk.add(ASMOpcode.Exchange);
-			innerChunk.add(ASMOpcode.StoreI);
-			innerChunk.add(ASMOpcode.PushD, RunTime.PRINT_TEMP_1);
-			innerChunk.add(ASMOpcode.Exchange);
-			innerChunk.add(ASMOpcode.StoreI);
-			innerChunk.add(ASMOpcode.PushD, RunTime.ARRAY_TEMP_1);
-			innerChunk.add(ASMOpcode.Exchange);
-			innerChunk.add(ASMOpcode.StoreI);
-		}
-		else {
-			assert false: "Type " + type + " unimplemented in opcodeForPrint()";
-		}
-		
-		return innerChunk;
-	}
 }
