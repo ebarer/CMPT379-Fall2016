@@ -1,6 +1,0 @@
-exec {
-    const result := 33 >= 23.
-    var knownType := _false_.
-     knownType := result.
-    print result, _n_.
-}

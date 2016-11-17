@@ -1,5 +1,0 @@
-exec {
-	var c := "Howdy, Bob!".
-	const d := [c | string].
-	print c; d, _n_.
-}

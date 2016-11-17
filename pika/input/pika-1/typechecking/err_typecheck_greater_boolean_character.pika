@@ -1,4 +1,0 @@
-exec {
-    const result := _false_ > ^g^.
-    print result, _n_.
-}

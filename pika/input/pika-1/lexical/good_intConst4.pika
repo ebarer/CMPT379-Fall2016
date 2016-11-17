@@ -1,5 +1,0 @@
-exec {
-	const starters :=  -265.
-
-	print starters, _n_.
-}

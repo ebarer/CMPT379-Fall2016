@@ -1,4 +1,0 @@
-exec {
-    const 3abc := 10.
-    print 3abc, _n_.
-}

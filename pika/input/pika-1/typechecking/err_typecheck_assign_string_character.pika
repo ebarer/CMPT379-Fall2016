@@ -1,5 +1,0 @@
-exec {
-    var result := "?VtHH".
-     result := ^_^.
-    print result, _n_.
-}

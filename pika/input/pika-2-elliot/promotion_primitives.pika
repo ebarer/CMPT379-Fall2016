@@ -1,1 +1,0 @@
-exec {    var a := ^e^ + 4.2 * 9 + ^a^.    print a, _n_.    var b := ^e^ + 4.3.    print b, _n_.    var c := ^e^ + 4 // 3.    print c, _n_.    var d := 5 + 4.3.    print d, _n_.    var e := 5 + 4 // 3.    print e, _n_.}

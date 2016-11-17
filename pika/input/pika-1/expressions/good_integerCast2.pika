@@ -1,5 +1,0 @@
-exec {
-	const c := ^a^.
-	const ascii := [c | int].
-	print c; ascii, _n_.
-}

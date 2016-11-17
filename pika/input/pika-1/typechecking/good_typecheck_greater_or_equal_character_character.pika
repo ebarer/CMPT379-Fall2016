@@ -1,6 +1,0 @@
-exec {
-    const result := ^C^ >= ^e^.
-    var knownType := _true_.
-     knownType := result.
-    print result, _n_.
-}

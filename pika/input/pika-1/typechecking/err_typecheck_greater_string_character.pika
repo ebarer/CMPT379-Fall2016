@@ -1,4 +1,0 @@
-exec {
-    const result := "NM!Q" > ^I^.
-    print result, _n_.
-}

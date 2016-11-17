@@ -1,5 +1,0 @@
-exec {
-	const c := 2.
-	const d := [c | bool].
-	print c; d, _n_.
-}

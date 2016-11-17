@@ -1,5 +1,0 @@
-exec {
-    var result := 3.7.
-     result := _true_.
-    print result, _n_.
-}

@@ -1,4 +1,0 @@
-exec {
-    const result := "(WsP(" > 44.
-    print result, _n_.
-}

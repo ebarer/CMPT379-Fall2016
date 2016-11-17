@@ -1,12 +1,23 @@
-func other<int a, int b, <int, int> -> rat c> -> rat {
-	return c(a, b).
+func stepForward<int input> -> int {
+  	return input + 1.
+}
+
+func stepBackward<int input> -> int {
+	 return input - 1.
+}
+
+func chooseStepFunction<bool backward, int input> -> int {
+	if (backward) {
+		return stepBackward(input).
+	} else {
+		return stepForward(input).
+	}
 }
 
 exec {
-	var d := <int a, int b> -> rat { return (a*a) // b. }.
-	#call d(1, 2).
-	print d(1, 2).
-    
-    call other(2, 1, d).
-    print other(2, 1, d).
+	var input := 5.
+	print input, _n_.
+	
+	input := chooseStepFunction(_true_, input).
+	print input, _n_.
 }

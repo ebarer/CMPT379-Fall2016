@@ -1,3 +1,0 @@
-exec {
-	print  _true_ == 3 == 4 , _n_.
-}

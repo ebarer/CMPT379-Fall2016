@@ -1,4 +1,0 @@
-exec {
-    const result := "oMt[" <= 9.4.
-    print result, _n_.
-}

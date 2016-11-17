@@ -1,5 +1,0 @@
-exec {
-    const w := "abc
-    def".
-    print w, _n_.
-}

@@ -1,4 +1,0 @@
-exec {
-    const result := 46 - "*0N".
-    print result, _n_.
-}

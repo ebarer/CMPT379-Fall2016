@@ -1,4 +1,0 @@
-exec {
-    const result := 4.6 * ^x^.
-    print result, _n_.
-}

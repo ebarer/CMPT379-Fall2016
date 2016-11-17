@@ -1,4 +1,0 @@
-exec {
-    const result := [ 3.3 | string ].
-    print result, _n_.
-}

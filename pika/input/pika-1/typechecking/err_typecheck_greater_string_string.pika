@@ -1,4 +1,0 @@
-exec {
-    const result := ":7D" > ":;".
-    print result, _n_.
-}

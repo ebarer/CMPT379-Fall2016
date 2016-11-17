@@ -1,5 +1,0 @@
-exec {
-    var result := _false_.
-     result := "@G".
-    print result, _n_.
-}

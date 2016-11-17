@@ -1,7 +1,0 @@
-exec {
-	const width := 4.	const height := 7.	const matrix := new [[float]](width).	
-	var x := 0.	while(x < width) {		matrix[x] := new[float](height).		x := x + 1.
-	}
-
-	print matrix.
-}

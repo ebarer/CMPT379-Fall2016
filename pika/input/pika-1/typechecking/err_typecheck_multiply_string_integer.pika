@@ -1,4 +1,0 @@
-exec {
-    const result := "@'" * 86.
-    print result, _n_.
-}

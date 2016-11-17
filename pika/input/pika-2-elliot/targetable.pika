@@ -1,7 +1,0 @@
-exec {
-	var myInt := 5.
-	print myInt, _n_.
-
-	(myInt) := 5 + 4.
-	print myInt, _n_.
-}

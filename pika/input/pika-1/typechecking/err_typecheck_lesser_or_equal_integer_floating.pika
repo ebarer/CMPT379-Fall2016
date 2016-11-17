@@ -1,4 +1,0 @@
-exec {
-    const result := 31 <= 7.2.
-    print result, _n_.
-}

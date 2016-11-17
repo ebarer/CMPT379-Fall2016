@@ -1,4 +1,0 @@
-exec {
-    const result := 26 * ^V^.
-    print result, _n_.
-}

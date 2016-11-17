@@ -1,4 +1,0 @@
-exec {
-	const v := ^^^.
-	print v, _n_.
-}

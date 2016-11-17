@@ -1,4 +1,0 @@
-exec {
-    const result := [ 8.0 | bool ].
-    print result, _n_.
-}

@@ -1,4 +1,0 @@
-exec {
-    const result := 99 + "3<g'&A!".
-    print result, _n_.
-}

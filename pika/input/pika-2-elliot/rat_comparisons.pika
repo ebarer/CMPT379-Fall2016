@@ -1,1 +1,0 @@
-exec {    var test := 3 // 5 <= 9 // 10.    print test, _n_.    test := 3 // 5 < 9 // 10.    print test, _n_.    test := 3 // 5 == 9 // 10.    print test, _n_.    test := 3 // 5 != 9 // 10.    print test, _n_.    test := 3 // 5 > 9 // 10.    print test, _n_.    test := 3 // 5 >= 9 // 10.    print test, _n_.}

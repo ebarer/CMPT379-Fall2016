@@ -1,4 +1,0 @@
-exec {
-    const result := 7.2 / 57.
-    print result, _n_.
-}

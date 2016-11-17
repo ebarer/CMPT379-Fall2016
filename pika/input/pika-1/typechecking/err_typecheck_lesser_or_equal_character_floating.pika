@@ -1,4 +1,0 @@
-exec {
-    const result := ^V^ <= 1.2.
-    print result, _n_.
-}

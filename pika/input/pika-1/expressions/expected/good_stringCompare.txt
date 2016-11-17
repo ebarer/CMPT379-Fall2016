@@ -1,1 +1,0 @@
-Couldn't read file "C:\Users\shermer\workspace\pika\input\pika-1\expressions/output/good_stringCompare.asm"

@@ -1,5 +1,0 @@
-exec {
-	const v := 3.
-	const ratio := -7 / v.
-	print ratio, _n_.
-}

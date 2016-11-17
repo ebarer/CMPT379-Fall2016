@@ -1,5 +1,0 @@
-exec {
-    var result := 60.
-     result := ^ ^.
-    print result, _n_.
-}

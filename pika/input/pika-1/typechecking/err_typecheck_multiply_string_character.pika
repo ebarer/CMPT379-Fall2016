@@ -1,4 +1,0 @@
-exec {
-    const result := "HYLLow" * ^|^.
-    print result, _n_.
-}

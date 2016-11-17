@@ -1,5 +1,0 @@
-exec {
-    var result := 8.8.
-     result := "tcR".
-    print result, _n_.
-}

@@ -1,5 +1,0 @@
-exec {
-    var result := ^x^.
-     result := 10.
-    print result, _n_.
-}
