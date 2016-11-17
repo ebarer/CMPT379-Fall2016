@@ -14,6 +14,7 @@ public class LambdaNode extends ParseNode {
 	protected FunctionSignature signature;
 	
 	String startLabel;
+	String jumpLabel;
 	String exitHandshakeLabel;
 	String exitErrorLabel;
 	
@@ -55,11 +56,15 @@ public class LambdaNode extends ParseNode {
 		
 		// Generate labels
 		this.startLabel = labeller.newLabel();
+		this.jumpLabel = labeller.newLabel("jump");
 		this.exitHandshakeLabel = labeller.newLabel("exit-handshake");
 		this.exitErrorLabel = labeller.newLabel("exit-error");
 	}
 	public String getStartLabel() {
 		return this.startLabel;
+	}
+	public String getJumpLabel() {
+		return this.jumpLabel;
 	}
 	public String getExitHandshakeLabel() {
 		return this.exitHandshakeLabel;

@@ -94,36 +94,32 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		if (!(node.child(0) instanceof FunctionInvocationNode)) {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
 		}
-		
-		verifyFunctionArguments(node);
 	}
 	@Override
 	public void visitLeave(FunctionInvocationNode node) {
-		if (node.child(0) instanceof IdentifierNode) {
-			IdentifierNode identifier = (IdentifierNode) node.child(0);
-			identifier.setBinding(identifier.findVariableBinding());
-			Type functionType = identifier.getBinding().getType();
+		if (node.child(0).getType() instanceof LambdaType) {
+			LambdaType type = (LambdaType)node.child(0).getType();
+			Type returnType = type.getReturnType();
 			
-			if (functionType == PrimitiveType.VOID) {
+			if (returnType == PrimitiveType.VOID) {
 				ParseNode parent = node.getParent();
 				while (parent != null && !(parent instanceof CallNode)) {
 					parent = parent.getParent();
 				}
 				
 				if (parent == null || !(parent instanceof CallNode)) {
-					Token token = node.getToken();
-					String identifierName = identifier.getToken().getLexeme();
-					logError("Cannot use VOID function \"" + identifierName + "\" as an expression at " + token.getLocation());
-					
-					node.setType(PrimitiveType.ERROR);
+					functionInvocationError(node, "Cannot use VOID function as an expression");
 					return;
 				}
 			}
 
-			verifyFunctionArguments(node);
+			verifyFunctionArguments(node, type.getSignature());
+		} else {
+			functionInvocationError(node, "Invoking function on non-Lambda type");
+			return;
 		}
 	}
-	private void verifyFunctionArguments(ParseNode node) {
+	private void verifyFunctionArguments(ParseNode node, FunctionSignature signature) {
 		FunctionInvocationNode function = null;
 
 		if (node instanceof CallNode) {
@@ -132,16 +128,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			function = (FunctionInvocationNode) node;
 		}
 		
-		assert function != null;
-		
-		// Get the function signature
-		function.setBinding(function.findVariableBinding());
-		FunctionSignature signature = function.getBinding().getSignature();
-		
 		if (signature == null) {
-			Token token = node.getToken();
-			logError("No signature defined for " + token.getLexeme() + " at " + token.getLocation());
-			node.setType(PrimitiveType.ERROR);
+			functionInvocationError(node, "No signature defined for function");
 			return;
 		}
 		
@@ -152,7 +140,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		
 		// Check that number of arguments is the same
 		if (signature.accepts(childTypes)) {
-			//node.setSignature(signature);
 			node.setType(signature.resultType());
 		} else {
 			typeCheckError(function, childTypes);
@@ -185,35 +172,15 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			returnType = node.child(0).getType();
 		}
 		
-		if (returnType instanceof ArrayType) {
-			if (((ArrayType)returnType).equals(lambdaReturnType)) {
-				node.setType(returnType);
-				return;
-			}
-			returnTypeString = returnType.infoString();
+		if (returnType.equals(lambdaReturnType)) {
+			node.setType(returnType);
+		} else {
+			node.setType(PrimitiveType.ERROR);
+			
+			Token token = node.getToken();
+			logError("Cannot return type " + returnTypeString + " for Lambda with return type "
+					 + lambdaReturnType.infoString() + " at " + token.getLocation());
 		}
-		if (returnType instanceof LambdaType) {
-			returnType = ((LambdaType) returnType).getReturnType();
-			if (returnType == lambdaReturnType) {
-				node.setType(returnType);
-				return;
-			}
-			returnTypeString = returnType.infoString();
-		}
-		if (returnType instanceof PrimitiveType) {
-			if (returnType == lambdaReturnType) {
-				node.setType(returnType);
-				return;
-			}
-			returnTypeString = returnType.infoString();
-		}
-		
-		node.setType(PrimitiveType.ERROR);
-		
-		Token token = node.getToken();
-		logError("Cannot return type " + returnTypeString + " for Lambda with return type "
-				 + lambdaReturnType.infoString() + " at " + token.getLocation());
-		return;
 	}
 
 	
@@ -434,16 +401,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				// Check that all values are of same type
 				Type t = childTypes.get(0);
 				for (ParseNode childNode : node.getChildren()) {
-					if (t instanceof ArrayType && childNode.getType() instanceof ArrayType) {
-						if (!((ArrayType)childNode.getType()).equals((ArrayType)t)) {
-							typeCheckError(node, childTypes);
-							return;
-						}
-					} else {
-						if (childNode.getType() != t){
-							typeCheckError(node, childTypes);
-							return;							
-						}
+					if (!(t.equals(childNode.getType()))) {
+						typeCheckError(node, childTypes);
+						return;
 					}
 				}
 				
@@ -599,12 +559,18 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		if (node instanceof OperatorNode && promoter.promotable((OperatorNode) node)) return;
 		if (node instanceof FunctionInvocationNode && promoter.promotable((FunctionInvocationNode) node)) return;
 		if (node instanceof ArrayNode && promoter.promotable((ArrayNode) node)) return;
+		if (node instanceof AssignmentNode && promoter.promotable((AssignmentNode) node)) return;
 		
 		List<String> errorTypes = new ArrayList<String>();
 		operandTypes.forEach((child) -> errorTypes.add(child.infoString()));
 		logError("operator " + token.getLexeme() + " not defined for types " 
 				 + errorTypes  + " at " + token.getLocation());
 		
+		node.setType(PrimitiveType.ERROR);
+	}
+	private void functionInvocationError(ParseNode node, String message) {
+		Token token = node.getToken();
+		logError(message + " at " + token.getLocation());
 		node.setType(PrimitiveType.ERROR);
 	}
 	private void logError(String message) {

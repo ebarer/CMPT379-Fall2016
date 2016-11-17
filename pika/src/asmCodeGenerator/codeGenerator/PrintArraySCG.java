@@ -105,7 +105,7 @@ public class PrintArraySCG implements SimpleCodeGenerator {
 			chunk.add(ASMOpcode.PushI, 44);
 			chunk.add(ASMOpcode.PushD, RunTime.CHARACTER_PRINT_FORMAT);
 			chunk.add(ASMOpcode.Printf);
-			chunk.add(ASMOpcode.PushI, 0);
+			chunk.add(ASMOpcode.PushI, 32);
 			chunk.add(ASMOpcode.PushD, RunTime.CHARACTER_PRINT_FORMAT);
 			chunk.add(ASMOpcode.Printf);
 			

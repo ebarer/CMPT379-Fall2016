@@ -54,6 +54,7 @@ public class RunTime {
 	public static final String USABLE_MEMORY_START    			= "$usable-memory-start";
 	public static final String STACK_POINTER    				= "$stack-pointer";
 	public static final String FRAME_POINTER    				= "$frame-pointer";
+	public static final String FUNC_RETURN_ADDR_TEMP			= "$func-return-addr-temp";
 	
 	public static final String MAIN_PROGRAM_LABEL     			= "$$main";
 	
@@ -220,6 +221,9 @@ public class RunTime {
 		frag.add(DLabel, PRINT_RATIONAL_TEMP_2);
 		frag.add(DataI, 0);
 		frag.add(DLabel, PRINT_RATIONAL_TEMP_3);
+		frag.add(DataI, 0);
+		
+		frag.add(DLabel, FUNC_RETURN_ADDR_TEMP);
 		frag.add(DataI, 0);
 		
 		return frag;

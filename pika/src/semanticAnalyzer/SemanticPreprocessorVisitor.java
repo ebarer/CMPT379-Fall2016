@@ -52,14 +52,14 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 			IdentifierNode identifier = (IdentifierNode) node.child(0);
 			LambdaNode lambda = (LambdaNode) node.child(1);
 
-			Type functionType = getType(lambda.child(0));
+			Type functionType = lambda.getType();
 			FunctionSignature signature = ((LambdaNode) node.child(1)).getSignature();
 			
 			node.setSignature(signature);
 			node.setType(functionType);
 			identifier.setType(functionType);
 			
-			addBinding(identifier, functionType, signature);		
+			addBinding(identifier, functionType, lambda.getStartLabel(), signature);		
 		}		
 	}
 
@@ -68,6 +68,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	// lambda
 	@Override
 	public void visitEnter(LambdaNode node) {
+		node.generateLabels();
 		createParameterScope(node);
 		enterScope(node);
 	}
@@ -113,7 +114,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 				signature = ((LambdaType) paramType).getSignature();
 			}
 			
-			addBinding(identifier, paramType, signature);
+			addBinding(identifier, paramType, null, signature);
 		}
 	}
 
@@ -134,7 +135,10 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 		if (t instanceof TypeLiteral) {
 			return ((TypeLiteral)t).getType();
 		}
-		if (t instanceof ArrayType || t instanceof LambdaType) {
+		if (t instanceof ArrayType) {
+			return t;
+		}
+		if (t instanceof LambdaType) {
 			return t;
 		}
 		
@@ -144,11 +148,12 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for binding
-	private void addBinding(IdentifierNode identifierNode, Type type, FunctionSignature signature) {
+	private void addBinding(IdentifierNode identifierNode, Type type, String label, FunctionSignature signature) {
 		Scope scope = identifierNode.getLocalScope();
 		Binding binding = scope.createBinding(identifierNode, type);
 		binding.setMutability(false);
 		binding.setSignature(signature);
+		binding.setLabel(label);
 		identifierNode.setBinding(binding);
 	}
 

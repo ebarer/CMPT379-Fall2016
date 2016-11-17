@@ -1,5 +1,7 @@
-pika/bin/
-pika/src/.DS_Store
-pika/output/
 tests/
 tests2/
+tests3/
+pika/bin/
+pika/src/.DS_Store
+pika/input/
+pika/output/

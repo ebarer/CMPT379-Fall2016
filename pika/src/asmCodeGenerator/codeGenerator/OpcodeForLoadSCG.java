@@ -33,11 +33,14 @@ public class OpcodeForLoadSCG implements SimpleCodeGenerator {
 		else if(type == PrimitiveType.STRING || type == TypeLiteral.STRING) {
 			chunk.add(ASMOpcode.LoadI);
 		}
+		else if(type == PrimitiveType.VOID || type == TypeLiteral.VOID) {
+			
+		}
 		else if(type instanceof ArrayType) {
 			chunk.add(ASMOpcode.LoadI);
 		}
 		else if(type instanceof LambdaType) {
-			chunk.add(ASMOpcode.StoreI);
+			chunk.add(ASMOpcode.LoadI);
 		}
 		else {
 			assert false: "Type " + type + " unimplemented in opcodeForLoad()";

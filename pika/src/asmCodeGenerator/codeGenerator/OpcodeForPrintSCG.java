@@ -66,7 +66,8 @@ public class OpcodeForPrintSCG implements SimpleCodeGenerator {
 			
 			chunk.add(ASMOpcode.LoadI);
 			Type subType = ((ArrayType) type).getSubtype();
-			chunk.append(generate(subType));
+			PrintArraySCG scg = new PrintArraySCG();
+			chunk.append(scg.generate(subType));
 
 			chunk.add(ASMOpcode.PushD, RunTime.PRINT_TEMP_3);
 			chunk.add(ASMOpcode.Exchange);

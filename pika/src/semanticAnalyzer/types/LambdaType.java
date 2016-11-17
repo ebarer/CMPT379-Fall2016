@@ -78,30 +78,13 @@ public class LambdaType implements Type {
 			Type t1 = this.typeList.get(i);
 			Type t2 = compareType.typeList.get(i);
 			
-			if (!compare(t1, t2)) {
+			if (!t1.equals(t2)) {
 				return false;
 			}
 		}
 
 		// Check that return type is the same
-		return compare(this.returnType, compareType.returnType);
-	}
-	private boolean compare(Type t1, Type t2) {
-		if (t1 instanceof ArrayType) {				
-			if (!((ArrayType) t1).equals(t2)) {
-				return false;
-			}
-		} else if (t1 instanceof LambdaType) {
-			if (!((LambdaType) t1).equals(t2)) {
-				return false;
-			}
-		} else {
-			if (t1 != t2) {
-				return false;
-			}
-		}
-		
-		return true;
+		return this.returnType.equals(compareType.returnType);
 	}
 
 }

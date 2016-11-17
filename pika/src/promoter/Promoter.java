@@ -9,6 +9,7 @@ import java.util.Map;
 import lexicalAnalyzer.*;
 import parseTree.ParseNode;
 import parseTree.nodeTypes.ArrayNode;
+import parseTree.nodeTypes.AssignmentNode;
 import parseTree.nodeTypes.CastNode;
 import parseTree.nodeTypes.FunctionInvocationNode;
 import parseTree.nodeTypes.OperatorNode;
@@ -39,7 +40,7 @@ public class Promoter {
 		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
 		
 		// Check for cast to integer
-		for (int i = 1; i < childTypes.size(); i++) {
+		for (int i = 0; i < childTypes.size(); i++) {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.INTEGER);
 		    	if (debug) {
@@ -61,7 +62,7 @@ public class Promoter {
 		}
 		
 		// Check for cast to float
-		for (int i = 1; i < childTypes.size(); i++) {
+		for (int i = 0; i < childTypes.size(); i++) {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.FLOATING);
 		    	if (debug) {
@@ -96,7 +97,7 @@ public class Promoter {
 		}
 		
 		// Check for cast to rational
-		for (int i = 1; i < childTypes.size(); i++) {
+		for (int i = 0; i < childTypes.size(); i++) {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.RATIONAL);
 		    	if (debug) {
@@ -132,8 +133,117 @@ public class Promoter {
 		
 		return false;
 	}
+	public boolean promotable(AssignmentNode node) {
+		Lextant operator = operatorFor(node);
+		
+		List<Type> childTypes = new ArrayList<Type>();
+		node.getChildren().forEach((child) -> childTypes.add(child.getType()));
+		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
+		
+		// Check for cast to integer
+		for (int i = 1; i < childTypes.size(); i++) {
+		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
+		    	childTypes.set(i, PrimitiveType.INTEGER);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
+				signature = FunctionSignatures.signature(operator, childTypes);
+				if (signature.isNull()) {
+					childTypes.set(i, PrimitiveType.CHARACTER);
+				} else {
+					addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER));
+				}
+		    }
+		}
+		
+		if (signature.accepts(childTypes)) {
+			node.setType(signature.resultType());
+			return true;
+		}
+		
+		// Check for cast to float
+		for (int i = 1; i < childTypes.size(); i++) {
+		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
+		    	childTypes.set(i, PrimitiveType.FLOATING);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
+				signature = FunctionSignatures.signature(operator, childTypes);
+				if (signature.isNull()) {
+					childTypes.set(i, PrimitiveType.CHARACTER);
+				} else {
+					addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER, TypeLiteral.FLOATING));
+				}
+		    }
+		    
+		    if (childTypes.get(i) == PrimitiveType.INTEGER) {
+		    	childTypes.set(i, PrimitiveType.FLOATING);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
+				signature = FunctionSignatures.signature(operator, childTypes);
+				if (signature.isNull()) {
+					childTypes.set(i, PrimitiveType.INTEGER);
+				} else {
+					addPromotion(node.child(i), Arrays.asList(TypeLiteral.FLOATING));
+				}
+		    }
+		}
+		
+		if (signature.accepts(childTypes)) {
+			node.setType(signature.resultType());
+			return true;
+		}
+		
+		// Check for cast to rational
+		for (int i = 1; i < childTypes.size(); i++) {
+		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
+		    	childTypes.set(i, PrimitiveType.RATIONAL);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
+				signature = FunctionSignatures.signature(operator, childTypes);
+				if (signature.isNull()) {
+					childTypes.set(i, PrimitiveType.CHARACTER);
+				} else {
+					addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER, TypeLiteral.RATIONAL));
+				}
+		    }
+		    
+		    if (childTypes.get(i) == PrimitiveType.INTEGER) {
+		    	childTypes.set(i, PrimitiveType.RATIONAL);
+		    	if (debug) {
+		    		System.out.println(FunctionSignatures.numSignature(operator, childTypes));
+		    	}
+				signature = FunctionSignatures.signature(operator, childTypes);
+				if (signature.isNull()) {
+					childTypes.set(i, PrimitiveType.INTEGER);
+				} else {
+					addPromotion(node.child(i), Arrays.asList(TypeLiteral.RATIONAL));
+				}
+		    }
+		}
+		
+		if (signature.accepts(childTypes)) {
+			node.setType(signature.resultType());
+			return true;
+		}
+		
+		return false;
+	}
 	public boolean promotable(FunctionInvocationNode node) {
-		FunctionSignature signature = node.findVariableBinding().getSignature();
+		FunctionSignature signature;
+		
+		if (node.child(0).getType() instanceof LambdaType) {
+			LambdaType type = (LambdaType)node.child(0).getType();
+			signature = type.getSignature();
+		} else {
+			signature = node.findVariableBinding().getSignature();
+		}
+		
+		assert signature != null;
+		
+		Type[] sigTypes = signature.getParamTypes();
 		
 		List<Type> childTypes = new ArrayList<Type>();
 		node.getChildren().forEach((child) -> childTypes.add(child.getType()));
@@ -141,6 +251,13 @@ public class Promoter {
 		
 		// Check for cast to integer
 		for (int i = 0; i < childTypes.size(); i++) {
+			// FIXME: verify promotions for FunctionInvocation is correct
+			// Check current type against expected type for each argument,
+			// if promotable, return true, else false
+			// for (i = 0; i < sigTypes.length) { .. }
+			//Type argType = childTypes.get(i);
+			//Type expectedType = sigTypes[i];
+			
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.INTEGER);
 				if (signature.accepts(childTypes)) {

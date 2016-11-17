@@ -18,6 +18,10 @@ public class ArrayPopulateSCG implements SimpleCodeGenerator {
 		assert var.length >= 1;
 		Type type = (Type)var[0];
 		
+		if (type instanceof TypeLiteral) {
+			type = ((TypeLiteral) type).getType();
+		}
+		
 		//chunk.add(ASMOpcode.Label, RunTime.SUB_PRINT_ARRAY);
 
 		Labeller labeller = new Labeller("populate-array");

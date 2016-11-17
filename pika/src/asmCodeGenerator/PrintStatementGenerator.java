@@ -6,6 +6,7 @@ import parseTree.nodeTypes.PrintStatementNode;
 import parseTree.nodeTypes.SpaceNode;
 import parseTree.nodeTypes.TabNode;
 import semanticAnalyzer.types.ArrayType;
+import semanticAnalyzer.types.LambdaType;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;
 import asmCodeGenerator.ASMCodeGenerator.CodeVisitor;
@@ -71,18 +72,25 @@ public class PrintStatementGenerator {
 
 
 	private static String printFormat(Type type) {
-		assert type instanceof PrimitiveType;
-		
-		switch((PrimitiveType)type) {
-		case INTEGER:	return RunTime.INTEGER_PRINT_FORMAT;
-		case FLOATING:	return RunTime.FLOATING_PRINT_FORMAT;
-		case RATIONAL:  return RunTime.RATIONAL_PRINT_FORMAT;
-		case BOOLEAN:	return RunTime.BOOLEAN_PRINT_FORMAT;
-		case CHARACTER:	return RunTime.CHARACTER_PRINT_FORMAT;
-		case STRING:	return RunTime.STRING_PRINT_FORMAT;
-		default:		
-			assert false : "Type " + type + " unimplemented in PrintStatementGenerator.printFormat()";
-			return "";
+		if (type instanceof LambdaType) {
+			return RunTime.INTEGER_PRINT_FORMAT;
 		}
+		
+		if (type instanceof PrimitiveType) {
+			switch((PrimitiveType)type) {
+			case INTEGER:	return RunTime.INTEGER_PRINT_FORMAT;
+			case FLOATING:	return RunTime.FLOATING_PRINT_FORMAT;
+			case RATIONAL:  return RunTime.RATIONAL_PRINT_FORMAT;
+			case BOOLEAN:	return RunTime.BOOLEAN_PRINT_FORMAT;
+			case CHARACTER:	return RunTime.CHARACTER_PRINT_FORMAT;
+			case STRING:	return RunTime.STRING_PRINT_FORMAT;
+			default:		
+				assert false : "Type " + type + " unimplemented in PrintStatementGenerator.printFormat()";
+				return "";
+			}
+		}
+		
+		assert false : "Type " + type + " unimplemented in PrintStatementGenerator.printFormat()";
+		return "";
 	}
 }

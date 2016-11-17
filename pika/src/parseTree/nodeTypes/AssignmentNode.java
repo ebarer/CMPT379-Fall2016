@@ -7,7 +7,7 @@ import lexicalAnalyzer.Punctuator;
 import tokens.LextantToken;
 import tokens.Token;
 
-public class AssignmentNode extends OperatorNode {
+public class AssignmentNode extends ParseNode {
 	
 	public AssignmentNode(Token token) {
 		super(token);

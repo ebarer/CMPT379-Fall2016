@@ -4,10 +4,10 @@ public enum PrimitiveType implements Type {
 	ANY(0),
 	BOOLEAN(1),
 	CHARACTER(1),
-	STRING(4),
-	INTEGER(4),
 	FLOATING(8),
+	INTEGER(4),
 	RATIONAL(8),
+	STRING(4),
 	VOID(0),
 	
 	ERROR(0),			// use as a value when a syntax error has occurred

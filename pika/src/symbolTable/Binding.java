@@ -10,6 +10,7 @@ public class Binding {
 	private Type type;
 	private Boolean mutable = null;
 	private FunctionSignature signature = null;
+	private String label = null;
 	private TextLocation textLocation;
 	private MemoryLocation memoryLocation;
 	private String lexeme;
@@ -55,6 +56,13 @@ public class Binding {
 		return mutable;
 	}
 
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	public String getLabel() {
+		return label;
+	}
+	
 	public void setSignature(FunctionSignature signature) {
 		this.signature = signature;
 	}

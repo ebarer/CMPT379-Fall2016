@@ -1,6 +1,8 @@
 package asmCodeGenerator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import asmCodeGenerator.codeGenerator.*;
 import asmCodeGenerator.codeStorage.*;
@@ -17,6 +19,7 @@ import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 // do not call the code generator if any errors have occurred during analysis.
 public class ASMCodeGenerator {
 	ParseNode root;
+	List<IdentifierNode> functionDefinitions;
 
 	public static ASMCodeFragment generate(ParseNode syntaxTree) {
 		ASMCodeGenerator codeGenerator = new ASMCodeGenerator(syntaxTree);
@@ -25,6 +28,7 @@ public class ASMCodeGenerator {
 	public ASMCodeGenerator(ParseNode root) {
 		super();
 		this.root = root;
+		this.functionDefinitions = new ArrayList<IdentifierNode>();
 	}
 	
 	public ASMCodeFragment makeASM() {
@@ -82,7 +86,6 @@ public class ASMCodeGenerator {
 		root.accept(visitor);
 		return visitor.removeRootCode(root);
 	}
-
 
 	protected class CodeVisitor extends ParseNodeVisitor.Default {
 		private Map<ParseNode, ASMCodeFragment> codeMap;
@@ -196,10 +199,25 @@ public class ASMCodeGenerator {
 			
 			code.add(Label, RunTime.MAIN_PROGRAM_LABEL);
 			
+			code.append(storeFunctionDefinitions());
+			
 			for(ParseNode child : node.getChildren()) {
 				ASMCodeFragment childCode = removeVoidCode(child);
 				code.append(childCode);
 			}
+		}
+		private ASMCodeFragment storeFunctionDefinitions() {
+			ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
+
+			for (IdentifierNode identifier : functionDefinitions) {
+				String label = identifier.getBinding().getLabel();
+				ASMCodeFragment address = removeAddressCode(identifier);
+				code.append(address);
+				code.add(PushD, label);
+				code.add(StoreI);
+			}
+			
+			return code;
 		}
 		public void visitLeave(BlockNode node) {
 			newVoidCode(node);
@@ -214,18 +232,22 @@ public class ASMCodeGenerator {
 
 		public void visitLeave(FunctionDefinitionNode node) {
 			newVoidCode(node);
-
-			// FIXME: Need to store function in an identifier
+			
+			if (node.child(0) instanceof IdentifierNode) {
+				functionDefinitions.add((IdentifierNode) node.child(0));
+			}
 			
 			ASMCodeFragment lambda = removeValueCode(node.child(1));
 			code.append(lambda);
 		}
 		
-		public void visitEnter(LambdaNode node) {
-			node.generateLabels();
-		}
 		public void visitLeave(LambdaNode node) {
 			newValueCode(node);
+			
+			// Jump over lambda if it is inline
+			if (!(node.getParent() instanceof FunctionDefinitionNode)) {
+				code.add(Jump,  node.getJumpLabel());
+			}
 			
 			code.add(Label, node.getStartLabel());
 			
@@ -304,26 +326,36 @@ public class ASMCodeGenerator {
 			code.add(Subtract);
 			code.add(StoreI);
 			
-			// Bring the return value back to the top of the ASM accumulator stack.
-			// (Swap return value with return address)
-			code.add(Exchange);
+			// Store return address in temp until value is stored
+			code.add(ASMOpcode.PushD, RunTime.FUNC_RETURN_ADDR_TEMP);
+			code.add(ASMOpcode.Exchange);
+			code.add(ASMOpcode.StoreI);
 			
 			// Store return value
-			code.add(PushD, RunTime.STACK_POINTER);
-			code.add(LoadI);
-			code.add(Exchange);
-			
-			OpcodeForStoreSCG scg = new OpcodeForStoreSCG(returnType);
+			OpcodeForStoreFunctionSCG scg = new OpcodeForStoreFunctionSCG(returnType);
 			code.addChunk(scg.generate());
 			
+			// Load return address from temp
+			code.add(ASMOpcode.PushD, RunTime.FUNC_RETURN_ADDR_TEMP);
+			code.add(ASMOpcode.LoadI);
+			
 			code.add(Return);
+			
+			code.add(Label, node.getJumpLabel());
+			
+			// Push lambda address onto accumulator if inline
+			if (!(node.getParent() instanceof FunctionDefinitionNode)) {
+				code.add(PushD, node.getStartLabel());
+			}
 		}
 		public void visitLeave(ReturnNode node) {
 			newVoidCode(node);
 			
 			// Get the return value
-			ASMCodeFragment returnValue = removeValueCode(node.child(0));
-			code.append(returnValue);
+			if (node.nChildren() > 0) {
+				ASMCodeFragment returnValue = removeValueCode(node.child(0));
+				code.append(returnValue);
+			}
 			
 			// Jump to exit handshake
 			LambdaNode lambda = (LambdaNode) node.getLambda();
@@ -337,10 +369,21 @@ public class ASMCodeGenerator {
 		public void visitLeave(CallNode node) {
 			newVoidCode(node);
 			
-			// FIXME: Implement CallNode ASM
+			ASMCodeFragment lambdaCode = removeValueCode(node.child(0));
+			code.append(lambdaCode);
+			
+			// Remove value if function return isn't VOID
+			if (node.getType() != PrimitiveType.VOID) {
+				code.add(Pop);
+			}
 		}
 		public void visitLeave(FunctionInvocationNode node) {
 			newValueCode(node);
+			
+			if (!(node.child(0) instanceof IdentifierNode)) {
+				ASMCodeFragment subroutineCode = removeValueCode(node.child(0));
+				code.append(subroutineCode);
+			}
 			
 			// Push arguments onto Frame Stack
 			for (int i = 1; i < node.nChildren(); i++) {
@@ -391,7 +434,6 @@ public class ASMCodeGenerator {
 			code.add(PushI, returnType.getSize());
 			code.add(Add);
 			code.add(StoreI);
-			
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
