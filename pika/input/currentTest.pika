@@ -1,23 +1,18 @@
-func stepForward<int input> -> int {
-  	return input + 1.
-}
-
-func stepBackward<int input> -> int {
-	 return input - 1.
-}
-
-func chooseStepFunction<bool backward, int input> -> int {
-	if (backward) {
-		return stepBackward(input).
-	} else {
-		return stepForward(input).
-	}
+func test<> -> void {
+	var a := 5.
 }
 
 exec {
-	var input := 5.
-	print input, _n_.
-	
-	input := chooseStepFunction(_true_, input).
-	print input, _n_.
+	var a := <[[int]] a, int b, int c> -> int {
+		if (b < length a) {
+			if (b < length a[b]) {
+				return a[b][c].
+			}
+		}
+
+		print "Index out of bounds.";.
+		return -1.
+	}.
+
+	print a([[99,23,103], [-2,9]], 0, 1).
 }

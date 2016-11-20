@@ -51,10 +51,12 @@ public class ArrayType implements Type {
 			subtype2 = ((TypeLiteral) subtype2).getType();
 		}
 		
-		if (subtype1.equals(subtype2)) {
-			return true;
-		} else {
-			return false;
+		if (subtype1 != null && subtype1 != null) {
+			if (subtype1.equals(subtype2)) {
+				return true;
+			}
 		}
+		
+		return false;
 	}
 }

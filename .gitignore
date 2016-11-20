@@ -1,7 +1,9 @@
-tests/
-tests2/
-tests3/
 pika/bin/
 pika/src/.DS_Store
 pika/input/
 pika/output/
+
+tests/
+tests2/
+tests2_1/
+tests3/

@@ -210,6 +210,7 @@ public class ASMCodeGenerator {
 			ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
 
 			for (IdentifierNode identifier : functionDefinitions) {
+//				String label = ((LambdaNode)identifier.getParent().child(1)).getStartLabel();
 				String label = identifier.getBinding().getLabel();
 				ASMCodeFragment address = removeAddressCode(identifier);
 				code.append(address);
@@ -409,8 +410,7 @@ public class ASMCodeGenerator {
 				OpcodeForStoreSCG scg1 = new OpcodeForStoreSCG(argType);
 				code.addChunk(scg1.generate());
 			}
-			
-			// FIXME: Handle/test all possible function invocations
+
 			if (node.child(0) instanceof IdentifierNode) {				
 				ASMCodeFragment identifier = removeAddressCode(node.child(0));
 				code.append(identifier);

@@ -1,5 +1,6 @@
 package optimizer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,7 +9,6 @@ import asmCodeGenerator.codeStorage.ASMCodeChunk;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
-import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
@@ -54,8 +54,8 @@ public class Optimizer {
 		while(simplifyJumps(fragments[INSTRUCTIONS]));
 		
 		// Merge fragments
-		returnFragment.append(fragments[HEADER]);
 		returnFragment.append(fragments[DATA]);
+		returnFragment.append(fragments[HEADER]);
 		returnFragment.append(fragments[INSTRUCTIONS]);
 		
 		return returnFragment;
@@ -111,7 +111,13 @@ public class Optimizer {
 				if (opcode == ASMOpcode.Nop) {
 					continue;
 				} else if (opcode.isDataDirective()) {
-					fragments[DATA].add(instruction);				
+					if (instruction.getOpcode() == ASMOpcode.DataS) {
+						String argString = ((String)instruction.getArgument()).replaceAll("^\"|\"$", "");
+						ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.DataS, argString, instruction.getComment());
+						fragments[DATA].add(newInstruction);
+					} else {
+						fragments[DATA].add(instruction);
+					}
 				} else {
 					fragments[INSTRUCTIONS].add(instruction);
 				}
@@ -140,18 +146,21 @@ public class Optimizer {
 		ASMCodeChunk chunk = fragment.getChunks().get(0);
 		List<ASMInstruction> instructions = chunk.getInstructions();
 		
-		for (ASMInstruction instruction : instructions) {
+		for (int i = 0; i < instructions.size(); i++) {
+			ASMInstruction instruction = instructions.get(i);
 			if (instruction.isString()) {
 				Object operand = instruction.getArgument();
-				Integer loc = instructions.indexOf(instruction);
-				strings.put(loc, operand);
+				strings.put(i, operand);
+				
+				while (instruction.getOpcode() == ASMOpcode.DLabel) {
+					instruction = instructions.get(++i);
+				}
 			}
 		}
 		
 		return strings;
 	}
 	private void removeDuplicateStrings(ASMCodeFragment fragment) {
-		int stringRecordOffset = 4;
 		if (fragment.getChunks().size() > 0) {
 			ASMCodeChunk chunk = fragment.getChunks().get(0);
 			List<ASMInstruction> instructions = chunk.getInstructions();
@@ -161,16 +170,40 @@ public class Optimizer {
 			LinkedHashMap<Integer, Object> strings = locateStrings(fragment);
 			for (Map.Entry<Integer, Object> stringEntry : strings.entrySet()) {
 				int loc = stringEntry.getKey();
-				loc -= removedInstrCount; // Compensate for deleted instructions				
-				int stringStart = loc + stringRecordOffset;
+				loc -= removedInstrCount; // Compensate for deleted instructions
 				
-				ASMInstruction dLabel = instructions.get(loc);
+				// Get header start
+				int headerStart = loc;
+				while (instructions.get(headerStart).getOpcode() == ASMOpcode.DLabel) {
+					headerStart++;
+				}
+				
+				// Get header end
+				int headerEnd = headerStart;
+				while (instructions.get(headerEnd).getOpcode() == ASMOpcode.DataI) {
+					headerEnd++;
+				}
+				
+				int stringStart = headerEnd;
+				while (instructions.get(stringStart).getOpcode() != ASMOpcode.DataC &&
+					   instructions.get(stringStart).getOpcode() != ASMOpcode.DataS) {
+					stringStart++;
+				}
+				
 				ASMOpcode opcode = instructions.get(stringStart).getOpcode();
 				String stringData = getString(instructions, stringStart);
 				
-				if (stringLegend.containsKey(stringData)) {					
-					// Remove string label and record
-					for (int l = loc; l < stringStart; l++) {
+				if (stringLegend.containsKey(stringData)) {
+					List<ASMInstruction> labels = new ArrayList<ASMInstruction>();
+					// Store and remove string labels
+					for (int l = loc; l < headerStart; l++) {
+						labels.add(instructions.get(loc));
+						instructions.remove(loc);
+						removedInstrCount++;
+					}
+					
+					// Remove record instructions
+					for (int l = headerStart; l < headerEnd; l++) {
 						instructions.remove(loc);
 						removedInstrCount++;
 					}
@@ -189,8 +222,10 @@ public class Optimizer {
 					
 					// Insert DLabel at location of first instance of string
 					int addLoc = stringLegend.get(stringData) + 1;
-					instructions.add(addLoc, dLabel);
-					removedInstrCount--;
+					for (ASMInstruction label : labels) {
+						instructions.add(addLoc++, label);
+						removedInstrCount--;
+					}
 				} else {
 					stringLegend.put(stringData, loc);				
 				}
@@ -204,12 +239,17 @@ public class Optimizer {
 			return (String)instruction.getArgument();
 		} else if (instruction.getOpcode() == ASMOpcode.DataC) {
 			StringBuffer stringBuffer = new StringBuffer();
+			
 			while (instruction.getOpcode() == ASMOpcode.DataC) {
 				int value = (int)instruction.getArgument();
-				stringBuffer.append(value);
+				if (value == 0) break;
+				stringBuffer.append((char)value);
 				instruction = instructions.get(++loc);
 			}
-			return stringBuffer.toString();
+
+			// stringBuffer.setLength(stringBuffer.length() - 1);
+			String returnString = stringBuffer.toString();
+			return returnString;
 		} else {
 			return "";
 		}
@@ -235,7 +275,7 @@ public class Optimizer {
 					if (op1 == ASMOpcode.PushI) {
 						switch (op2) {
 						case PushI:
-							if (op3.isArithmetic()) {
+							if (op3.isArithmetic() || op3 == ASMOpcode.Duplicate) {
 								foldArithmetic(i, instructions, op1);
 							}
 							break;
@@ -251,7 +291,7 @@ public class Optimizer {
 					} else if (op1 == ASMOpcode.PushF) {
 						switch (op2) {
 						case PushF:
-							if (op3.isArithmetic()) {
+							if (op3.isArithmetic() || op3 == ASMOpcode.Duplicate) {
 								foldArithmetic(i, instructions, op1);
 							}
 							break;
@@ -297,7 +337,19 @@ public class Optimizer {
 		case Divide:
 		case FDivide:
 		case Duplicate:
-			foldDivision(left, right, loc, instructions, opcode);
+			if (op == ASMOpcode.Duplicate) {
+				ASMInstruction jumpInstr = instructions.get(loc+3);
+				ASMInstruction divideInstr = instructions.get(loc+4);
+				
+				if (divideInstr.getOpcode() == ASMOpcode.FDivide || divideInstr.getOpcode() == ASMOpcode.Divide) {
+					if (jumpInstr.getOpcode() == ASMOpcode.JumpFalse || jumpInstr.getOpcode() == ASMOpcode.JumpFZero) {
+						foldDivision(left, right, loc, instructions, opcode);	
+					}
+				}
+			} else {
+				foldDivision(left, right, loc, instructions, opcode);
+			}
+			
 			return;
 		default:
 			break;
@@ -319,30 +371,35 @@ public class Optimizer {
 	private void foldDivision(Object left, Object right, int loc, List<ASMInstruction> instructions, ASMOpcode opcode) {
 		if (right instanceof Integer) { right = ((Integer)right).doubleValue(); }
 		if (left instanceof Integer) { left = ((Integer)left).doubleValue(); }
+		ASMInstruction jumpInstr = instructions.get(loc + 3);
 		
 		// Remove old instructions
 		instructions.remove(loc);
 		instructions.remove(loc);
 		instructions.remove(loc);
-		instructions.remove(loc);
-		instructions.remove(loc);
 		
-		if ((Double)right == 0) {
-			// Issue division by 0 error
+		if (jumpInstr.getOpcode().isJump()) {
 			instructions.remove(loc);
-			ASMInstruction instr = new ASMInstruction(ASMOpcode.Jump, RunTime.DIVIDE_BY_ZERO_RUNTIME_ERROR);
-			instructions.add(loc, instr);
-		} else {			
-			// Insert folded instruction
-			Double argument = (Double)left / (Double)right;
+			instructions.remove(loc);
 			
-			if (opcode == ASMOpcode.PushF) {
-				ASMInstruction instr = new ASMInstruction(opcode, argument.doubleValue());
-				instructions.add(loc, instr);				
-			} else if (opcode == ASMOpcode.PushI) {
-				ASMInstruction instr = new ASMInstruction(opcode, argument.intValue());
+			// Issue division by 0 error
+			if ((Double)right == 0) {
+				ASMInstruction instr = new ASMInstruction(ASMOpcode.Jump, jumpInstr.getArgument());
 				instructions.add(loc, instr);
+				numChanges++;
+				return;
 			}
+		}	
+		
+		// Insert folded instruction
+		Double argument = (Double)left / (Double)right;
+		
+		if (opcode == ASMOpcode.PushF) {
+			ASMInstruction instr = new ASMInstruction(opcode, argument.doubleValue());
+			instructions.add(loc, instr);				
+		} else if (opcode == ASMOpcode.PushI) {
+			ASMInstruction instr = new ASMInstruction(opcode, argument.intValue());
+			instructions.add(loc, instr);
 		}
 		
 		numChanges++;
@@ -531,7 +588,7 @@ public class Optimizer {
 		for (int i = 0; i < fragment.getBlocks().size(); i++) {
 			BasicBlock block = fragment.getBlock(i);
 			String labelString = "basicBlock-" + (i+1);
-			newInstructions.add(ASMOpcode.Label, labelString);
+			//newInstructions.add(ASMOpcode.Label, labelString);
 			for (ASMInstruction instruction : block.getInstructions()) {
 				newInstructions.add(instruction);
 			}
