@@ -54,8 +54,8 @@ public class Optimizer {
 		while(simplifyJumps(fragments[INSTRUCTIONS]));
 		
 		// Merge fragments
-		returnFragment.append(fragments[DATA]);
 		returnFragment.append(fragments[HEADER]);
+		returnFragment.append(fragments[DATA]);
 		returnFragment.append(fragments[INSTRUCTIONS]);
 		
 		return returnFragment;

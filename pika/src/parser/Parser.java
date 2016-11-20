@@ -205,6 +205,14 @@ public class Parser {
 		
 		ParseNode initializer = parseExpression();
 		
+		// Check for index
+		if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+			while (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+				ParseNode index = parseIndex();
+				initializer = IndexNode.withChildren(initializer.getToken(), initializer, index);
+			}
+		}
+		
 		expect(Punctuator.TERMINATOR);
 		
 		return DeclarationNode.withChildren(declarationToken, identifier, initializer);
@@ -231,7 +239,19 @@ public class Parser {
 			target = parseExpression();
 		}
 		
+		if (startsCastOrArray(nowReading)) {
+			target = parseExpression();
+		}
+		
 		assert target != null;
+		
+		// Check for index
+		if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+			while (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+				ParseNode index = parseIndex();
+				target = IndexNode.withChildren(target.getToken(), target, index);
+			}
+		}
 
 		expect(Punctuator.ASSIGN);
 		Token assignmentToken = Punctuator.ASSIGN.prototype();
@@ -242,7 +262,7 @@ public class Parser {
 		return AssignmentNode.withChildren(assignmentToken, target, expression);
 	}
 	private boolean startsAssignment(Token token) {
-		return (token instanceof IdentifierToken || startsParenthetical(token));
+		return (token instanceof IdentifierToken || startsParenthetical(token) || startsCastOrArray(token));
 	}
 	
 	///////////////////////////////////////////////////////////

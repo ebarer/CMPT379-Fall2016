@@ -1,18 +1,24 @@
-func test<> -> void {
-	var a := 5.
-}
-
 exec {
-	var a := <[[int]] a, int b, int c> -> int {
-		if (b < length a) {
-			if (b < length a[b]) {
-				return a[b][c].
-			}
+	const max := 20.
+	const fibs := new[int](max).
+	
+	fibs[0] := 0.
+	fibs[1] := 1.
+	
+	var n := 1.
+	while(n < length fibs) {
+		if(n >= 2) {
+			fibs[n] := fibs[n - 1] + fibs[n - 2].
 		}
-
-		print "Index out of bounds.";.
-		return -1.
-	}.
-
-	print a([[99,23,103], [-2,9]], 0, 1).
+		n := n + 1.
+	}
+	
+	n := 1.
+	while(n < length fibs) {
+		if(n < 10) {
+			print ^ ^.
+		}
+		print n; fibs[n], _n_.
+		n := n + 1.
+	}
 }

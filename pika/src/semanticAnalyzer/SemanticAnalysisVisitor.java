@@ -208,22 +208,26 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	@Override
 	public void visitLeave(AssignmentNode node) {
-		// Configure identifier
-		ParseNode temp = node.child(0);
-		while (!(temp instanceof IdentifierNode)) {
-			temp = temp.child(0);
+		// Check for mutability
+		ParseNode tempNode = node.child(0);
+		while (!(tempNode instanceof IdentifierNode) && tempNode.nChildren() > 0) {
+			tempNode = tempNode.child(0);
 		}
-		IdentifierNode target = (IdentifierNode)temp;
-		target.setBinding(target.findVariableBinding());
-		target.setType(target.getBinding().getType());
 		
-		// Check for immutability
-		if (target.isMutable() == null) {
-			return;
-		} else if (!target.isMutable() && !(node.child(0) instanceof IndexNode)) {
-			String targetName = target.getToken().getLexeme();
-			logError("Cannot assign to value: '" + targetName + "' is a 'const' constant.");
-			return;
+		if (tempNode instanceof IdentifierNode) { 
+			// Configure identifier		
+			IdentifierNode target = (IdentifierNode) tempNode;
+			target.setBinding(target.findVariableBinding());
+			target.setType(target.getBinding().getType());
+			
+			// Check for immutability
+			if (target.isMutable() != null) {
+				if (!target.isMutable() && !(node.child(0) instanceof IndexNode)) {
+					String targetName = target.getToken().getLexeme();
+					logError("Cannot assign to CONST variable '" + targetName + "'.");
+					return;
+				}
+			}
 		}
 
 		// Check for type-match
@@ -559,7 +563,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		if (node instanceof OperatorNode && promoter.promotable((OperatorNode) node)) return;
 		if (node instanceof FunctionInvocationNode && promoter.promotable((FunctionInvocationNode) node)) return;
 		if (node instanceof ArrayNode && promoter.promotable((ArrayNode) node)) return;
-		if (node instanceof AssignmentNode && promoter.promotable((AssignmentNode) node)) return;
+		if (node instanceof IndexNode && promoter.promotable((IndexNode) node)) return;
+		if (node instanceof AssignmentNode && promoter.promotable(node)) return;
 		
 		List<String> errorTypes = new ArrayList<String>();
 		operandTypes.forEach((child) -> errorTypes.add(child.infoString()));
