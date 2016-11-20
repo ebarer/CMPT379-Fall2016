@@ -343,7 +343,11 @@ public class Parser {
 		expect(Keyword.IF);
 
 		Token ifToken = previouslyRead;
+		
+		expect(Punctuator.OPEN_PARENTHESIS);
 		ParseNode condition = parseExpression();
+		expect(Punctuator.CLOSE_PARENTHESIS);
+		
 		ParseNode blockStatement = parseBlockStatement();
 		
 		// Check for ELSE clause
@@ -374,7 +378,11 @@ public class Parser {
 		expect(Keyword.WHILE);
 
 		Token whileToken = previouslyRead;
+		
+		expect(Punctuator.OPEN_PARENTHESIS);
 		ParseNode condition = parseExpression();
+		expect(Punctuator.CLOSE_PARENTHESIS);
+		
 		ParseNode blockStatement = parseBlockStatement();
 		
 		ParseNode whileNode = new WhileNode(whileToken, condition, blockStatement);	

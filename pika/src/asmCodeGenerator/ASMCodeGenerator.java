@@ -185,7 +185,7 @@ public class ASMCodeGenerator {
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
-		// constructs larger than statements
+		
 		public void visitLeave(ProgramNode node) {
 			newVoidCode(node);
 			
@@ -602,11 +602,6 @@ public class ASMCodeGenerator {
 
 		///////////////////////////////////////////////////////////////////////////
 		// expressions
-		public void visitEnter(BinaryOperatorNode node) {
-			if (node.isBooleanOperator() && !(node.getParent() instanceof BinaryOperatorNode)) {
-				new Labeller("boolean");
-			}
-		}
 		public void visitLeave(BinaryOperatorNode node) {
 			newValueCode(node);
 			
@@ -624,7 +619,7 @@ public class ASMCodeGenerator {
 			if (variant instanceof ASMOpcode) {
 				ASMOpcode opcode = (ASMOpcode) variant;
 			
-				Labeller labeller = new Labeller("boolean", false);
+				Labeller labeller = new Labeller("boolean");
 				String joinLabel  = labeller.newLabel("join");
 
 				ASMCodeFragment arg1 = removeValueCode(node.child(0));
@@ -641,10 +636,8 @@ public class ASMCodeGenerator {
 
 				code.append(arg2);
 				code.add(opcode);
-				
-				if (!(node.getParent() instanceof BinaryOperatorNode)) {
-					code.add(Label, joinLabel);
-				}
+
+				code.add(Label, joinLabel);
 			}
 		}
 		private void visitComparisonOperatorNode(BinaryOperatorNode node, Lextant operator) {
@@ -757,6 +750,19 @@ public class ASMCodeGenerator {
 
 			code.append(arg1);
 			code.append(arg2);
+			
+			// Ensure numerator has negative sign
+			RationalNegateSCG scg = new RationalNegateSCG();
+			code.addChunk(scg.generate());
+			
+			// Find GCD
+			RationalStackToTempSCG scg1 = new RationalStackToTempSCG();
+			code.addChunk(scg1.generate());
+
+			code.add(ASMOpcode.Call, RunTime.SUB_RATIONAL_FIND_GCD);
+			
+			RationalTempToStackSCG scg2 = new RationalTempToStackSCG();
+			code.addChunk(scg2.generate());
 		}
 		private void visitExpressOverOperatorNode(RationalOperatorNode node) {
 			assert node.nChildren() == 2;
@@ -769,7 +775,7 @@ public class ASMCodeGenerator {
 			Type type = node.child(0).getType();
 			if (type == PrimitiveType.FLOATING) {
 				code.append(arg2);
-				DivisionByZeroSCG divZero = new DivisionByZeroSCG(type);
+				DivisionByZeroSCG divZero = new DivisionByZeroSCG(PrimitiveType.INTEGER);
 				code.addChunk(divZero.generate());
 				code.add(ConvertF);
 				code.add(FMultiply);
@@ -777,7 +783,7 @@ public class ASMCodeGenerator {
 			} else if (type == PrimitiveType.RATIONAL) {
 				code.add(Exchange);
 				code.append(arg2);
-				DivisionByZeroSCG divZero = new DivisionByZeroSCG(type);
+				DivisionByZeroSCG divZero = new DivisionByZeroSCG(PrimitiveType.INTEGER);
 				code.addChunk(divZero.generate());
 				code.add(Multiply);
 				code.add(Exchange);
@@ -795,7 +801,7 @@ public class ASMCodeGenerator {
 			if (type == PrimitiveType.FLOATING) {
 				code.append(arg2);
 				frag.add(ConvertF);
-				DivisionByZeroSCG divZero = new DivisionByZeroSCG(type);
+				DivisionByZeroSCG divZero = new DivisionByZeroSCG(PrimitiveType.INTEGER);
 				code.addChunk(divZero.generate());
 				frag.add(FMultiply);
 				frag.add(ConvertI);
@@ -803,7 +809,7 @@ public class ASMCodeGenerator {
 			} else if (type == PrimitiveType.RATIONAL) {
 				code.add(Exchange);
 				code.append(arg2);
-				DivisionByZeroSCG divZero = new DivisionByZeroSCG(type);
+				DivisionByZeroSCG divZero = new DivisionByZeroSCG(PrimitiveType.INTEGER);
 				code.addChunk(divZero.generate());
 				frag.add(Multiply);
 				frag.add(Exchange);
@@ -813,8 +819,13 @@ public class ASMCodeGenerator {
 			
 			code.append(arg2);
 			
-			RationalStackToTempSCG scg = new RationalStackToTempSCG();
+			// Ensure numerator has negative sign
+			RationalNegateSCG scg = new RationalNegateSCG();
 			code.addChunk(scg.generate());
+			
+			// Find GCD
+			RationalStackToTempSCG scg1 = new RationalStackToTempSCG();
+			code.addChunk(scg1.generate());
 			
 			code.add(ASMOpcode.Call, RunTime.SUB_RATIONAL_FIND_GCD);
 			

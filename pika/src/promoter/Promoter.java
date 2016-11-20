@@ -420,7 +420,7 @@ public class Promoter {
 		return token.getLextant();
 	}
 	
-	public void promote() {		
+	public void promote() {
 		for (Map.Entry<ParseNode, List<TypeLiteral>> entry : promotions.entrySet()) { 
 			ParseNode node = entry.getKey();
 			List<TypeLiteral> casts = entry.getValue();

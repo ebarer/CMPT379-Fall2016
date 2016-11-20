@@ -1,24 +1,22 @@
 exec {
-	const max := 20.
-	const fibs := new[int](max).
+	const a := "the".		# 16 bytes
+	const between1 := "xxx".# 16 bytes
+	const b := "proud".		# 18 bytes
+	const between2 := "xxx".# 16 bytes
+	const c := "man's".		# 18 bytes
+	const between3 := "xxx".# 16 bytes
+	const d := "contumely".	# 22 bytes
 	
-	fibs[0] := 0.
-	fibs[1] := 1.
+	var collect := [a, b, c, d].
+	print collect, _n_.
 	
-	var n := 1.
-	while(n < length fibs) {
-		if(n >= 2) {
-			fibs[n] := fibs[n - 1] + fibs[n - 2].
-		}
-		n := n + 1.
-	}
+	release collect.
+	var reuse := [14].		# 20 bytes
 	
-	n := 1.
-	while(n < length fibs) {
-		if(n < 10) {
-			print ^ ^.
-		}
-		print n; fibs[n], _n_.
-		n := n + 1.
-	}
+	# now check the strings
+	# "contumely" could be messed up if the string constants are being
+	# returned to the deallocator.  (as could "man's")
+
+	print a; b; c; d; _n_.
+	
 }

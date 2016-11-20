@@ -6,6 +6,7 @@ import asmCodeGenerator.runtime.*;
 import semanticAnalyzer.types.*;
 
 public class ArrayReleaseSCG implements SimpleCodeGenerator {
+	boolean debug = true;
 	
 	@Override
 	public ASMCodeChunk generate() {
@@ -113,10 +114,11 @@ public class ArrayReleaseSCG implements SimpleCodeGenerator {
 					chunk.add(ASMOpcode.Exchange);
 					chunk.add(ASMOpcode.StoreI);
 					
-					// DEBUG: Release
-//					chunk.add(ASMOpcode.PushD, RunTime.ARRAY_RECURSE_RELEASED);
-//					chunk.add(ASMOpcode.PushD, RunTime.STRING_PRINT_FORMAT);
-//					chunk.add(ASMOpcode.Printf);
+					if (debug) {
+						chunk.add(ASMOpcode.PushD, RunTime.ARRAY_RECURSE_RELEASED);
+						chunk.add(ASMOpcode.PushD, RunTime.STRING_PRINT_FORMAT);
+						chunk.add(ASMOpcode.Printf);
+					}
 					
 					chunk.add(ASMOpcode.Jump, loopLabel);
 				chunk.add(ASMOpcode.Label, joinLoopLabel);
@@ -146,10 +148,12 @@ public class ArrayReleaseSCG implements SimpleCodeGenerator {
 		chunk.add(ASMOpcode.Jump, joinLabel);
 
 		// DEBUG: Release
-//		chunk.add(ASMOpcode.Label, joinDeletedLabel);
-//		chunk.add(ASMOpcode.PushD, RunTime.ARRAY_ALREADY_RELEASED);
-//		chunk.add(ASMOpcode.PushD, RunTime.STRING_PRINT_FORMAT);
-//		chunk.add(ASMOpcode.Printf);
+		if (debug) { 
+			chunk.add(ASMOpcode.Label, joinDeletedLabel);
+			chunk.add(ASMOpcode.PushD, RunTime.ARRAY_ALREADY_RELEASED);
+			chunk.add(ASMOpcode.PushD, RunTime.STRING_PRINT_FORMAT);
+			chunk.add(ASMOpcode.Printf);
+		}
 		
 		chunk.add(ASMOpcode.Label, joinLabel);
 		
