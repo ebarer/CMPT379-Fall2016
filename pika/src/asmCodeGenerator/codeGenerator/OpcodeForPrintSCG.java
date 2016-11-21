@@ -83,8 +83,10 @@ public class OpcodeForPrintSCG implements SimpleCodeGenerator {
 			chunk.add(ASMOpcode.StoreI);
 		}
 		else if (type instanceof LambdaType) {
+			// Load address and remove
 			chunk.add(ASMOpcode.LoadI);
-			chunk.add(ASMOpcode.PushD, RunTime.INTEGER_PRINT_FORMAT);
+			chunk.add(ASMOpcode.Pop);
+			chunk.add(ASMOpcode.PushD, RunTime.LAMBDA_PRINT_FORMAT);
 			chunk.add(ASMOpcode.Printf);
 		}
 		else {

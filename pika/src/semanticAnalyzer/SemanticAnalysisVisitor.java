@@ -178,6 +178,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			node.setType(PrimitiveType.ERROR);
 			
 			Token token = node.getToken();
+			returnTypeString = returnType.infoString();
 			logError("Cannot return type " + returnTypeString + " for Lambda with return type "
 					 + lambdaReturnType.infoString() + " at " + token.getLocation());
 		}
@@ -188,6 +189,8 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	// declarations, and assignments
 	@Override
 	public void visitLeave(DeclarationNode node) {
+		if (node.child(1) instanceof LambdaNode) return;
+
 		if (node.child(0) instanceof IdentifierNode) {
 			IdentifierNode identifier = (IdentifierNode) node.child(0);
 			ParseNode initializer = node.child(1);
@@ -322,7 +325,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			} else {
 				typeCheckError(node, childTypes);
 			}
-		} else {
+		} else {			
 			FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
 			
 			if (signature.accepts(childTypes)) {
@@ -420,7 +423,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 					subtype = ((ArrayType) subtype).getSubtype();
 				}
 				
-				if (subtype == TypeLiteral.VOID) {
+				if (subtype == PrimitiveType.VOID) {
 					typeCheckError(node, Arrays.asList(node.getType()));
 					return;
 				}

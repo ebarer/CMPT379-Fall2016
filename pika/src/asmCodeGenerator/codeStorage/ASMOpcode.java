@@ -193,9 +193,12 @@ public enum ASMOpcode {
 				this == ASMOpcode.JumpFalse || this == ASMOpcode.JumpFZero  ||
 				this == ASMOpcode.JumpPos 	|| this == ASMOpcode.JumpFPos  	||
 				this == ASMOpcode.JumpNeg 	|| this == ASMOpcode.JumpFNeg	||
-				this == ASMOpcode.JumpV		||
-				this == ASMOpcode.Call		|| this == ASMOpcode.CallV
+				this == ASMOpcode.JumpV
 			   );
+	}
+	
+	public boolean isCall() {
+		return (this == ASMOpcode.Call || this == ASMOpcode.CallV);
 	}
 	
 	public boolean isLeave() {

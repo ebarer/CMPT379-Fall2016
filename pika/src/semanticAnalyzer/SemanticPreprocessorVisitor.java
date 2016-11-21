@@ -66,6 +66,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	
 	///////////////////////////////////////////////////////////////////////////
 	// lambda
+	
 	@Override
 	public void visitEnter(LambdaNode node) {
 		node.generateLabels();
@@ -119,7 +120,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	}
 
 	
-	/////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
 	// lambdaType
 	public void visit(LambdaTypeNode node) {
 	}
@@ -145,6 +146,23 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 		return PrimitiveType.ERROR;
 	}
 
+	///////////////////////////////////////////////////////////////////////////
+	// declaration (to ensure inline recursion)
+	@Override
+	public void visitLeave(DeclarationNode node) {
+		if (node.child(0) instanceof IdentifierNode && node.child(1) instanceof LambdaNode) {
+			IdentifierNode identifier = (IdentifierNode) node.child(0);
+			LambdaNode lambda = (LambdaNode) node.child(1);
+
+			Type functionType = lambda.getType();
+			FunctionSignature signature = ((LambdaNode) node.child(1)).getSignature();
+
+			node.setType(functionType);
+			identifier.setType(functionType);
+			
+			addBinding(identifier, functionType, lambda.getStartLabel(), signature);		
+		}
+	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for binding

@@ -877,9 +877,7 @@ public class Parser {
 				
 				LambdaParamNode child = LambdaParamNode.withChildren(token, type, identifier);
 				parent.appendChild(child);
-			}
-			
-			if(startsCastOrArray(nowReading)) {
+			} else if(startsCastOrArray(nowReading)) {
 				Token token = nowReading;
 				Type type = parseArrayType();
 				
@@ -887,9 +885,7 @@ public class Parser {
 				
 				LambdaParamNode child = LambdaParamNode.withChildren(token, type, identifier);
 				parent.appendChild(child);
-			}
-			
-			if(startsLambdaType(nowReading)) {
+			} else if(startsLambdaType(nowReading)) {
 				ParseNode lambda = parseLambdaType();
 				
 				Token token = nowReading;
@@ -898,8 +894,10 @@ public class Parser {
 				
 				LambdaParamNode child = LambdaParamNode.withChildren(token, type, identifier, lambda);
 				parent.appendChild(child);
+			} else {
+				parent.appendChild(syntaxErrorNode(Punctuator.GREATER.getLexeme()));
+				return;
 			}
-			
 		}
 		
 		expect(Punctuator.GREATER);
@@ -1079,6 +1077,9 @@ public class Parser {
 		expect(Punctuator.RETURNS);
 		
 		Type returnType = parseType();
+		if (returnType == PrimitiveType.ERROR) {
+			return syntaxErrorNode("valid type");
+		}
 		
 		result.setReturnType(returnType);
 		
@@ -1090,13 +1091,20 @@ public class Parser {
 	private void parseTypeList(LambdaTypeNode parent) {
 		expect(Punctuator.LESS);
 		
+		boolean expectSeparator = false;
 		while (!nowReading.isLextant(Punctuator.GREATER)) {
-			if(nowReading.isLextant(Punctuator.SEPARATOR)) {
-				readToken();
+			if (expectSeparator) {
+				expect(Punctuator.SEPARATOR);
+			} else {
+				expectSeparator = true;
 			}
 			
 			Type type = parseType();
-			parent.addChildType(type);			
+			parent.addChildType(type);
+			if (type == PrimitiveType.ERROR) {
+				syntaxError(nowReading, "Bad lambda type.");
+				return;
+			}
 		}
 		
 		expect(Punctuator.GREATER);

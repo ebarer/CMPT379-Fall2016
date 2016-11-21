@@ -154,7 +154,7 @@ public class Promoter {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.INTEGER);
 				if (signature.accepts(childTypes)) {
-					addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER));
+					addPromotion(node.child(i+1), Arrays.asList(TypeLiteral.INTEGER));
 				} else {
 					childTypes.set(i, PrimitiveType.CHARACTER);
 				}
@@ -171,7 +171,7 @@ public class Promoter {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.FLOATING);
 		    	if (signature.accepts(childTypes)) {
-		    		addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER, TypeLiteral.FLOATING));
+		    		addPromotion(node.child(i+1), Arrays.asList(TypeLiteral.INTEGER, TypeLiteral.FLOATING));
 				} else {
 					childTypes.set(i, PrimitiveType.CHARACTER);
 				}
@@ -180,7 +180,7 @@ public class Promoter {
 		    if (childTypes.get(i) == PrimitiveType.INTEGER) {
 		    	childTypes.set(i, PrimitiveType.FLOATING);
 		    	if (signature.accepts(childTypes)) {
-		    		addPromotion(node.child(i), Arrays.asList(TypeLiteral.FLOATING));
+		    		addPromotion(node.child(i+1), Arrays.asList(TypeLiteral.FLOATING));
 				} else {
 					childTypes.set(i, PrimitiveType.INTEGER);
 				}
@@ -197,7 +197,7 @@ public class Promoter {
 		    if (childTypes.get(i) == PrimitiveType.CHARACTER) {
 		    	childTypes.set(i, PrimitiveType.RATIONAL);
 		    	if (signature.accepts(childTypes)) {
-		    		addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER, TypeLiteral.RATIONAL));
+		    		addPromotion(node.child(i+1), Arrays.asList(TypeLiteral.INTEGER, TypeLiteral.RATIONAL));
 				} else {
 					childTypes.set(i, PrimitiveType.CHARACTER);
 				}
@@ -206,9 +206,9 @@ public class Promoter {
 		    if (childTypes.get(i) == PrimitiveType.INTEGER) {
 		    	childTypes.set(i, PrimitiveType.RATIONAL);
 		    	if (signature.accepts(childTypes)) {
-					childTypes.set(i, PrimitiveType.INTEGER);
+		    		addPromotion(node.child(i+1), Arrays.asList(TypeLiteral.RATIONAL));
 				} else {
-					addPromotion(node.child(i), Arrays.asList(TypeLiteral.RATIONAL));
+					childTypes.set(i, PrimitiveType.INTEGER);
 				}
 		    }
 		}

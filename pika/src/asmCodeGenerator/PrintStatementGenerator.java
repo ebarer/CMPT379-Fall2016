@@ -73,7 +73,7 @@ public class PrintStatementGenerator {
 
 	private static String printFormat(Type type) {
 		if (type instanceof LambdaType) {
-			return RunTime.INTEGER_PRINT_FORMAT;
+			return RunTime.LAMBDA_PRINT_FORMAT;
 		}
 		
 		if (type instanceof PrimitiveType) {

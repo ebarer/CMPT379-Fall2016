@@ -12,7 +12,7 @@ import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = false;
+	boolean debug = true;
 	
 	private ASMCodeFragment fragment;
 	private static final int HEADER = 0;
@@ -468,11 +468,7 @@ public class Optimizer {
 				continue;
 			}
 			
-			if (instruction.getOpcode() == ASMOpcode.Return ||
-				instruction.getOpcode() == ASMOpcode.Halt ||
-				instruction.getOpcode() == ASMOpcode.Call ||
-				instruction.getOpcode() == ASMOpcode.CallV) {
-				
+			if (instruction.getOpcode().isLeave() || instruction.getOpcode().isCall()) {
 				blocks.add(instructions.get(i));
 				blocks.newBlock();
 				continue;
@@ -509,23 +505,22 @@ public class Optimizer {
 					BasicBlock incomingBlock = fragment.getBlock(j-1);
 					
 					// Define incoming edge
-					block.addIncomingEdge(ASMOpcode.Nop, incomingBlock);
+					block.addIncomingEdge(incomingBlock.getNum(), incomingBlock);
 					
 					// Define outgoing edge
-					incomingBlock.addOutgoingEdge(ASMOpcode.Nop, block);
+					incomingBlock.addOutgoingEdge(block.getNum(), block);
 				}
 				
 				// If instruction is a jump, define edges
-				if (instruction.getOpcode().isJump()) {	
+				if (instruction.getOpcode().isJump() || instruction.getOpcode() == ASMOpcode.Call) {	
 					String label = (String)instruction.getArgument();
-					ASMOpcode opcode = instruction.getOpcode();
 					BasicBlock outgoingBlock = labelLookup.get(label);
 					
 					// Define outgoing edge
-					block.addOutgoingEdge(opcode, outgoingBlock);
+					block.addOutgoingEdge(outgoingBlock.getNum(), outgoingBlock);
 					
 					// Define incoming edge
-					outgoingBlock.addIncomingEdge(opcode, block);
+					outgoingBlock.addIncomingEdge(block.getNum(), block);
 				}
 				
 				// If last instruction is not a Jump type or Call, connect to next block
@@ -533,10 +528,10 @@ public class Optimizer {
 					BasicBlock outgoingBlock = fragment.getBlock(j+1);
 					
 					// Define outgoing edge
-					block.addOutgoingEdge(ASMOpcode.Nop, outgoingBlock);
+					block.addOutgoingEdge(outgoingBlock.getNum(), outgoingBlock);
 					
 					// Define incoming edge
-					outgoingBlock.addIncomingEdge(ASMOpcode.Nop, block);
+					outgoingBlock.addIncomingEdge(block.getNum(), block);
 				}
 			}
 		}
@@ -546,15 +541,17 @@ public class Optimizer {
 	private int removeUnreachableCode(BasicBlockFragment fragment) {
 		int nodesRemoved = fragment.getBlocks().size();
 		
-		fragment.traverseTree();
+		fragment.unvisitAllBlocks();
 		fragment.traverseSubroutines();
+		fragment.traverseGraph();
 		
 		// Remove unvisited nodes
 		fragment.getBlocks().removeIf(block -> !block.wasVisited());
 		nodesRemoved = nodesRemoved - fragment.getBlocks().size();
 		
-		fragment.unvisitAllBlocks();
 		fragment.locateSubroutines();
+		
+		printCFG(fragment);
 		
 		return nodesRemoved;
 	}
@@ -588,7 +585,7 @@ public class Optimizer {
 		for (int i = 0; i < fragment.getBlocks().size(); i++) {
 			BasicBlock block = fragment.getBlock(i);
 			String labelString = "basicBlock-" + (i+1);
-			//newInstructions.add(ASMOpcode.Label, labelString);
+			newInstructions.add(ASMOpcode.Label, labelString);
 			for (ASMInstruction instruction : block.getInstructions()) {
 				newInstructions.add(instruction);
 			}
@@ -697,10 +694,13 @@ public class Optimizer {
 			StringBuilder stringBuilder = new StringBuilder();
 			
 			stringBuilder.append("<--------------------- CFG Print --------------------->\n");
-			
-			int i = 1;
+			stringBuilder.append("  Num Blocks: " + fragment.getBlocks().size() + "\n");
+			stringBuilder.append("<----------------------------------------------------->\n\n");
+			stringBuilder.append("===============================================================\n");
+
 			for (BasicBlock block : fragment.getBlocks()) {
-				stringBuilder.append("Block #" + (i++) + ":\n");
+				stringBuilder.append("Block #" + block.getNum() + ":\n");
+				stringBuilder.append("  Visited: " + block.wasVisited() + "\n");
 				stringBuilder.append("  Incoming Number of Edges: " + block.getIncomingEdges().size() + "\n");
 				stringBuilder.append("  Outgoing Number of Edges: " + block.getOutgoingEdges().size() + "\n\n");
 			    stringBuilder.append(block.toString());

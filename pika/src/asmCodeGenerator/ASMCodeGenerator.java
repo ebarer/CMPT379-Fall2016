@@ -95,7 +95,6 @@ public class ASMCodeGenerator {
 			codeMap = new HashMap<ParseNode, ASMCodeFragment>();
 		}
 
-
 		////////////////////////////////////////////////////////////////////
         // Make the field "code" refer to a new fragment of different sorts.
 		private void newAddressCode(ParseNode node) {
@@ -247,7 +246,7 @@ public class ASMCodeGenerator {
 			
 			// Jump over lambda if it is inline
 			if (!(node.getParent() instanceof FunctionDefinitionNode)) {
-				code.add(Jump,  node.getJumpLabel());
+				code.add(Jump, node.getJumpLabel());
 			}
 			
 			code.add(Label, node.getStartLabel());
@@ -342,10 +341,9 @@ public class ASMCodeGenerator {
 			
 			code.add(Return);
 			
-			code.add(Label, node.getJumpLabel());
-			
-			// Push lambda address onto accumulator if inline
+			// Push lambda jump and address onto accumulator if inline
 			if (!(node.getParent() instanceof FunctionDefinitionNode)) {
+				code.add(Label, node.getJumpLabel());
 				code.add(PushD, node.getStartLabel());
 			}
 		}
@@ -504,7 +502,6 @@ public class ASMCodeGenerator {
 			code.addChunk(scg.generate());
 		}
 
-		
 		///////////////////////////////////////////////////////////////////////////
 		// release statement
 		public void visitLeave(ReleaseNode node) {

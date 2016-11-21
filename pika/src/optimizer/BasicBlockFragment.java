@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-
-
 import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 
@@ -14,6 +12,8 @@ public class BasicBlockFragment {
 	private HashMap<String, BasicBlock> labelLookup;
 	private HashSet<String> subroutineLookup;
 	private BasicBlock firstBlock;
+	
+	public static int num = 1;
 	
 	public BasicBlockFragment() {
 		this.blocks = new LinkedList<BasicBlock>();
@@ -34,7 +34,8 @@ public class BasicBlockFragment {
 			labelLookup.put(label, getLastBlock());
 		}
 		
-		if (instruction.getOpcode() == ASMOpcode.Call) {
+		if (instruction.getOpcode() == ASMOpcode.Call ||
+			instruction.getOpcode() == ASMOpcode.PushD) {
 			String label = (String)instruction.getArgument();
 			subroutineLookup.add(label);
 		}
@@ -49,7 +50,7 @@ public class BasicBlockFragment {
 
 /////////////////////////////////////////////////////////////////////////
 // Tree functions
-	public void traverseTree() {
+	public void traverseGraph() {
 		traverse(firstBlock);
 	}
 	private void traverse(BasicBlock block) {
@@ -67,7 +68,8 @@ public class BasicBlockFragment {
 		
 		for (BasicBlock block : blocks) {
 			for (ASMInstruction instruction : block.getInstructions()) {
-				if (instruction.getOpcode() == ASMOpcode.Call) {
+				if (instruction.getOpcode() == ASMOpcode.Call ||
+					instruction.getOpcode() == ASMOpcode.PushD) {
 					String label = (String)instruction.getArgument();
 					subroutineLookup.add(label);
 				}
@@ -77,7 +79,9 @@ public class BasicBlockFragment {
 	public void traverseSubroutines() {
 		for (String label : subroutineLookup) {
 			BasicBlock subroutineBlock = labelLookup.get(label);
-			subroutineBlock.visit();
+			if (subroutineBlock != null) {
+				traverse(subroutineBlock);
+			}
 		}
 	}
 	

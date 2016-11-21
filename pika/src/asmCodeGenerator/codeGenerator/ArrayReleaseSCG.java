@@ -6,7 +6,7 @@ import asmCodeGenerator.runtime.*;
 import semanticAnalyzer.types.*;
 
 public class ArrayReleaseSCG implements SimpleCodeGenerator {
-	boolean debug = true;
+	boolean debug = false;
 	
 	@Override
 	public ASMCodeChunk generate() {
