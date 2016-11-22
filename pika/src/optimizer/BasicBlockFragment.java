@@ -26,7 +26,9 @@ public class BasicBlockFragment {
 		
 		Object argument = instruction.getArgument();
 		if (argument != null && argument.equals("$$main")) {
-			firstBlock = getLastBlock();
+			if (firstBlock == null) {
+				firstBlock = getLastBlock();
+			}
 		}
 		
 		if (instruction.getOpcode() == ASMOpcode.Label) {

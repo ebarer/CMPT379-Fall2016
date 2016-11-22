@@ -227,7 +227,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			if (target.isMutable() != null) {
 				if (!target.isMutable() && !(node.child(0) instanceof IndexNode)) {
 					String targetName = target.getToken().getLexeme();
-					logError("Cannot assign to CONST variable '" + targetName + "'.");
+					logError("Cannot assign to variable '" + targetName + "'.");
 					return;
 				}
 			}

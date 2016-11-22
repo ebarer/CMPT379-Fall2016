@@ -42,16 +42,15 @@ public class Optimizer {
 		fragments[INSTRUCTIONS] = flattenFragment(fragments[INSTRUCTIONS]);
 		BasicBlockFragment cfg = blockDivision(fragments[INSTRUCTIONS]);
 		constructControlFlowGraph(cfg);
-		printCFG(cfg);
 		
 		// Manipulate CFG
 		while(removeUnreachableCode(cfg) > 0);
 		while(mergeBlocks(cfg));
 		cloneBlocks(cfg);
-		printCFG(cfg);
 		
 		// Sort CFG based on traversal order for future extraction
 		cfg = setExtractOrder(cfg);
+		insertLabels(cfg);
 		//replaceLabels(cfg);
 		printCFG(cfg);
 		
@@ -600,6 +599,14 @@ public class Optimizer {
 		}
 		
 		return newFragment;
+	}
+	private void insertLabels(BasicBlockFragment fragment) {
+		fragment.renumberBlocks();
+		
+		for (BasicBlock block : fragment.getBlocks()) {
+			ASMInstruction label = new ASMInstruction(ASMOpcode.Label, block.getLabel());
+			block.getInstructions().add(0, label);
+		}
 	}
 	private void replaceLabels(BasicBlockFragment fragment) {
 		fragment.renumberBlocks();
