@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+
+import asmCodeGenerator.codeStorage.ASMCodeFragment;
+import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 
@@ -62,6 +65,34 @@ public class BasicBlockFragment {
 			traverse(childBlock);
 		}
 	}
+	public BasicBlockFragment sortGraph() {
+		unvisitAllBlocks();
+		BasicBlockFragment fragment = new BasicBlockFragment();
+		
+		// Configure CFG
+		fragment.labelLookup = this.labelLookup;
+		fragment.subroutineLookup = this.subroutineLookup;
+		fragment.firstBlock = this.firstBlock;
+		
+		fragment.append(traverseSort(this.firstBlock));
+		return fragment;
+	}
+	
+	private BasicBlockFragment traverseSort(BasicBlock block) {
+		BasicBlockFragment fragment = new BasicBlockFragment();
+		
+		if (block.wasVisited()) return fragment;
+		block.visit();
+		fragment.addBlock(block);
+
+		for (BasicBlock childBlock : block.getOutgoingEdges().values()) {
+			BasicBlockFragment childFragment = traverseSort(childBlock);
+			fragment.append(childFragment);
+		}
+
+		return fragment;
+	}
+	
 	
 	public void locateSubroutines() {
 		subroutineLookup.clear();
@@ -98,6 +129,11 @@ public class BasicBlockFragment {
 	}
 	public void addBlock(BasicBlock block) {
 		blocks.add(block);
+	}
+	public void append(BasicBlockFragment fragment){
+		for (BasicBlock basicBlock : fragment.getBlocks()) {
+			this.addBlock(basicBlock);
+		}
 	}
 	public List<BasicBlock> getBlocks() {
 		return blocks;

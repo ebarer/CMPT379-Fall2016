@@ -73,7 +73,11 @@ public class BasicBlock {
 		ASMInstruction targetInstr = target.instructions.get(0);
 		while (targetInstr.getOpcode() == ASMOpcode.Label) {
 			target.instructions.remove(0);
-			targetInstr = target.instructions.get(0);
+			if (target.instructions.size() > 0) {
+				targetInstr = target.instructions.get(0);
+			} else {
+				break;
+			}
 		}
 		
 		// Copy instructions from target to current block

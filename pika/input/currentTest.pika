@@ -6,4 +6,6 @@ exec {
 	}.
 
 	print f1(2, 3), _n_.
+	
+	print [1, 2, 3].
 }

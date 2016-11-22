@@ -12,7 +12,8 @@ import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = true;
+	boolean debug = false;
+	boolean debugMerge = false;
 	
 	private ASMCodeFragment fragment;
 	private static final int HEADER = 0;
@@ -49,8 +50,13 @@ public class Optimizer {
 		cloneBlocks(cfg);
 		printCFG(cfg);
 		
+		// Sort CFG based on traversal order for future extraction
+		cfg = setExtractOrder(cfg);
+		replaceLabels(cfg);
+		printCFG(cfg);
+		
 		// Grab optimized instructions from BasicBlocks
-		fragments[INSTRUCTIONS] = replaceInstructions(cfg);
+		fragments[INSTRUCTIONS] = extractInstructions(cfg);
 		while(simplifyJumps(fragments[INSTRUCTIONS]));
 		
 		// Merge fragments
@@ -468,7 +474,7 @@ public class Optimizer {
 				continue;
 			}
 			
-			if (instruction.getOpcode().isLeave() || instruction.getOpcode().isCall()) {
+			if (instruction.getOpcode().isLeave()) {
 				blocks.add(instructions.get(i));
 				blocks.newBlock();
 				continue;
@@ -512,7 +518,7 @@ public class Optimizer {
 				}
 				
 				// If instruction is a jump, define edges
-				if (instruction.getOpcode().isJump() || instruction.getOpcode() == ASMOpcode.Call) {	
+				if (instruction.getOpcode().isJump()) {	
 					String label = (String)instruction.getArgument();
 					BasicBlock outgoingBlock = labelLookup.get(label);
 					
@@ -551,7 +557,9 @@ public class Optimizer {
 		
 		fragment.locateSubroutines();
 		
-		printCFG(fragment);
+		if (debugMerge) {
+			printCFG(fragment);
+		}
 		
 		return nodesRemoved;
 	}
@@ -579,19 +587,36 @@ public class Optimizer {
 	}
 	
 	// Convert CFD into ASMCodeFragment
-	private ASMCodeFragment replaceInstructions(BasicBlockFragment fragment) {
-		ASMCodeFragment newInstructions = new ASMCodeFragment(CodeType.GENERATES_VOID);
-
+	private BasicBlockFragment setExtractOrder(BasicBlockFragment fragment) {
+		// Traverse graph and sort blocks
+		BasicBlockFragment newFragment = fragment.sortGraph();
+		
+		// Visit "unvisited" nodes and grab their instructions
 		for (int i = 0; i < fragment.getBlocks().size(); i++) {
 			BasicBlock block = fragment.getBlock(i);
-			String labelString = "basicBlock-" + (i+1);
-			newInstructions.add(ASMOpcode.Label, labelString);
-			for (ASMInstruction instruction : block.getInstructions()) {
-				newInstructions.add(instruction);
+			if (block.wasVisited() == false) {
+				newFragment.addBlock(block);
 			}
 		}
 		
-		return newInstructions;
+		return newFragment;
+	}
+	private void replaceLabels(BasicBlockFragment fragment) {
+		for (String label : fragment.getLabelLookup().keySet()) {
+			System.out.println(label);
+		}		
+	}
+	private ASMCodeFragment extractInstructions(BasicBlockFragment fragment) {
+		ASMCodeFragment extractedInstructions = new ASMCodeFragment(CodeType.GENERATES_VOID);
+		
+		// Visit each block and extract instructions
+		for (BasicBlock block : fragment.getBlocks()) {
+			for (ASMInstruction instruction : block.getInstructions()) {
+				extractedInstructions.add(instruction);
+			}
+		}
+
+		return extractedInstructions;
 	}
 	private boolean simplifyJumps(ASMCodeFragment fragment) {
 		List<ASMInstruction> instructions = fragment.getChunk(0).getInstructions();
@@ -603,9 +628,9 @@ public class Optimizer {
 				ASMInstruction jumpInstruction = instructions.get(i+1);
 				ASMOpcode jumpCode = jumpInstruction.getOpcode();
 				Object jumpArgument = jumpInstruction.getArgument();
+				ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
+				
 				if (jumpCode.isJump()) {
-					ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
-					
 					switch (jumpCode) {
 					case JumpTrue:
 						if ((int)pushValue != 0) {
@@ -649,9 +674,9 @@ public class Optimizer {
 				ASMInstruction jumpInstruction = instructions.get(i+1);
 				ASMOpcode jumpCode = jumpInstruction.getOpcode();
 				Object jumpArgument = jumpInstruction.getArgument();
-				if (jumpCode.isJump()) {
-					ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
-					
+				ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
+				
+				if (jumpCode.isJump()) {					
 					switch (jumpCode) {
 					case JumpFZero:
 						if ((double)pushValue == 0.0) {
