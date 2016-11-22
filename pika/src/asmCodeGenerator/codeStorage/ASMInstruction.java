@@ -61,18 +61,28 @@ public class ASMInstruction {
 		this.argument = argument;
 		this.comment = comment;
 	}
+	
+	public void setOpcode(ASMOpcode op) {
+		this.opcode = op;
+	}
 	public ASMOpcode getOpcode() {
 		return opcode;
+	}
+	
+	public void setArgument(Object arg) {
+		this.argument = arg;
 	}
 	public Object getArgument() {
 		return argument;
 	}
+	
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
 	public String getComment() {
 		return comment;
 	}
+	
 	public boolean isString() {	
 		return (opcode == ASMOpcode.DLabel && argument instanceof String &&
 					((String)argument).contains("stringConstant"));

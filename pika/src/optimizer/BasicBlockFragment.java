@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-
-import asmCodeGenerator.codeStorage.ASMCodeFragment;
-import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 
@@ -65,6 +62,7 @@ public class BasicBlockFragment {
 			traverse(childBlock);
 		}
 	}
+	
 	public BasicBlockFragment sortGraph() {
 		unvisitAllBlocks();
 		BasicBlockFragment fragment = new BasicBlockFragment();
@@ -77,7 +75,6 @@ public class BasicBlockFragment {
 		fragment.append(traverseSort(this.firstBlock));
 		return fragment;
 	}
-	
 	private BasicBlockFragment traverseSort(BasicBlock block) {
 		BasicBlockFragment fragment = new BasicBlockFragment();
 		
@@ -93,6 +90,18 @@ public class BasicBlockFragment {
 		return fragment;
 	}
 	
+	public void locateLabels() {
+		subroutineLookup.clear();
+		
+		for (BasicBlock block : blocks) {
+			for (ASMInstruction instruction : block.getInstructions()) {
+				if (instruction.getOpcode() == ASMOpcode.Label) {
+					String label = (String)instruction.getArgument();
+					labelLookup.put(label, block);
+				}
+			}
+		}
+	}
 	
 	public void locateSubroutines() {
 		subroutineLookup.clear();
@@ -120,6 +129,13 @@ public class BasicBlockFragment {
 		this.getBlocks().forEach(block -> block.unvisit());
 	}
 	
+	public void renumberBlocks() {
+		int i = 1;
+		for (BasicBlock block : blocks) {
+			block.setNum(i++);
+		}
+	}
+	
 /////////////////////////////////////////////////////////////////////////
 // Optimizer helper functions
 
@@ -145,7 +161,6 @@ public class BasicBlockFragment {
 		int index = blocks.size() - 1;
 		return getBlock(index);
 	}
-	
 	public BasicBlock getFirstBlock() {
 		return firstBlock;
 	}

@@ -58,8 +58,15 @@ public class BasicBlock {
 	public boolean wasVisited() {
 		return visited;
 	}
+	
+	public void setNum(int num) {
+		this.blockNum = num;
+	}
 	public int getNum() {
 		return this.blockNum;
+	}
+	public String getLabel() {
+		return "basicBlock-" + blockNum;
 	}
 	
 	public void mergeWith(BasicBlock target) {
