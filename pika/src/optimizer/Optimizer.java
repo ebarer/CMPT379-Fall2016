@@ -52,7 +52,7 @@ public class Optimizer {
 		
 		// Sort CFG based on traversal order for future extraction
 		cfg = setExtractOrder(cfg);
-		replaceLabels(cfg);
+		//replaceLabels(cfg);
 		printCFG(cfg);
 		
 		// Grab optimized instructions from BasicBlocks
@@ -602,8 +602,26 @@ public class Optimizer {
 		return newFragment;
 	}
 	private void replaceLabels(BasicBlockFragment fragment) {
+		fragment.renumberBlocks();
+		
 		for (String label : fragment.getLabelLookup().keySet()) {
-			System.out.println(label);
+			BasicBlock block = fragment.getLabelLookup().get(label);
+			for (ASMInstruction instruction : block.getInstructions()) {
+				if (instruction.getArgument() != null && instruction.getArgument().equals(label)) {
+					instruction.setArgument(block.getLabel());
+				}
+			}
+			
+			for (BasicBlock inBlock : block.getIncomingEdges().values()) {
+				for (ASMInstruction instruction : inBlock.getInstructions()) {
+					if (instruction.getArgument() != null) {
+						if (instruction.getArgument() == label) {
+							instruction.setArgument(block.getLabel());
+							System.out.println(instruction);
+						}
+					}
+				}
+			}
 		}		
 	}
 	private ASMCodeFragment extractInstructions(BasicBlockFragment fragment) {
