@@ -3,6 +3,7 @@ package semanticAnalyzer;
 import java.util.ArrayList;
 import java.util.List;
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import lexicalAnalyzer.Keyword;
 import logging.PikaLogger;
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
@@ -28,12 +29,34 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 		Scope scope = Scope.createProgramScope();
 		node.setScope(scope);
 	}
+	@Override
+	public void visitEnter(MainBlockNode node) {
+		createSubscope(node);
+	}
+	@Override
+	public void visitEnter(BlockNode node) {
+		if (node.getParent() instanceof LambdaNode) {
+			createProcedureScope(node);
+		} else {
+			createSubscope(node);
+		}
+	}
 
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for scoping.
 	private void createParameterScope(ParseNode node) {
 		Scope scope = Scope.createParameterScope();
+		node.setScope(scope);
+	}
+	private void createProcedureScope(ParseNode node) {
+		Scope baseScope = node.getLocalScope();
+		Scope scope = baseScope.createProcedureScope();
+		node.setScope(scope);
+	}
+	private void createSubscope(ParseNode node) {
+		Scope baseScope = node.getLocalScope();
+		Scope scope = baseScope.createSubscope();
 		node.setScope(scope);
 	}
 	private void enterScope(ParseNode node) {
@@ -59,7 +82,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 			node.setType(functionType);
 			identifier.setType(functionType);
 			
-			addBinding(identifier, functionType, lambda.getStartLabel(), signature);		
+			addBinding(identifier, functionType, lambda.getStartLabel(), signature, false);		
 		}		
 	}
 
@@ -115,7 +138,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 				signature = ((LambdaType) paramType).getSignature();
 			}
 			
-			addBinding(identifier, paramType, null, signature);
+			addBinding(identifier, paramType, null, signature, false);
 		}
 	}
 
@@ -160,16 +183,17 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 			node.setType(functionType);
 			identifier.setType(functionType);
 			
-			addBinding(identifier, functionType, lambda.getStartLabel(), signature);		
+			Boolean mutable = node.getToken().isLextant(Keyword.VAR);
+			addBinding(identifier, functionType, lambda.getStartLabel(), signature, mutable);		
 		}
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for binding
-	private void addBinding(IdentifierNode identifierNode, Type type, String label, FunctionSignature signature) {
+	private void addBinding(IdentifierNode identifierNode, Type type, String label, FunctionSignature signature, boolean mutable) {
 		Scope scope = identifierNode.getLocalScope();
 		Binding binding = scope.createBinding(identifierNode, type);
-		binding.setMutability(false);
+		binding.setMutability(mutable);
 		binding.setSignature(signature);
 		binding.setLabel(label);
 		identifierNode.setBinding(binding);

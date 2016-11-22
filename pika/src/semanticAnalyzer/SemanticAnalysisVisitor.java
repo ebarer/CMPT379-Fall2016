@@ -38,7 +38,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	
 	public void visitEnter(MainBlockNode node) {
-		createSubscope(node);
 		enterScope(node);
 	}
 	public void visitLeave(MainBlockNode node) {
@@ -46,12 +45,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	
 	public void visitEnter(BlockNode node) {
-		if (node.getParent() instanceof LambdaNode) {
-			createProcedureScope(node);
-		} else {
-			createSubscope(node);
-		}
-		
 		enterScope(node);
 	}
 	public void visitLeave(BlockNode node) {
@@ -61,16 +54,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for scoping.
-	private void createProcedureScope(ParseNode node) {
-		Scope baseScope = node.getLocalScope();
-		Scope scope = baseScope.createProcedureScope();
-		node.setScope(scope);
-	}
-	private void createSubscope(ParseNode node) {
-		Scope baseScope = node.getLocalScope();
-		Scope scope = baseScope.createSubscope();
-		node.setScope(scope);
-	}
 	private void enterScope(ParseNode node) {
 		node.getScope().enter();
 	}
@@ -211,7 +194,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	@Override
 	public void visitLeave(AssignmentNode node) {
-		// Check for mutability
 		ParseNode tempNode = node.child(0);
 		while (!(tempNode instanceof IdentifierNode) && tempNode.nChildren() > 0) {
 			tempNode = tempNode.child(0);
@@ -231,6 +213,15 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 					return;
 				}
 			}
+		}
+		
+		// Ensure target is a targetable entity
+		ParseNode target = node.child(0);
+		if (!(target instanceof IdentifierNode || target instanceof IndexNode)) {
+			List<Type> childTypes = new ArrayList<Type>();
+			node.getChildren().forEach((child) -> childTypes.add(child.getType()));
+			typeCheckError(node, childTypes);
+			return;
 		}
 
 		// Check for type-match

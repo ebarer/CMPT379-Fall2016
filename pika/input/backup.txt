@@ -1,20 +1,21 @@
+func f2<int a, int b> -> [int] {
+	if (b <= 0) { return [a]. }
+	var s := a + f2(a, b - 1)[0].
+	return [s].
+}
+
 exec {
-
-	const a := <int a, <int, int, float, float> -> int b> -> int {
-		return a * b(a, 5, 3.4, 9.6).
-	}.
-
-	const b := <int a, int b, float c, float d> -> int {
-		return a.
-	}.
-
-	print a(2, b), _n_.
-	
-	const c := <float a, float b> -> int {
-		print a.
-		return [a * b | int].
+	var f1 := <int a, int b> -> [int] {
+		if (b <= 0) { return [a]. }
+		var s := a + f1(a, b - 1)[0].
+		return [s].
 	}.
 	
-	print c(2, 3.0), _n_. 
+	print f2(2, 3), _n_.
 
+	print f1(2, 3), _n_.
+
+	f1(2, 3)[0] := 5.
+	
+	print [1, 2, 3].
 }

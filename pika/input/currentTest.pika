@@ -1,21 +1,20 @@
-func f2<int a, int b> -> [int] {
+func f1<int a, int b, <float, float> -> void f2> -> [int] {
 	if (b <= 0) { return [a]. }
-	var s := a + f1(a, b - 1)[0].
+	
+	call f2([a | float], b - 1).
+	
+	var s := a.
 	return [s].
 }
 
+func test<float a, float b> -> void {
+	var c := a * b.
+	print "Void function executed!"; c, _n_.
+	return.
+}
+
 exec {
-	var f1 := <int a, int b> -> [int] {
-		if (b <= 0) { return [a]. }
-		var s := a + f1(a, b - 1)[0].
-		return [s].
-	}.
+	call test(20.0, 30.0).
 	
-	print f2(2, 3), _n_.
-
-	print f1(2, 3), _n_.
-
-	f1(2, 3)[0] := 5.
-	
-	print [1, 2, 3].
+	print f1(2, 3, test), _n_.
 }

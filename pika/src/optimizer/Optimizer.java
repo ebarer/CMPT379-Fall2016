@@ -9,13 +9,14 @@ import asmCodeGenerator.codeStorage.ASMCodeChunk;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
+import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = true;
+	boolean debug = false;
 	boolean debugMerge = false;
 	
-	private ASMCodeFragment fragment;
+	private ASMCodeFragment[] programFragments;
 	private static final int HEADER = 0;
 	private static final int DATA = 1;
 	private static final int INSTRUCTIONS = 2;
@@ -25,22 +26,20 @@ public class Optimizer {
 		return optimizer.optimize();
 	}
 	public Optimizer(ASMCodeFragment fragment) {
-		this.fragment = fragment;
+		this.programFragments = splitDirectives(fragment);
 	}
 	
-	public ASMCodeFragment optimize() {
-		ASMCodeFragment[] fragments = splitDirectives(fragment);		
+	public ASMCodeFragment optimize() {		
 		ASMCodeFragment returnFragment = new ASMCodeFragment(CodeType.GENERATES_VOID);
 		
 		// Eliminate duplicate strings
-		removeDuplicateStrings(fragments[DATA]);
+		removeDuplicateStrings(programFragments[DATA]);
 		
 		// Constant arithmetic calculations
-		constantFolding(fragments[INSTRUCTIONS]);
+		constantFolding(programFragments[INSTRUCTIONS]);
 		
 		// Divide instructions into BasicBlocks, construct ControlFlowGraph
-		fragments[INSTRUCTIONS] = flattenFragment(fragments[INSTRUCTIONS]);
-		BasicBlockFragment cfg = blockDivision(fragments[INSTRUCTIONS]);
+		BasicBlockFragment cfg = blockDivision(programFragments[INSTRUCTIONS]);
 		constructControlFlowGraph(cfg);
 		printCFG(cfg);
 		
@@ -50,22 +49,21 @@ public class Optimizer {
 		cloneBlocks(cfg);
 		
 		// Sort CFG based on traversal order for future extraction
-		//cfg = setExtractOrder(cfg);
-		//insertLabels(cfg);
 		replaceLabels(cfg);
 		printCFG(cfg);
 		
 		// Grab optimized instructions from BasicBlocks
-		fragments[INSTRUCTIONS] = extractInstructions(cfg);
-		while(simplifyJumps(fragments[INSTRUCTIONS]));
+		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
+		while(simplifyJumps(programFragments[INSTRUCTIONS]));
 		
 		// Merge fragments
-		returnFragment.append(fragments[HEADER]);
-		returnFragment.append(fragments[DATA]);
-		returnFragment.append(fragments[INSTRUCTIONS]);
+		returnFragment.append(programFragments[HEADER]);
+		returnFragment.append(programFragments[DATA]);
+		returnFragment.append(programFragments[INSTRUCTIONS]);
 		
 		return returnFragment;
 	}
+	
 	
 	// Split into data and instruction fragments
 	private ASMCodeFragment[] splitDirectives(ASMCodeFragment fragment) {
@@ -75,58 +73,39 @@ public class Optimizer {
 			new ASMCodeFragment(CodeType.GENERATES_VOID),
 		};
 		
-		List<ASMCodeChunk> chunks = fragment.getChunks();
-		
-		// Indexes
-		int currentChunk = 0;
-		int currentInstr = 0;
-		
-		// Ensure header information stays at the top,
-		// regardless of optimizer input (compilers vs. file)
-		if (chunks.size() > 1) {
-			fragments[HEADER].addChunk(chunks.get(0));
-			fragments[HEADER].addChunk(chunks.get(1));
-			fragments[HEADER].addChunk(chunks.get(2));
-			currentChunk = 3;
-		} else {
-			ASMCodeChunk chunk = chunks.get(currentChunk);
-			List<ASMInstruction> instructions = chunk.getInstructions();
-			
-			while (currentInstr < chunk.getInstructions().size()) {
-				Object argument = instructions.get(currentInstr).getArgument();
-				if (argument == null || !argument.equals("$$main")) {
-					fragments[HEADER].add(instructions.get(currentInstr++));
-				} else break;
-			}
-			
-			fragments[HEADER].add(instructions.get(currentInstr++));
-		}
+		fragment = flattenFragment(fragment);
 
-		for (; currentChunk < chunks.size(); currentChunk++) {
-			ASMCodeChunk chunk = chunks.get(currentChunk);
-			List<ASMInstruction> instructions = chunk.getInstructions();
+		ASMCodeChunk chunk = fragment.getChunk(0);
+		List<ASMInstruction> instructions = chunk.getInstructions();
+
+		// Ensure header information stays at the top, using HEADER
+		int currentInstr = 0;
+		while (currentInstr < chunk.getInstructions().size()) {
+			Object argument = instructions.get(currentInstr).getArgument();
+			if (argument == null || !argument.equals("$$main")) {
+				fragments[HEADER].add(instructions.get(currentInstr++));
+			} else break;
+		}
+		
+		fragments[HEADER].add(instructions.get(currentInstr++));
 			
-			if (chunks.size() > 1) {
-				currentInstr = 0;
-			}
+		// Move all instructions into DATA or INSTRUCTIONS
+		for (; currentInstr < chunk.getInstructions().size(); currentInstr++) {
+			ASMInstruction instruction = instructions.get(currentInstr);
+			ASMOpcode opcode = instruction.getOpcode();
 			
-			for (; currentInstr < chunk.getInstructions().size(); currentInstr++) {
-				ASMInstruction instruction = instructions.get(currentInstr);
-				ASMOpcode opcode = instruction.getOpcode();
-				
-				if (opcode == ASMOpcode.Nop) {
-					continue;
-				} else if (opcode.isDataDirective()) {
-					if (instruction.getOpcode() == ASMOpcode.DataS) {
-						String argString = ((String)instruction.getArgument()).replaceAll("^\"|\"$", "");
-						ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.DataS, argString, instruction.getComment());
-						fragments[DATA].add(newInstruction);
-					} else {
-						fragments[DATA].add(instruction);
-					}
+			if (opcode == ASMOpcode.Nop) {
+				continue;
+			} else if (opcode.isDataDirective()) {
+				if (instruction.getOpcode() == ASMOpcode.DataS) {
+					String argString = ((String)instruction.getArgument()).replaceAll("^\"|\"$", "");
+					ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.DataS, argString, instruction.getComment());
+					fragments[DATA].add(newInstruction);
 				} else {
-					fragments[INSTRUCTIONS].add(instruction);
+					fragments[DATA].add(instruction);
 				}
+			} else {
+				fragments[INSTRUCTIONS].add(instruction);
 			}
 		}
 		
@@ -144,6 +123,7 @@ public class Optimizer {
 		
 		return flatFragment;
 	}
+	
 	
 	// Eliminate duplicate strings
 	private LinkedHashMap<Integer, Object> locateStrings(ASMCodeFragment fragment) {
@@ -261,6 +241,7 @@ public class Optimizer {
 		}
 	}
 
+	
 	// Constant arithmetic calculations
 	static int numChanges = -1;
 	private void constantFolding(ASMCodeFragment fragment) {
@@ -457,6 +438,7 @@ public class Optimizer {
 		}
 	}
 
+	
 	// Divide instructions into BasicBlocks, construct Control Flow Graph (CFG)
 	private BasicBlockFragment blockDivision(ASMCodeFragment fragment) {
 		BasicBlockFragment blocks = new BasicBlockFragment();
@@ -543,6 +525,7 @@ public class Optimizer {
 		}
 	}
 	
+	
 	// Manipulate CFG
 	private int removeUnreachableCode(BasicBlockFragment fragment) {
 		int nodesRemoved = fragment.getBlocks().size();
@@ -586,29 +569,8 @@ public class Optimizer {
 		
 	}
 	
+	
 	// Convert CFD into ASMCodeFragment
-	private BasicBlockFragment setExtractOrder(BasicBlockFragment fragment) {
-		// Traverse graph and sort blocks
-		BasicBlockFragment newFragment = fragment.sortGraph();
-		
-		// Visit "unvisited" nodes and grab their instructions
-		for (int i = 0; i < fragment.getBlocks().size(); i++) {
-			BasicBlock block = fragment.getBlock(i);
-			if (block.wasVisited() == false) {
-				newFragment.addBlock(block);
-			}
-		}
-		
-		return newFragment;
-	}
-	private void insertLabels(BasicBlockFragment fragment) {
-		fragment.renumberBlocks();
-		
-		for (BasicBlock block : fragment.getBlocks()) {
-			ASMInstruction label = new ASMInstruction(ASMOpcode.Label, block.getLabel());
-			block.getInstructions().add(0, label);
-		}
-	}
 	private void replaceLabels(BasicBlockFragment fragment) {
 		fragment.renumberBlocks();
 		
@@ -617,6 +579,17 @@ public class Optimizer {
 			for (ASMInstruction instruction : block.getInstructions()) {
 				if (instruction.getArgument() != null && instruction.getArgument().equals(label)) {
 					instruction.setArgument(block.getLabel());
+				}
+			}
+			
+			// Handle main program label
+			if (label == RunTime.MAIN_PROGRAM_LABEL) {
+				for (ASMInstruction instruction : programFragments[HEADER].getChunk(0).getInstructions()) {
+					if (instruction.getArgument() != null) {
+						if (instruction.getArgument() == label) {
+							instruction.setArgument(block.getLabel());
+						}
+					}
 				}
 			}
 			
@@ -738,6 +711,7 @@ public class Optimizer {
 		return false;
 	}
 
+	
 	// CFG print helper function
 	private void printCFG(BasicBlockFragment fragment) {
 		if (debug) {
