@@ -12,7 +12,7 @@ import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = false;
+	boolean debug = true;
 	boolean debugMerge = false;
 	
 	private ASMCodeFragment fragment;
@@ -42,6 +42,7 @@ public class Optimizer {
 		fragments[INSTRUCTIONS] = flattenFragment(fragments[INSTRUCTIONS]);
 		BasicBlockFragment cfg = blockDivision(fragments[INSTRUCTIONS]);
 		constructControlFlowGraph(cfg);
+		printCFG(cfg);
 		
 		// Manipulate CFG
 		while(removeUnreachableCode(cfg) > 0);
@@ -49,9 +50,9 @@ public class Optimizer {
 		cloneBlocks(cfg);
 		
 		// Sort CFG based on traversal order for future extraction
-		cfg = setExtractOrder(cfg);
-		insertLabels(cfg);
-		//replaceLabels(cfg);
+		//cfg = setExtractOrder(cfg);
+		//insertLabels(cfg);
+		replaceLabels(cfg);
 		printCFG(cfg);
 		
 		// Grab optimized instructions from BasicBlocks
@@ -619,12 +620,11 @@ public class Optimizer {
 				}
 			}
 			
-			for (BasicBlock inBlock : block.getIncomingEdges().values()) {
+			for (BasicBlock inBlock : fragment.getBlocks()) {
 				for (ASMInstruction instruction : inBlock.getInstructions()) {
 					if (instruction.getArgument() != null) {
 						if (instruction.getArgument() == label) {
 							instruction.setArgument(block.getLabel());
-							System.out.println(instruction);
 						}
 					}
 				}
@@ -701,7 +701,7 @@ public class Optimizer {
 				Object jumpArgument = jumpInstruction.getArgument();
 				ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
 				
-				if (jumpCode.isJump()) {					
+				if (jumpCode.isJump()) {
 					switch (jumpCode) {
 					case JumpFZero:
 						if ((double)pushValue == 0.0) {

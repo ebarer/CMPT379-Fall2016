@@ -20,6 +20,7 @@ import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 public class ASMCodeGenerator {
 	ParseNode root;
 	List<IdentifierNode> functionDefinitions;
+	ASMCodeFragment functions;
 
 	public static ASMCodeFragment generate(ParseNode syntaxTree) {
 		ASMCodeGenerator codeGenerator = new ASMCodeGenerator(syntaxTree);
@@ -29,6 +30,7 @@ public class ASMCodeGenerator {
 		super();
 		this.root = root;
 		this.functionDefinitions = new ArrayList<IdentifierNode>();
+		this.functions = new ASMCodeFragment(GENERATES_VOID);
 	}
 	
 	public ASMCodeFragment makeASM() {
@@ -78,6 +80,7 @@ public class ASMCodeGenerator {
 
 		code.append(programCode());
 		code.add(Halt, "", "%% End of Execution");
+		code.append(functions);
 		
 		return code;
 	}
@@ -209,7 +212,6 @@ public class ASMCodeGenerator {
 			ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
 
 			for (IdentifierNode identifier : functionDefinitions) {
-//				String label = ((LambdaNode)identifier.getParent().child(1)).getStartLabel();
 				String label = identifier.getBinding().getLabel();
 				ASMCodeFragment address = removeAddressCode(identifier);
 				code.append(address);
@@ -237,8 +239,8 @@ public class ASMCodeGenerator {
 				functionDefinitions.add((IdentifierNode) node.child(0));
 			}
 			
-			ASMCodeFragment lambda = removeValueCode(node.child(1));
-			code.append(lambda);
+//			ASMCodeFragment lambda = removeValueCode(node.child(1));
+//			code.append(lambda);
 		}
 		
 		public void visitLeave(LambdaNode node) {
@@ -246,104 +248,104 @@ public class ASMCodeGenerator {
 			
 			// Jump over lambda if it is inline
 			if (!(node.getParent() instanceof FunctionDefinitionNode)) {
-				code.add(Jump, node.getJumpLabel());
+				//code.add(Jump, node.getJumpLabel());
 			}
 			
-			code.add(Label, node.getStartLabel());
+			functions.add(Label, node.getStartLabel());
 			
 			// Put return address on Frame Stack below Dynamic Link
-			code.add(PushD, RunTime.STACK_POINTER, "%% store return addr.");
-			code.add(LoadI);
-			code.add(PushI, -8);
-			code.add(Add);
-			code.add(Exchange);
-			code.add(StoreI);
+			functions.add(PushD, RunTime.STACK_POINTER, "%% store return addr.");
+			functions.add(LoadI);
+			functions.add(PushI, -8);
+			functions.add(Add);
+			functions.add(Exchange);
+			functions.add(StoreI);
 			
 			// Store Dynamic Link (current value of Frame Pointer) below the Stack Pointer
-			code.add(PushD, RunTime.STACK_POINTER, "%% store dyn. link");
-			code.add(LoadI);
-			code.add(PushI, -4);
-			code.add(Add);
-			code.add(PushD, RunTime.FRAME_POINTER);
-			code.add(LoadI);
-			code.add(StoreI);
+			functions.add(PushD, RunTime.STACK_POINTER, "%% store dyn. link");
+			functions.add(LoadI);
+			functions.add(PushI, -4);
+			functions.add(Add);
+			functions.add(PushD, RunTime.FRAME_POINTER);
+			functions.add(LoadI);
+			functions.add(StoreI);
 			
 			// Move Frame Pointer to Stack Pointer
-			code.add(PushD, RunTime.FRAME_POINTER, "%% move frame pointer");
-			code.add(PushD, RunTime.STACK_POINTER);
-			code.add(LoadI);
-			code.add(StoreI);
+			functions.add(PushD, RunTime.FRAME_POINTER, "%% move frame pointer");
+			functions.add(PushD, RunTime.STACK_POINTER);
+			functions.add(LoadI);
+			functions.add(StoreI);
 			
 			// Move Stack Pointer to end of frame
-			code.add(PushD, RunTime.STACK_POINTER, "%% move stack pointer");
-			code.add(PushD, RunTime.STACK_POINTER);
-			code.add(LoadI);
-			code.add(PushI, node.getFrameSize());
-			code.add(Subtract);
-			code.add(StoreI);
+			functions.add(PushD, RunTime.STACK_POINTER, "%% move stack pointer");
+			functions.add(PushD, RunTime.STACK_POINTER);
+			functions.add(LoadI);
+			functions.add(PushI, node.getFrameSize());
+			functions.add(Subtract);
+			functions.add(StoreI);
 
 			
 			// Lambda execution code
 			ASMCodeFragment childCode = removeVoidCode(node.child(1));
-			code.append(childCode);
+			functions.append(childCode);
 
 			
 			// Runoff error handling
-			code.add(Label, node.getExitErrorLabel());
-			code.add(Jump, RunTime.FUNCTION_RUNOFF_RUNTIME_ERROR);
+			functions.add(Label, node.getExitErrorLabel());
+			functions.add(Jump, RunTime.FUNCTION_RUNOFF_RUNTIME_ERROR);
 			
 			// Exit handshake
-			code.add(Label, node.getExitHandshakeLabel());
+			functions.add(Label, node.getExitHandshakeLabel());
 		
 			// Push the return address onto the accumulator stack
-			code.add(PushD, RunTime.FRAME_POINTER, "%% get return addr.");
-			code.add(LoadI);
-			code.add(PushI, -8);
-			code.add(Add);
-			code.add(LoadI);
+			functions.add(PushD, RunTime.FRAME_POINTER, "%% get return addr.");
+			functions.add(LoadI);
+			functions.add(PushI, -8);
+			functions.add(Add);
+			functions.add(LoadI);
 			
 			// Replace the Frame Pointer with the dynamic link
-			code.add(PushD, RunTime.FRAME_POINTER, "%% restore frame pointer");
-			code.add(PushD, RunTime.FRAME_POINTER);
-			code.add(LoadI);
-			code.add(PushI, -4);
-			code.add(Add);
-			code.add(LoadI);
-			code.add(StoreI);
+			functions.add(PushD, RunTime.FRAME_POINTER, "%% restore frame pointer");
+			functions.add(PushD, RunTime.FRAME_POINTER);
+			functions.add(LoadI);
+			functions.add(PushI, -4);
+			functions.add(Add);
+			functions.add(LoadI);
+			functions.add(StoreI);
 			
 			// Move Stack Pointer above current Parameter Scope
-			code.add(PushD, RunTime.STACK_POINTER, "%% pop frame stack");
-			code.add(PushD, RunTime.STACK_POINTER);
-			code.add(LoadI);
-			code.add(PushI, node.getFrameSize());
-			code.add(Add);
-			code.add(PushI, node.getArgSize());
-			code.add(Add);
+			functions.add(PushD, RunTime.STACK_POINTER, "%% pop frame stack");
+			functions.add(PushD, RunTime.STACK_POINTER);
+			functions.add(LoadI);
+			functions.add(PushI, node.getFrameSize());
+			functions.add(Add);
+			functions.add(PushI, node.getArgSize());
+			functions.add(Add);
 			
 			// Decrease the stack pointer by the return value size
 			Type returnType = node.getReturnType();
-			code.add(PushI, returnType.getSize(), "%% store return val.");
-			code.add(Subtract);
-			code.add(StoreI);
+			functions.add(PushI, returnType.getSize(), "%% store return val.");
+			functions.add(Subtract);
+			functions.add(StoreI);
 			
 			// Store return address in temp until value is stored
-			code.add(ASMOpcode.PushD, RunTime.FUNC_RETURN_ADDR_TEMP);
-			code.add(ASMOpcode.Exchange);
-			code.add(ASMOpcode.StoreI);
+			functions.add(PushD, RunTime.FUNC_RETURN_ADDR_TEMP);
+			functions.add(Exchange);
+			functions.add(StoreI);
 			
 			// Store return value
 			OpcodeForStoreFunctionSCG scg = new OpcodeForStoreFunctionSCG(returnType);
-			code.addChunk(scg.generate());
+			functions.addChunk(scg.generate());
 			
 			// Load return address from temp
-			code.add(ASMOpcode.PushD, RunTime.FUNC_RETURN_ADDR_TEMP);
-			code.add(ASMOpcode.LoadI);
+			functions.add(PushD, RunTime.FUNC_RETURN_ADDR_TEMP);
+			functions.add(LoadI);
 			
-			code.add(Return);
+			functions.add(Return);
 			
 			// Push lambda jump and address onto accumulator if inline
 			if (!(node.getParent() instanceof FunctionDefinitionNode)) {
-				code.add(Label, node.getJumpLabel());
+				//code.add(Label, node.getJumpLabel());
 				code.add(PushD, node.getStartLabel());
 			}
 		}

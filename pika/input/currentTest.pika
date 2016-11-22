@@ -1,13 +1,21 @@
+func f2<int a, int b> -> [int] {
+	if (b <= 0) { return [a]. }
+	var s := a + f1(a, b - 1)[0].
+	return [s].
+}
+
 exec {
 	var f1 := <int a, int b> -> [int] {
 		if (b <= 0) { return [a]. }
 		var s := a + f1(a, b - 1)[0].
 		return [s].
 	}.
+	
+	print f2(2, 3), _n_.
 
 	print f1(2, 3), _n_.
-	
-	#f1(2, 3)[0] := 5.
+
+	f1(2, 3)[0] := 5.
 	
 	print [1, 2, 3].
 }

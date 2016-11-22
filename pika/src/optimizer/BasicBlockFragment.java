@@ -69,12 +69,22 @@ public class BasicBlockFragment {
 		unvisitAllBlocks();
 		BasicBlockFragment fragment = new BasicBlockFragment();
 		
+		// Visit suroutines and prepend code
+		for (String subroutine : subroutineLookup) {
+			BasicBlock block = labelLookup.get(subroutine);
+			if (block != null) {
+				block.visit();
+				fragment.addBlock(block);
+			}
+		}
+		
+		fragment.append(traverseSort(this.firstBlock));
+		
 		// Configure CFG
 		fragment.labelLookup = this.labelLookup;
 		fragment.subroutineLookup = this.subroutineLookup;
 		fragment.firstBlock = this.firstBlock;
-		
-		fragment.append(traverseSort(this.firstBlock));
+				
 		return fragment;
 	}
 	private BasicBlockFragment traverseSort(BasicBlock block) {
@@ -169,5 +179,8 @@ public class BasicBlockFragment {
 	
 	public HashMap<String, BasicBlock> getLabelLookup() {
 		return labelLookup;
+	}
+	public HashSet<String> getSubroutines() {
+		return subroutineLookup;
 	}
 }
