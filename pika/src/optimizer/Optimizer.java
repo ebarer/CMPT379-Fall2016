@@ -41,29 +41,27 @@ public class Optimizer {
 		// Divide instructions into BasicBlocks, construct ControlFlowGraph
 		BasicBlockFragment cfg = blockDivision(programFragments[INSTRUCTIONS]);
 		constructControlFlowGraph(cfg);
+		blockTempLabel(cfg);
 		
 		// Manipulate CFG
 		while(removeUnreachableCode(cfg) > 0);
-		printCFG(cfg);
 
 		boolean loop = true;
 		while(loop) {
 			loop = false;
-			//if (cloneBlocks(cfg)) { loop = true; }
+			while (cloneBlocks(cfg)) { loop = true; }
 			while (mergeBlocks(cfg)) { loop = true; }
 			while (simplifyJumps(cfg)) { loop = true; }
-			printCFG(cfg);
 		}
-		
+
+		// For each block that "fallsthrough", add explicit jump
+		// to ensure code runs in the correct order
 		addFallthroughJumps(cfg);
-		printCFG(cfg);
-		
-		// Sort CFG based on traversal order for future extraction
 		replaceLabels(cfg);
-		printCFG(cfg);
 		
 		// Grab optimized instructions from BasicBlocks
 		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
+		cleanupJumps(programFragments[INSTRUCTIONS]);
 		
 		// Merge fragments
 		returnFragment.append(programFragments[HEADER]);
@@ -489,6 +487,17 @@ public class Optimizer {
 		}
 		
 		return blocks;
+	}	
+	private void blockTempLabel(BasicBlockFragment fragment) {
+		for (BasicBlock block : fragment.getBlocks()) {
+			if (block.getInstructions().size() == 0 || block.getInstructions().get(0).getOpcode() != ASMOpcode.Label) {
+				String label = "tempLabel-" + block.getNum();
+				ASMInstruction labelInstr = new ASMInstruction(ASMOpcode.Label, label);
+				block.setLabel(label);
+				block.getInstructions().add(0, labelInstr);
+				fragment.getLabelLookup().put(label, block);
+			}
+		}
 	}
 	private void constructControlFlowGraph(BasicBlockFragment fragment) {
 		HashMap<String, BasicBlock> labelLookup = fragment.getLabelLookup();
@@ -625,7 +634,7 @@ public class Optimizer {
 							instructions.remove(i);
 							instructions.remove(i);
 							if ((int)pushValue != 0) {
-								instructions.add(i, newInstruction);
+								instructions.add(i++, newInstruction);
 								
 								while (i < instructions.size()) {
 									instructions.remove(i);
@@ -653,7 +662,7 @@ public class Optimizer {
 							instructions.remove(i);
 							instructions.remove(i);
 							if ((int)pushValue == 0) {
-								instructions.add(i, newInstruction);
+								instructions.add(i++, newInstruction);
 								
 								while (i < instructions.size()) {
 									instructions.remove(i);
@@ -681,7 +690,7 @@ public class Optimizer {
 							instructions.remove(i);
 							instructions.remove(i);
 							if ((int)pushValue > 0) {
-								instructions.add(i, newInstruction);
+								instructions.add(i++, newInstruction);
 								
 								while (i < instructions.size()) {
 									instructions.remove(i);
@@ -709,7 +718,7 @@ public class Optimizer {
 							instructions.remove(i);
 							instructions.remove(i);
 							if ((int)pushValue < 0) {
-								instructions.add(i, newInstruction);
+								instructions.add(i++, newInstruction);
 								
 								while (i < instructions.size()) {
 									instructions.remove(i);
@@ -749,7 +758,7 @@ public class Optimizer {
 							instructions.remove(i);
 							instructions.remove(i);
 							if ((double)pushValue == 0.0) {
-								instructions.add(i, newInstruction);
+								instructions.add(i++, newInstruction);
 								
 								while (i < instructions.size()) {
 									instructions.remove(i);
@@ -777,7 +786,7 @@ public class Optimizer {
 							instructions.remove(i);
 							instructions.remove(i);
 							if ((double)pushValue > 0.0) {
-								instructions.add(i, newInstruction);
+								instructions.add(i++, newInstruction);
 								
 								while (i < instructions.size()) {
 									instructions.remove(i);
@@ -805,7 +814,7 @@ public class Optimizer {
 							instructions.remove(i);
 							instructions.remove(i);
 							if ((double)pushValue < 0.0) {
-								instructions.add(i, newInstruction);
+								instructions.add(i++, newInstruction);
 								
 								while (i < instructions.size()) {
 									instructions.remove(i);
@@ -856,6 +865,7 @@ public class Optimizer {
 			}
 		}
 	}
+
 	
 	// Convert CFD into ASMCodeFragment
 	private void replaceLabels(BasicBlockFragment fragment) {
@@ -905,7 +915,9 @@ public class Optimizer {
 
 		return extractedInstructions;
 	}
-	
+	private void cleanupJumps(ASMCodeFragment fragment){
+		
+	}
 	
 	// CFG print helper function
 	private void printCFG(BasicBlockFragment fragment) {
