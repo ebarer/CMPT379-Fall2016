@@ -9,6 +9,7 @@ import tokens.Token;
 
 public class WhileNode extends ParseNode {
 	String loopLabel;
+	String bodyLabel;
 	String joinLabel;
 	
 	public WhileNode(Token token) {
@@ -40,12 +41,16 @@ public class WhileNode extends ParseNode {
 		return (LextantToken)token;
 	}
 	
-	public void setLabels(String loop, String join) {
+	public void setLabels(String loop, String body, String join) {
 		this.loopLabel = loop;
+		this.bodyLabel = body;
 		this.joinLabel = join;
 	}
 	public String getLoopLabel() {
 		return this.loopLabel;
+	}
+	public String getBodyLabel() {
+		return this.bodyLabel;
 	}
 	public String getJoinLabel() {
 		return this.joinLabel;

@@ -353,7 +353,7 @@ public class ASMCodeGenerator {
 			newVoidCode(node);
 			
 			// Get the return value
-			if (node.nChildren() > 0) {
+			if (node.nChildren() > 0 && node.getType() != PrimitiveType.VOID) {
 				ASMCodeFragment returnValue = removeValueCode(node.child(0));
 				code.append(returnValue);
 			}
@@ -376,6 +376,11 @@ public class ASMCodeGenerator {
 			// Remove value if function return isn't VOID
 			if (node.getType() != PrimitiveType.VOID) {
 				code.add(Pop);
+				
+				// If RATIONAL, add a second pop
+				if (node.getType() == PrimitiveType.RATIONAL) {
+					code.add(Pop);
+				}
 			}
 		}
 		public void visitLeave(FunctionInvocationNode node) {
@@ -556,10 +561,11 @@ public class ASMCodeGenerator {
 		// while statements
 		public void visitEnter(WhileNode node){
 			Labeller labeller = new Labeller("while-stmt");
-			String loopLabel  = labeller.newLabel("loop");
-			String joinLabel  = labeller.newLabel("join");
+			String loopLabel  = labeller.newLabel("condition");
+			String bodyLabel  = labeller.newLabel("body");
+			String joinLabel  = labeller.newLabel("end");
 			
-			node.setLabels(loopLabel, joinLabel);
+			node.setLabels(loopLabel, bodyLabel, joinLabel);
 		}
 		public void visitLeave(WhileNode node) {
 			newVoidCode(node);
@@ -570,6 +576,7 @@ public class ASMCodeGenerator {
 			code.append(conditionCode);
 			code.add(JumpFalse, node.getJoinLabel());
 
+			code.add(Label, node.getBodyLabel());
 			ASMCodeFragment blockCode = removeVoidCode(node.child(1));
 			code.append(blockCode);
 
@@ -698,6 +705,7 @@ public class ASMCodeGenerator {
 			code.add(Jump, joinLabel);
 			code.add(Label, falseLabel);
 			code.add(PushI, 0);
+			code.add(Jump, joinLabel);
 			code.add(Label, joinLabel);
 		}
 		private void visitNormalBinaryOperatorNode(BinaryOperatorNode node) {
@@ -1004,5 +1012,5 @@ public class ASMCodeGenerator {
 			
 		}
 	}
-
+	
 }

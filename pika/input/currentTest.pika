@@ -1,20 +1,24 @@
-func f1<int a, int b, <float, float> -> void f2> -> [int] {
-	if (b <= 0) { return [a]. }
-	
-	call f2([a | float], b - 1).
-	
-	var s := a.
-	return [s].
-}
-
-func test<float a, float b> -> void {
-	var c := a * b.
-	print "Void function executed!"; c, _n_.
-	return.
-}
-
 exec {
-	call test(20.0, 30.0).
+	var i := 1.
+	const numFactorials := 11.
+	var sum := 0.
 	
-	print f1(2, 3, test), _n_.
+	while (i < numFactorials) {
+		# compute the factorial of i
+		var j := 1.
+		var factorial := 1.
+		
+		while (j <= i) {
+			factorial := factorial * j.
+			j := j + 1.
+		}
+		
+		# ... and add it to sum
+		sum := sum + factorial.
+		
+		print "sum of first "; i; " factorials is "; sum, _n_.
+		i := i + 1.
+	}
+	
+	print "done", _n_.
 }

@@ -9,6 +9,7 @@ import asmCodeGenerator.codeStorage.ASMOpcode;
 public class BasicBlock {
 	private static int blockCount = 1;
 	private int blockNum;
+	private String label;
 	private List<ASMInstruction> instructions;
 	private HashMap<Integer, BasicBlock> incomingEdges;
 	private HashMap<Integer, BasicBlock> outgoingEdges;
@@ -16,9 +17,20 @@ public class BasicBlock {
 	
 	public BasicBlock() {
 		this.blockNum = blockCount++;
+		this.label = null;
 		this.instructions = new LinkedList<ASMInstruction>();
 		this.incomingEdges = new HashMap<Integer, BasicBlock>();
 		this.outgoingEdges = new HashMap<Integer, BasicBlock>();
+	}
+	
+	public static BasicBlock clone(BasicBlock oldBlock) {
+		BasicBlock newBlock = new BasicBlock();
+		
+		newBlock.blockNum = oldBlock.blockNum;
+		newBlock.instructions.addAll(oldBlock.instructions);
+		newBlock.outgoingEdges.putAll(oldBlock.outgoingEdges);
+		
+		return newBlock;
 	}
 	
 	public List<ASMInstruction> getInstructions() {
@@ -34,9 +46,24 @@ public class BasicBlock {
 	}
 	
 /////////////////////////////////////////////////////////////////////////
-// CFD Edge helper functions
+// CFG Edge Definitions
+	public static void createEdge(BasicBlock fromBlock, BasicBlock toBlock) {
+		fromBlock.addOutgoingEdge(toBlock.blockNum, toBlock);
+		toBlock.addIncomingEdge(fromBlock.blockNum, fromBlock);
+	}
+	
+	public static void removeEdge(BasicBlock fromBlock, BasicBlock toBlock) {
+		fromBlock.removeOutgoingEdge(toBlock);
+		toBlock.removeIncomingEdge(fromBlock);
+	}
+	
+/////////////////////////////////////////////////////////////////////////
+// CFG Edge helper functions
 	public void addIncomingEdge(Integer blockNum, BasicBlock node) {
 		incomingEdges.put(blockNum, node);
+	}
+	public void removeIncomingEdge(BasicBlock node) {
+		incomingEdges.remove(node.getNum());
 	}
 	public HashMap<Integer, BasicBlock> getIncomingEdges() {
 		return incomingEdges;
@@ -44,6 +71,9 @@ public class BasicBlock {
 	
 	public void addOutgoingEdge(Integer blockNum, BasicBlock node) {
 		outgoingEdges.put(blockNum, node);
+	}
+	public void removeOutgoingEdge(BasicBlock node) {
+		outgoingEdges.remove(node.getNum());
 	}
 	public HashMap<Integer, BasicBlock> getOutgoingEdges() {
 		return outgoingEdges;
@@ -65,7 +95,14 @@ public class BasicBlock {
 	public int getNum() {
 		return this.blockNum;
 	}
+
+	public void setLabel(String label){
+		this.label = label;
+	}
 	public String getLabel() {
+		return this.label;
+	}
+	public String getOutputLabel() {
 		return "basicBlock-" + blockNum;
 	}
 	
@@ -97,10 +134,9 @@ public class BasicBlock {
 		
 		// Update outgoing targets' incoming edges
 		for (BasicBlock outBlock : outgoingEdges.values()) {
-			outBlock.incomingEdges.remove(target.getNum());
-			outBlock.incomingEdges.put(this.getNum(), this);
+			outBlock.removeIncomingEdge(target);
+			outBlock.addIncomingEdge(this.blockNum, this);
 		}
-
 	}
 	
 /////////////////////////////////////////////////////////////////////////

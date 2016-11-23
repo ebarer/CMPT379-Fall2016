@@ -10,6 +10,9 @@ import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.runtime.RunTime;
+import jdk.nashorn.internal.ir.Block;
+import jdk.nashorn.internal.ir.BlockStatement;
+import sun.java2d.pipe.LoopBasedPipe;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
@@ -41,12 +44,25 @@ public class Optimizer {
 		// Divide instructions into BasicBlocks, construct ControlFlowGraph
 		BasicBlockFragment cfg = blockDivision(programFragments[INSTRUCTIONS]);
 		constructControlFlowGraph(cfg);
-		printCFG(cfg);
 		
 		// Manipulate CFG
 		while(removeUnreachableCode(cfg) > 0);
-		while(mergeBlocks(cfg));
-		cloneBlocks(cfg);
+		printCFG(cfg);
+
+		boolean loop = true;
+		while(loop) {
+			loop = false;
+			
+			if (cloneBlocks(cfg)) { loop = true; }
+			while (mergeBlocks(cfg)) { loop = true; }
+			while (simplifyJumps(cfg)) { loop = true; }
+			printCFG(cfg);
+			//destructControlFlowGraph(cfg);
+			//constructControlFlowGraph(cfg);
+		}
+		
+		addFallthroughJumps(cfg);
+		printCFG(cfg);
 		
 		// Sort CFG based on traversal order for future extraction
 		replaceLabels(cfg);
@@ -54,7 +70,7 @@ public class Optimizer {
 		
 		// Grab optimized instructions from BasicBlocks
 		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
-		while(simplifyJumps(programFragments[INSTRUCTIONS]));
+		//while(simplifyJumps(programFragments[INSTRUCTIONS]));
 		
 		// Merge fragments
 		returnFragment.append(programFragments[HEADER]);
@@ -451,6 +467,9 @@ public class Optimizer {
 				if (!blocks.lastBlock().isEmpty()) {
 					blocks.newBlock();
 				}
+				if (instruction.getArgument() instanceof String) { 
+					blocks.lastBlock().setLabel((String)instruction.getArgument());
+				}
 				
 				blocks.add(instructions.get(i));
 				continue;
@@ -490,42 +509,27 @@ public class Optimizer {
 				
 				// If first instruction is not a label, connect to previous block
 				if ((j > 0) && (i == 0) && (instruction.getOpcode() != ASMOpcode.Label)) {
-					BasicBlock incomingBlock = fragment.getBlock(j-1);
-					
-					// Define incoming edge
-					block.addIncomingEdge(incomingBlock.getNum(), incomingBlock);
-					
-					// Define outgoing edge
-					incomingBlock.addOutgoingEdge(block.getNum(), block);
+					BasicBlock fromBlock = fragment.getBlock(j-1);
+					BasicBlock.createEdge(fromBlock, block);
 				}
 				
 				// If instruction is a jump, define edges
 				if (instruction.getOpcode().isJump()) {	
 					String label = (String)instruction.getArgument();
-					BasicBlock outgoingBlock = labelLookup.get(label);
-					
-					// Define outgoing edge
-					block.addOutgoingEdge(outgoingBlock.getNum(), outgoingBlock);
-					
-					// Define incoming edge
-					outgoingBlock.addIncomingEdge(block.getNum(), block);
+					BasicBlock toBlock = labelLookup.get(label);
+					BasicBlock.createEdge(block, toBlock);
 				}
 				
 				// If last instruction is not a Jump type or Call, connect to next block
 				if ((j < fragment.getBlocks().size() - 1) && (i == instructions.size() - 1) && (instruction.getOpcode() != ASMOpcode.Jump) && (!instruction.getOpcode().isLeave())) {
-					BasicBlock outgoingBlock = fragment.getBlock(j+1);
-					
-					// Define outgoing edge
-					block.addOutgoingEdge(outgoingBlock.getNum(), outgoingBlock);
-					
-					// Define incoming edge
-					outgoingBlock.addIncomingEdge(block.getNum(), block);
+					BasicBlock toBlock = fragment.getBlock(j+1);
+					BasicBlock.createEdge(block, toBlock);
 				}
 			}
 		}
 	}
-	
-	
+
+
 	// Manipulate CFG
 	private int removeUnreachableCode(BasicBlockFragment fragment) {
 		int nodesRemoved = fragment.getBlocks().size();
@@ -546,10 +550,53 @@ public class Optimizer {
 		
 		return nodesRemoved;
 	}
-	private boolean mergeBlocks(BasicBlockFragment fragment) {		
+	private boolean cloneBlocks(BasicBlockFragment fragment){
 		for (int j = 0; j < fragment.getBlocks().size(); j++) {
-			BasicBlock block = fragment.getBlock(j);
+			BasicBlock blockX = fragment.getBlock(j);
 			
+			// Suppose that we have an empty block X with two outneighbors
+			if (blockX.getOutgoingEdges().size() == 2) {
+				
+				// X has two or more inneighbors Y1, Y2, ... Yk,
+				if (blockX.getIncomingEdges().size() >= 2) {
+					
+					// All of these inneighbors have one outneighbor
+					for (BasicBlock inBlock : blockX.getIncomingEdges().values()) {
+						if (inBlock.getOutgoingEdges().size() > 1) {
+							return false;
+						}
+					}
+					
+					// If X ends in a true/false branch
+					int instrSize = blockX.getInstructions().size();
+					if (instrSize == 2) {
+						ASMInstruction instr1 = blockX.getInstructions().get(instrSize - 1);
+						if (instr1.getOpcode().isJump()) {
+							
+							// Remove initial block
+							fragment.getBlocks().remove(j);
+							
+							// Clone X for each INCOMING EDGE
+							for (BasicBlock fromBlock : blockX.getIncomingEdges().values()) {
+								BasicBlock cloneBlock = BasicBlock.clone(blockX);
+
+								// Redefine edges
+								fromBlock.removeOutgoingEdge(blockX);
+								BasicBlock.createEdge(fromBlock, cloneBlock);
+								fragment.getBlocks().add(j, cloneBlock);
+							}
+							
+							return true;
+						}					
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	private boolean mergeBlocks(BasicBlockFragment fragment) {
+		for (BasicBlock block : fragment.getBlocks()) {			
 			if (block.getOutgoingEdges().size() == 1) {
 				for (BasicBlock target : block.getOutgoingEdges().values()) {
 					if (target.getIncomingEdges().size() == 1) {
@@ -565,10 +612,229 @@ public class Optimizer {
 		
 		return false;
 	}
-	private void cloneBlocks(BasicBlockFragment fragment){
+	private boolean simplifyJumps(BasicBlockFragment fragment) {
+		for (BasicBlock block : fragment.getBlocks()) {
+			List<ASMInstruction> instructions = block.getInstructions();
+			
+			for (int i = 0; i < instructions.size() - 1; i++) {
+				ASMInstruction instruction = instructions.get(i);
+				Object pushValue = instruction.getArgument();
+				
+				if (instruction.getOpcode() == ASMOpcode.PushI) {
+					ASMInstruction jumpInstruction = instructions.get(i+1);
+					ASMOpcode jumpCode = jumpInstruction.getOpcode();
+					Object jumpArgument = jumpInstruction.getArgument();
+					ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
+					
+					if (jumpCode.isJump()) {
+						switch (jumpCode) {
+						case JumpTrue:
+							instructions.remove(i);
+							instructions.remove(i);
+							if ((int)pushValue != 0) {
+								instructions.add(i, newInstruction);
+								
+								// Remove outgoing edges
+								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
+									toBlock.removeIncomingEdge(block);
+								}
+								block.getOutgoingEdges().clear();
+								
+								// Redefine outgoing edges
+								BasicBlock toBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (toBlock != null) {
+									BasicBlock.createEdge(block, toBlock);
+								}
+							} else {								
+								BasicBlock outBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (outBlock != null) {
+									BasicBlock.removeEdge(block, outBlock);
+								}
+							}
+							return true;
+						case JumpFalse:
+							instructions.remove(i);
+							instructions.remove(i);
+							if ((int)pushValue == 0) {
+								instructions.add(i, newInstruction);
+								
+								// Remove outgoing edges
+								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
+									toBlock.removeIncomingEdge(block);
+								}
+								block.getOutgoingEdges().clear();
+								
+								// Redefine outgoing edges
+								BasicBlock toBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (toBlock != null) {
+									BasicBlock.createEdge(block, toBlock);
+								}
+							} else {								
+								BasicBlock outBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (outBlock != null) {
+									BasicBlock.removeEdge(block, outBlock);
+								}
+							}
+							return true;
+						case JumpPos:
+							instructions.remove(i);
+							instructions.remove(i);
+							if ((int)pushValue > 0) {
+								instructions.add(i, newInstruction);
+								
+								// Remove outgoing edges
+								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
+									toBlock.removeIncomingEdge(block);
+								}
+								block.getOutgoingEdges().clear();
+								
+								// Redefine outgoing edges
+								BasicBlock toBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (toBlock != null) {
+									BasicBlock.createEdge(block, toBlock);
+								}
+							} else {								
+								BasicBlock outBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (outBlock != null) {
+									BasicBlock.removeEdge(block, outBlock);
+								}
+							}
+							return true;
+						case JumpNeg:
+							instructions.remove(i);
+							instructions.remove(i);
+							if ((int)pushValue < 0) {
+								instructions.add(i, newInstruction);
+								
+								// Remove outgoing edges
+								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
+									toBlock.removeIncomingEdge(block);
+								}
+								block.getOutgoingEdges().clear();
+								
+								// Redefine outgoing edges
+								BasicBlock toBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (toBlock != null) {
+									BasicBlock.createEdge(block, toBlock);
+								}
+							} else {								
+								BasicBlock outBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (outBlock != null) {
+									BasicBlock.removeEdge(block, outBlock);
+								}
+							}
+							return true;
+						default:
+							break;
+						}
+					}
+				} else if (instruction.getOpcode() == ASMOpcode.PushF) {
+					ASMInstruction jumpInstruction = instructions.get(i+1);
+					ASMOpcode jumpCode = jumpInstruction.getOpcode();
+					Object jumpArgument = jumpInstruction.getArgument();
+					ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
+					
+					if (jumpCode.isJump()) {
+						switch (jumpCode) {
+						case JumpFZero:
+							instructions.remove(i);
+							instructions.remove(i);
+							if ((double)pushValue == 0.0) {
+								instructions.add(i, newInstruction);
+								
+								// Remove outgoing edges
+								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
+									toBlock.removeIncomingEdge(block);
+								}
+								block.getOutgoingEdges().clear();
+								
+								// Redefine outgoing edges
+								BasicBlock toBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (toBlock != null) {
+									BasicBlock.createEdge(block, toBlock);
+								}
+							} else {								
+								BasicBlock outBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (outBlock != null) {
+									BasicBlock.removeEdge(block, outBlock);
+								}
+							}
+							return true;
+						case JumpFPos:
+							instructions.remove(i);
+							instructions.remove(i);
+							if ((double)pushValue > 0.0) {
+								instructions.add(i, newInstruction);
+								
+								// Remove outgoing edges
+								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
+									toBlock.removeIncomingEdge(block);
+								}
+								block.getOutgoingEdges().clear();
+								
+								// Redefine outgoing edges
+								BasicBlock toBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (toBlock != null) {
+									BasicBlock.createEdge(block, toBlock);
+								}
+							} else {								
+								BasicBlock outBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (outBlock != null) {
+									BasicBlock.removeEdge(block, outBlock);
+								}
+							}
+							return true;
+						case JumpFNeg:
+							instructions.remove(i);
+							instructions.remove(i);
+							if ((double)pushValue < 0.0) {
+								instructions.add(i, newInstruction);
+								
+								// Remove outgoing edges
+								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
+									toBlock.removeIncomingEdge(block);
+								}
+								block.getOutgoingEdges().clear();
+								
+								// Redefine outgoing edges
+								BasicBlock toBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (toBlock != null) {
+									BasicBlock.createEdge(block, toBlock);
+								}
+							} else {								
+								BasicBlock outBlock = fragment.getLabelLookup().get(jumpArgument);
+								if (outBlock != null) {
+									BasicBlock.removeEdge(block, outBlock);
+								}
+							}
+							return true;
+						default:
+							break;
+						}
+					}
+				}
+				
+			}
+		}
 		
+		return false;
 	}
-	
+	private void addFallthroughJumps(BasicBlockFragment fragment) {
+		for (BasicBlock block : fragment.getBlocks()) {
+			// If last instruction isn't a leave or jump, add jump for fallthrough
+			ASMInstruction lastInstr = block.getInstructions().get(block.getInstructions().size() - 1);
+			if (!lastInstr.getOpcode().isLeave() && lastInstr.getOpcode() != ASMOpcode.Jump) {
+				for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
+					// Select the outgoing edge that is not represented
+					// if there already exists a conditional jump
+					if (!toBlock.getLabel().equals(lastInstr.getArgument())) {
+						ASMInstruction jumpInstr = new ASMInstruction(ASMOpcode.Jump, toBlock.getLabel());
+						block.getInstructions().add(jumpInstr);	
+					}
+				}
+			}
+		}
+	}
 	
 	// Convert CFD into ASMCodeFragment
 	private void replaceLabels(BasicBlockFragment fragment) {
@@ -578,7 +844,7 @@ public class Optimizer {
 			BasicBlock block = fragment.getLabelLookup().get(label);
 			for (ASMInstruction instruction : block.getInstructions()) {
 				if (instruction.getArgument() != null && instruction.getArgument().equals(label)) {
-					instruction.setArgument(block.getLabel());
+					instruction.setArgument(block.getOutputLabel());
 				}
 			}
 			
@@ -587,7 +853,7 @@ public class Optimizer {
 				for (ASMInstruction instruction : programFragments[HEADER].getChunk(0).getInstructions()) {
 					if (instruction.getArgument() != null) {
 						if (instruction.getArgument() == label) {
-							instruction.setArgument(block.getLabel());
+							instruction.setArgument(block.getOutputLabel());
 						}
 					}
 				}
@@ -596,8 +862,10 @@ public class Optimizer {
 			for (BasicBlock inBlock : fragment.getBlocks()) {
 				for (ASMInstruction instruction : inBlock.getInstructions()) {
 					if (instruction.getArgument() != null) {
-						if (instruction.getArgument() == label) {
-							instruction.setArgument(block.getLabel());
+						if (instruction.getArgument() instanceof String) {
+							if (((String)instruction.getArgument()).equals(label)) {
+								instruction.setArgument(block.getOutputLabel());
+							}
 						}
 					}
 				}
@@ -616,101 +884,7 @@ public class Optimizer {
 
 		return extractedInstructions;
 	}
-	private boolean simplifyJumps(ASMCodeFragment fragment) {
-		List<ASMInstruction> instructions = fragment.getChunk(0).getInstructions();
-		for (int i = 0; i < instructions.size(); i++) {
-			ASMInstruction instruction = instructions.get(i);
-			Object pushValue = instruction.getArgument();
-			
-			if (instruction.getOpcode() == ASMOpcode.PushI) {
-				ASMInstruction jumpInstruction = instructions.get(i+1);
-				ASMOpcode jumpCode = jumpInstruction.getOpcode();
-				Object jumpArgument = jumpInstruction.getArgument();
-				ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
-				
-				if (jumpCode.isJump()) {
-					switch (jumpCode) {
-					case JumpTrue:
-						if ((int)pushValue != 0) {
-							instructions.remove(i);
-							instructions.remove(i);
-							instructions.add(i, newInstruction);
-							return true;
-						}
-						break;
-					case JumpFalse:
-						if ((int)pushValue == 0) {
-							instructions.remove(i);
-							instructions.remove(i);
-							instructions.add(i, newInstruction);
-							return true;
-						}
-						break;	
-					case JumpPos:
-						if ((int)pushValue > 0) {
-							instructions.remove(i);
-							instructions.remove(i);
-							instructions.add(i, newInstruction);
-							return true;
-						}
-						break; 
-					case JumpNeg:
-						if ((int)pushValue < 0) {
-							instructions.remove(i);
-							instructions.remove(i);
-							instructions.add(i, newInstruction);
-							return true;
-						}
-						break;
-					default:
-							break;
-					}
-				}
-			}
-			
-			if (instruction.getOpcode() == ASMOpcode.PushF) {
-				ASMInstruction jumpInstruction = instructions.get(i+1);
-				ASMOpcode jumpCode = jumpInstruction.getOpcode();
-				Object jumpArgument = jumpInstruction.getArgument();
-				ASMInstruction newInstruction = new ASMInstruction(ASMOpcode.Jump, jumpArgument);
-				
-				if (jumpCode.isJump()) {
-					switch (jumpCode) {
-					case JumpFZero:
-						if ((double)pushValue == 0.0) {
-							instructions.remove(i);
-							instructions.remove(i);
-							instructions.add(i, newInstruction);
-							return true;
-						}
-						break;	
-					case JumpFPos:
-						if ((double)pushValue > 0.0) {
-							instructions.remove(i);
-							instructions.remove(i);
-							instructions.add(i, newInstruction);
-							return true;
-						}
-						break; 
-					case JumpFNeg:
-						if ((double)pushValue < 0.0) {
-							instructions.remove(i);
-							instructions.remove(i);
-							instructions.add(i, newInstruction);
-							return true;
-						}
-						break; 
-					default:
-						break;
-					}
-				}
-			}
-			
-		}
-		
-		return false;
-	}
-
+	
 	
 	// CFG print helper function
 	private void printCFG(BasicBlockFragment fragment) {
@@ -725,8 +899,21 @@ public class Optimizer {
 			for (BasicBlock block : fragment.getBlocks()) {
 				stringBuilder.append("Block #" + block.getNum() + ":\n");
 				stringBuilder.append("  Visited: " + block.wasVisited() + "\n");
-				stringBuilder.append("  Incoming Number of Edges: " + block.getIncomingEdges().size() + "\n");
-				stringBuilder.append("  Outgoing Number of Edges: " + block.getOutgoingEdges().size() + "\n\n");
+				
+				stringBuilder.append("  Incoming Number of Edges: " + block.getIncomingEdges().size() + " - ");
+				stringBuilder.append("[");
+				for (BasicBlock inBlock : block.getIncomingEdges().values()) {
+					stringBuilder.append(inBlock.getNum() + ", ");
+				}
+				stringBuilder.append("]\n");
+				
+				stringBuilder.append("  Outgoing Number of Edges: " + block.getOutgoingEdges().size() + " - ");
+				stringBuilder.append("[");
+				for (BasicBlock outBlock : block.getOutgoingEdges().values()) {
+					stringBuilder.append(outBlock.getNum() + ", ");
+				}
+				stringBuilder.append("]\n\n");
+				
 			    stringBuilder.append(block.toString());
 			    stringBuilder.append("===============================================================\n");
 			}

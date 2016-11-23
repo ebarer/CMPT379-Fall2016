@@ -53,6 +53,10 @@ public class BasicBlockFragment {
 /////////////////////////////////////////////////////////////////////////
 // Tree functions
 	public void traverseGraph() {
+		if (firstBlock == null) {
+			firstBlock = blocks.get(0);
+		}
+		
 		traverse(firstBlock);
 	}
 	private void traverse(BasicBlock block) {
@@ -158,11 +162,16 @@ public class BasicBlockFragment {
 	public void addBlock(BasicBlock block) {
 		blocks.add(block);
 	}
+	public void addBlock(int index, BasicBlock block) {
+		blocks.add(index, block);
+	}
+	
 	public void append(BasicBlockFragment fragment){
 		for (BasicBlock basicBlock : fragment.getBlocks()) {
 			this.addBlock(basicBlock);
 		}
 	}
+	
 	public List<BasicBlock> getBlocks() {
 		return blocks;
 	}
