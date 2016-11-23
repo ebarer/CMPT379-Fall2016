@@ -164,6 +164,7 @@ public class ASMInstruction {
 	
 	private String argumentString() {
 		if(opcode.takesFloat()) {
+			// FIXME: Bad float printing
             return String.format("%-25g", (Double)argument);
 		}
 		

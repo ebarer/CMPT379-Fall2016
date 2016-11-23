@@ -13,7 +13,7 @@ import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = false;
+	boolean debug = true;
 	boolean debugMerge = false;
 	
 	private ASMCodeFragment[] programFragments;
@@ -57,9 +57,12 @@ public class Optimizer {
 		// For each block that "fallsthrough", add explicit jump
 		// to ensure code runs in the correct order
 		addFallthroughJumps(cfg);
-		replaceLabels(cfg);
+		printCFG(cfg);
+		
+		//FIXME: Label simple loops
 		
 		// Grab optimized instructions from BasicBlocks
+		replaceLabels(cfg);
 		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
 		while(cleanupJumps(programFragments[INSTRUCTIONS]));
 		
@@ -932,6 +935,7 @@ public class Optimizer {
 		
 		return false;
 	}
+
 	
 	// CFG print helper function
 	private void printCFG(BasicBlockFragment fragment) {

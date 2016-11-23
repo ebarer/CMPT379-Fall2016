@@ -521,13 +521,16 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
 			return;
 		}
-		
-		// TODO: Check before calling subtype()
-		Type subtype = ((ArrayType)node.child(0).getType()).getSubtype();
-		if (subtype instanceof TypeLiteral) {
-			subtype = ((TypeLiteral) subtype).getType();
+
+		if (node.child(0).getType() instanceof ArrayType) {
+			Type subtype = ((ArrayType)node.child(0).getType()).getSubtype();
+			if (subtype instanceof TypeLiteral) {
+				subtype = ((TypeLiteral) subtype).getType();
+			}
+			node.setType(subtype);
+		} else {
+			//FIXME: Bad index?
 		}
-		node.setType(subtype);
 	}
 
 	
