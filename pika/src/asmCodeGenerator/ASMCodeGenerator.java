@@ -385,12 +385,7 @@ public class ASMCodeGenerator {
 		}
 		public void visitLeave(FunctionInvocationNode node) {
 			newValueCode(node);
-			
-			if (!(node.child(0) instanceof IdentifierNode)) {
-				ASMCodeFragment subroutineCode = removeValueCode(node.child(0));
-				code.append(subroutineCode);
-			}
-			
+						
 			// Push arguments onto Frame Stack
 			for (int i = 1; i < node.nChildren(); i++) {
 				Type argType = node.child(i).getType();
@@ -414,6 +409,12 @@ public class ASMCodeGenerator {
 				
 				OpcodeForStoreSCG scg1 = new OpcodeForStoreSCG(argType);
 				code.addChunk(scg1.generate());
+			}
+			
+			// Push lambda location
+			if (!(node.child(0) instanceof IdentifierNode)) {
+				ASMCodeFragment subroutineCode = removeValueCode(node.child(0));
+				code.append(subroutineCode);
 			}
 
 			if (node.child(0) instanceof IdentifierNode) {				

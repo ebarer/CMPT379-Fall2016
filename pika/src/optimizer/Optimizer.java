@@ -13,7 +13,7 @@ import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
-	boolean debug = true;
+	boolean debug = false;
 	boolean debugMerge = false;
 	
 	private ASMCodeFragment[] programFragments;

@@ -565,8 +565,13 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		
 		List<String> errorTypes = new ArrayList<String>();
 		operandTypes.forEach((child) -> errorTypes.add(child.infoString()));
-		logError("operator " + token.getLexeme() + " not defined for types " 
+		
+		if (node instanceof FunctionInvocationNode) {
+			logError("lambda not defined for types " + errorTypes  + " at " + token.getLocation());
+		} else {
+			logError("operator " + token.getLexeme() + " not defined for types " 
 				 + errorTypes  + " at " + token.getLocation());
+		}
 		
 		node.setType(PrimitiveType.ERROR);
 	}
