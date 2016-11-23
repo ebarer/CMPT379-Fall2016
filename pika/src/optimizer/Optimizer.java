@@ -10,9 +10,6 @@ import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.runtime.RunTime;
-import jdk.nashorn.internal.ir.Block;
-import jdk.nashorn.internal.ir.BlockStatement;
-import sun.java2d.pipe.LoopBasedPipe;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
@@ -52,13 +49,10 @@ public class Optimizer {
 		boolean loop = true;
 		while(loop) {
 			loop = false;
-			
-			if (cloneBlocks(cfg)) { loop = true; }
+			//if (cloneBlocks(cfg)) { loop = true; }
 			while (mergeBlocks(cfg)) { loop = true; }
 			while (simplifyJumps(cfg)) { loop = true; }
 			printCFG(cfg);
-			//destructControlFlowGraph(cfg);
-			//constructControlFlowGraph(cfg);
 		}
 		
 		addFallthroughJumps(cfg);
@@ -70,7 +64,6 @@ public class Optimizer {
 		
 		// Grab optimized instructions from BasicBlocks
 		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
-		//while(simplifyJumps(programFragments[INSTRUCTIONS]));
 		
 		// Merge fragments
 		returnFragment.append(programFragments[HEADER]);
@@ -634,6 +627,10 @@ public class Optimizer {
 							if ((int)pushValue != 0) {
 								instructions.add(i, newInstruction);
 								
+								while (i < instructions.size()) {
+									instructions.remove(i);
+								}
+								
 								// Remove outgoing edges
 								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
 									toBlock.removeIncomingEdge(block);
@@ -657,6 +654,10 @@ public class Optimizer {
 							instructions.remove(i);
 							if ((int)pushValue == 0) {
 								instructions.add(i, newInstruction);
+								
+								while (i < instructions.size()) {
+									instructions.remove(i);
+								}
 								
 								// Remove outgoing edges
 								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
@@ -682,6 +683,10 @@ public class Optimizer {
 							if ((int)pushValue > 0) {
 								instructions.add(i, newInstruction);
 								
+								while (i < instructions.size()) {
+									instructions.remove(i);
+								}
+								
 								// Remove outgoing edges
 								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
 									toBlock.removeIncomingEdge(block);
@@ -705,6 +710,10 @@ public class Optimizer {
 							instructions.remove(i);
 							if ((int)pushValue < 0) {
 								instructions.add(i, newInstruction);
+								
+								while (i < instructions.size()) {
+									instructions.remove(i);
+								}
 								
 								// Remove outgoing edges
 								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
@@ -742,6 +751,10 @@ public class Optimizer {
 							if ((double)pushValue == 0.0) {
 								instructions.add(i, newInstruction);
 								
+								while (i < instructions.size()) {
+									instructions.remove(i);
+								}
+								
 								// Remove outgoing edges
 								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
 									toBlock.removeIncomingEdge(block);
@@ -766,6 +779,10 @@ public class Optimizer {
 							if ((double)pushValue > 0.0) {
 								instructions.add(i, newInstruction);
 								
+								while (i < instructions.size()) {
+									instructions.remove(i);
+								}
+								
 								// Remove outgoing edges
 								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
 									toBlock.removeIncomingEdge(block);
@@ -789,6 +806,10 @@ public class Optimizer {
 							instructions.remove(i);
 							if ((double)pushValue < 0.0) {
 								instructions.add(i, newInstruction);
+								
+								while (i < instructions.size()) {
+									instructions.remove(i);
+								}
 								
 								// Remove outgoing edges
 								for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
@@ -827,7 +848,7 @@ public class Optimizer {
 				for (BasicBlock toBlock : block.getOutgoingEdges().values()) {
 					// Select the outgoing edge that is not represented
 					// if there already exists a conditional jump
-					if (!toBlock.getLabel().equals(lastInstr.getArgument())) {
+					if (toBlock.getLabel() != null && !toBlock.getLabel().equals(lastInstr.getArgument())) {
 						ASMInstruction jumpInstr = new ASMInstruction(ASMOpcode.Jump, toBlock.getLabel());
 						block.getInstructions().add(jumpInstr);	
 					}

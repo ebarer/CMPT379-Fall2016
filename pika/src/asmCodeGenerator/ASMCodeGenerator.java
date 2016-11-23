@@ -536,15 +536,18 @@ public class ASMCodeGenerator {
 			
 			Labeller labeller = new Labeller("if-stmt");
 			String startLabel = labeller.newLabel("");
+			String ifLabel = labeller.newLabel("if");
 			String elseLabel  = labeller.newLabel("else");
 			String joinLabel  = labeller.newLabel("join");
 			
-			code.add(Label, startLabel);
+			code.add(Label, startLabel);			
 			
 			ASMCodeFragment conditionCode = removeValueCode(node.child(0));
 			code.append(conditionCode);
 			code.add(JumpFalse, elseLabel);
+			code.add(Jump, ifLabel);
 			
+			code.add(Label, ifLabel);
 			ASMCodeFragment blockCode = removeVoidCode(node.child(1));
 			code.append(blockCode);
 			code.add(Jump, joinLabel);
