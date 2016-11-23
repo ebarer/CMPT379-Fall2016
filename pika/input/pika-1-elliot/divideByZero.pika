@@ -1,4 +1,0 @@
-exec {
-	const myFloat := 7 / 0.
-	print myFloat;_n_.
-}

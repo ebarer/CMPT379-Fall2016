@@ -49,9 +49,9 @@ public class Optimizer {
 		boolean loop = true;
 		while(loop) {
 			loop = false;
-			while (cloneBlocks(cfg)) { loop = true; }
-			while (mergeBlocks(cfg)) { loop = true; }
-			while (simplifyJumps(cfg)) { loop = true; }
+			while(cloneBlocks(cfg)) { loop = true; }
+			while(mergeBlocks(cfg)) { loop = true; }
+			while(simplifyJumps(cfg)) { loop = true; }
 		}
 
 		// For each block that "fallsthrough", add explicit jump
@@ -61,7 +61,7 @@ public class Optimizer {
 		
 		// Grab optimized instructions from BasicBlocks
 		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
-		cleanupJumps(programFragments[INSTRUCTIONS]);
+		while(cleanupJumps(programFragments[INSTRUCTIONS]));
 		
 		// Merge fragments
 		returnFragment.append(programFragments[HEADER]);
@@ -915,8 +915,22 @@ public class Optimizer {
 
 		return extractedInstructions;
 	}
-	private void cleanupJumps(ASMCodeFragment fragment){
+	private boolean cleanupJumps(ASMCodeFragment fragment){
+		for (int i = 0; i < fragment.getChunk(0).getInstructions().size() - 1; i++) {
+			ASMInstruction instr1 = fragment.getChunk(0).getInstructions().get(i);
+			ASMInstruction instr2 = fragment.getChunk(0).getInstructions().get(i+1);
+			
+			if (instr1.getOpcode().isJump()) {
+				if (instr2.getOpcode() == ASMOpcode.Label) {
+					if (instr1.getArgument().equals(instr2.getArgument())) {
+						fragment.getChunk(0).getInstructions().remove(i);
+						return true;
+					}
+				}
+			}
+		}
 		
+		return false;
 	}
 	
 	// CFG print helper function
