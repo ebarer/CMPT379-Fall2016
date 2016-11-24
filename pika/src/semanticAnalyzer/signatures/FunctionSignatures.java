@@ -4,7 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import asmCodeGenerator.codeGenerator.*;
+import asmCodeGenerator.codeGenerator.cast.CastIntToCharSCG;
+import asmCodeGenerator.codeGenerator.cast.CastRatToFloatSCG;
+import asmCodeGenerator.codeGenerator.cast.CastToBoolSCG;
+import asmCodeGenerator.codeGenerator.cast.CastToRatSCG;
+import asmCodeGenerator.codeGenerator.rational.RationalBinaryOperatorSCG;
+import asmCodeGenerator.codeGenerator.rational.RationalComparisonOperatorSCG;
+import asmCodeGenerator.codeGenerator.string.StringLengthSCG;
+import asmCodeGenerator.codeGenerator.string.StringOffsetSCG;
+import asmCodeGenerator.codeGenerator.string.StringRangeOffsetSCG;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import semanticAnalyzer.types.ArrayType;
 import semanticAnalyzer.types.Type;
@@ -230,7 +238,12 @@ public class FunctionSignatures extends ArrayList<FunctionSignature> {
 		
 		// Array Operators
 		new FunctionSignatures(Keyword.LENGTH,
-			new FunctionSignature(new ArrayLengthSCG(), 	new ArrayType(), 	INTEGER)		// Variable type not working
+			new FunctionSignature(new StringLengthSCG(), 	STRING, 	INTEGER)
+		);
+		
+		new FunctionSignatures(Punctuator.OPEN_BRACKET,
+			new FunctionSignature(new StringOffsetSCG(), 		STRING,		INTEGER,				CHARACTER),
+			new FunctionSignature(new StringRangeOffsetSCG(), 	STRING,		INTEGER, 	INTEGER, 	STRING)
 		);
 		
 		

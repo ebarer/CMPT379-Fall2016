@@ -1,8 +1,9 @@
 exec {
-	var c := <int a, int b> -> int {
-		var num := a * b.
-		return num.
-	}(5,2).
+	#var s := "Elliot".
+
+	#print "Index: ", s[1], _n_.
+	#print "Index Range: ", s[1, 3], _n_.
 	
-	print c, _n_.
+	#print "Test"[3], _n_.
+	print "Test"[0,4], _n_.
 }

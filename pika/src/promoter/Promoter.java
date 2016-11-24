@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import asmCodeGenerator.codeGenerator.array.ArrayOffsetSCG;
 import lexicalAnalyzer.*;
 import parseTree.ParseNode;
 import parseTree.nodeTypes.ArrayNode;
@@ -301,20 +302,52 @@ public class Promoter {
 		return false;
 	}
 	public boolean promotable(IndexNode node) {
-		if (node.child(0).getType() instanceof ArrayType) {
-			if (node.child(1).getType() == PrimitiveType.CHARACTER) {
+		Lextant operator = operatorFor(node);
+		List<Type> childTypes = new ArrayList<Type>();
+		node.getChildren().forEach((child) -> childTypes.add(child.getType()));
+
+		if (childTypes.get(0) instanceof ArrayType) {
+			if (childTypes.get(1) == PrimitiveType.CHARACTER) {
 				addPromotion(node.child(1), Arrays.asList(TypeLiteral.INTEGER));
 				
-				Type t = node.child(0).getType();
-				while (t instanceof ArrayType) {
-					t = ((ArrayType)t).getSubtype(); 
+				Type subtype = ((ArrayType)childTypes.get(0)).getSubtype();
+				if (subtype instanceof TypeLiteral) {
+					subtype = ((TypeLiteral) subtype).getType();
 				}
+
+				FunctionSignature signature = new FunctionSignature(new ArrayOffsetSCG(), new ArrayType(), PrimitiveType.INTEGER, subtype);
 				
-				node.setType(t);
+				node.setType(subtype);
+				node.setIndexType(childTypes.get(0));
+				node.setSignature(signature);
 				return true;
 			}
 		}
 		
+		if (childTypes.get(0) == PrimitiveType.STRING) {
+			FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
+			
+			for (int i = 1; i < childTypes.size(); i++) {
+				if (childTypes.get(i) == PrimitiveType.CHARACTER) {
+			    	childTypes.set(i, PrimitiveType.INTEGER);
+					signature = FunctionSignatures.signature(operator, childTypes);
+					
+					if (signature.isNull()) {
+						childTypes.set(i, PrimitiveType.CHARACTER);
+					} else {
+						addPromotion(node.child(i), Arrays.asList(TypeLiteral.INTEGER));
+					}
+			    }
+			}
+			
+			if (signature.accepts(childTypes)) {
+				node.setType(signature.resultType());
+				node.setIndexType(childTypes.get(0));
+				node.setSignature(signature);
+				return true;
+			}
+		}
+
 		return false;
 	}
 	public boolean promotable(ParseNode node) {

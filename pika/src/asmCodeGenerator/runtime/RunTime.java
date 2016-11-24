@@ -2,9 +2,9 @@ package asmCodeGenerator.runtime;
 import static asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType.*;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
-import asmCodeGenerator.codeGenerator.RationalInvertSCG;
-import asmCodeGenerator.codeGenerator.RationalTempToStackSCG;
-import asmCodeGenerator.codeGenerator.RationalStackToTempSCG;
+import asmCodeGenerator.codeGenerator.rational.RationalInvertSCG;
+import asmCodeGenerator.codeGenerator.rational.RationalStackToTempSCG;
+import asmCodeGenerator.codeGenerator.rational.RationalTempToStackSCG;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 public class RunTime {
@@ -36,11 +36,18 @@ public class RunTime {
 	public static final String RELEASE_TEMP_4				= "$release-temp-4";
 	public static final String INDEX_TEMP_1					= "$index-temp-1";
 	public static final String INDEX_TEMP_2					= "$index-temp-2";
+	public static final String INDEX_TEMP_3					= "$index-temp-3";
 	public static final String ARRAY_TEMP_1					= "$array-temp-1";
 	public static final String ARRAY_TEMP_2					= "$array-temp-2";
 	public static final String ARRAY_TEMP_3					= "$array-temp-3";
 	public static final String ARRAY_TEMP_4					= "$array-temp-4";
 	public static final String ARRAY_TEMP_5					= "$array-temp-5";
+	public static final String STRING_ADDR_1				= "$string-addr-1";
+	public static final String STRING_ADDR_2				= "$string-addr-2";
+	public static final String STRING_SIZE_1				= "$string-size-1";
+	public static final String STRING_COPY_START			= "$string-copy-start";
+	public static final String STRING_COPY_END				= "$string-copy-end";
+	public static final String STRING_TEMP_1				= "$string-temp-1";
 	public static final String PRINT_RATIONAL_TEMP_1		= "$print-rational-temp-1";
 	public static final String PRINT_RATIONAL_TEMP_2 		= "$print-rational-temp-2";
 	public static final String PRINT_RATIONAL_TEMP_3 		= "$print-rational-temp-3";
@@ -158,7 +165,7 @@ public class RunTime {
 		String badIndexValueMessage = "$errors-bad-index";
 		
 		frag.add(DLabel, badIndexValueMessage);
-		frag.add(DataS, "bad index used for array");
+		frag.add(DataS, "bad index");
 		
 		frag.add(Label, BAD_INDEX_RUNTIME_ERROR);
 		frag.add(PushD, badIndexValueMessage);
@@ -182,6 +189,8 @@ public class RunTime {
 		frag.add(DataI, 0);
 		frag.add(DLabel, INDEX_TEMP_2);
 		frag.add(DataI, 0);
+		frag.add(DLabel, INDEX_TEMP_3);
+		frag.add(DataI, 0);
 		
 		frag.add(DLabel, ARRAY_TEMP_1);
 		frag.add(DataI, 0);
@@ -192,6 +201,19 @@ public class RunTime {
 		frag.add(DLabel, ARRAY_TEMP_4);
 		frag.add(DataI, 0);
 		frag.add(DLabel, ARRAY_TEMP_5);
+		frag.add(DataI, 0);
+		
+		frag.add(DLabel, STRING_ADDR_1);
+		frag.add(DataI, 0);
+		frag.add(DLabel, STRING_ADDR_2);
+		frag.add(DataI, 0);
+		frag.add(DLabel, STRING_SIZE_1);
+		frag.add(DataI, 0);
+		frag.add(DLabel, STRING_COPY_START);
+		frag.add(DataI, 0);
+		frag.add(DLabel, STRING_COPY_END);
+		frag.add(DataI, 0);
+		frag.add(DLabel, STRING_TEMP_1);
 		frag.add(DataI, 0);
 		
 		frag.add(DLabel, RELEASE_TEMP_1);

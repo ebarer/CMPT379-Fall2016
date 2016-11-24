@@ -3,6 +3,8 @@ package semanticAnalyzer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import asmCodeGenerator.codeGenerator.array.ArrayLengthSCG;
+import asmCodeGenerator.codeGenerator.array.ArrayOffsetSCG;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
@@ -286,7 +288,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		List<Type> childTypes = Arrays.asList(left.getType(), right.getType());
 		
 		Lextant operator = operatorFor(node);
-
 		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
 		
 		if (signature.accepts(childTypes)) {
@@ -295,10 +296,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		} else {
 			typeCheckError(node, childTypes);
 		}
-	}
-	private Lextant operatorFor(RationalOperatorNode node) {
-		LextantToken token = (LextantToken) node.getToken();
-		return token.getLextant();
 	}
 	@Override
 	public void visitLeave(BinaryOperatorNode node) {
@@ -327,39 +324,31 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			}
 		}
 	}
-	private Lextant operatorFor(BinaryOperatorNode node) {
-		LextantToken token = (LextantToken) node.getToken();
-		return token.getLextant();
-	}
 	@Override
 	public void visitLeave(UnaryOperatorNode node) {
 		assert node.nChildren() == 1;
 		ParseNode left  = node.child(0);
 		List<Type> childTypes = Arrays.asList(left.getType());
-		
 		Lextant operator = operatorFor(node);
-		if (operator == Keyword.LENGTH) {
-			if (childTypes.get(0) instanceof ArrayType) {
-				FunctionSignature signature = FunctionSignatures.signaturesOf(operator).get(0);
+		
+		// Handle array length
+		if (childTypes.get(0) instanceof ArrayType) {
+			if (operator == Keyword.LENGTH) {
+				FunctionSignature signature = new FunctionSignature(new ArrayLengthSCG(), new ArrayType(), PrimitiveType.INTEGER);
 				node.setSignature(signature);		
 				node.setType(signature.resultType());
-			} else {
-				typeCheckError(node, childTypes);
-			}
-		} else {
-			FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
-			
-			if(signature.accepts(childTypes)) {
-				node.setSignature(signature);
-				node.setType(signature.resultType());
-			} else {
-				typeCheckError(node, childTypes);
+				return;
 			}
 		}
-	}
-	private Lextant operatorFor(UnaryOperatorNode node) {
-		LextantToken token = (LextantToken) node.getToken();
-		return token.getLextant();
+	
+		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
+		
+		if (signature.accepts(childTypes)) {
+			node.setSignature(signature);
+			node.setType(signature.resultType());
+		} else {
+			typeCheckError(node, childTypes);
+		}
 	}
 	@Override
 	public void visitLeave(CastNode node) {
@@ -382,7 +371,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				node.setSignature(signature);
 				node.setType(signature.resultType());
 			} else {
-				logError("cannot cast type '" + childTypes.get(0) + "' to type '" + childTypes.get(1) + "'");
+				logError("cannot cast type '" + childTypes.get(0).infoString() + "' to type '" + childTypes.get(1).infoString() + "'");
 				node.setType(PrimitiveType.ERROR);
 			}
 		}
@@ -436,10 +425,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 
 			node.setType(childTypes.get(0));
 		}
-	}
-	private Lextant operatorFor(ArrayNode node) {
-		LextantToken token = (LextantToken) node.getToken();
-		return token.getLextant();
 	}
 
 	
@@ -512,30 +497,51 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	public void visitLeave(IndexNode node) {
 		assert node.nChildren() >= 2;
 		
-		if (!(node.child(0).getType() instanceof ArrayType)) {
-			typeCheckError(node, Arrays.asList(node.child(0).getType()));
-			return;
+		List<Type> childTypes = new ArrayList<Type>();
+		node.getChildren().forEach((child) -> childTypes.add(child.getType()));
+		
+		Lextant operator = operatorFor(node);
+		
+		// Ensure index is correct type
+		if (childTypes.get(1) == PrimitiveType.INTEGER) {
+			if (childTypes.get(0) instanceof ArrayType) {
+				if (node.nChildren() == 2) {
+					Type subtype = ((ArrayType) childTypes.get(0)).getSubtype();
+					if (subtype instanceof TypeLiteral) {
+						subtype = ((TypeLiteral) subtype).getType();
+					}
+					
+					FunctionSignature signature = new FunctionSignature(new ArrayOffsetSCG(), new ArrayType(), PrimitiveType.INTEGER, subtype);
+					
+					node.setType(subtype);
+					node.setIndexType(childTypes.get(0));
+					node.setSignature(signature);
+					return;
+				}
+			}
+			
+			if (childTypes.get(0) == PrimitiveType.STRING) {
+				FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
+				
+				if (node.nChildren() > 2 && childTypes.get(2) != PrimitiveType.INTEGER) {
+					typeCheckError(node, childTypes);
+					return;
+				}
+				
+				node.setType(signature.resultType());
+				node.setIndexType(childTypes.get(0));
+				node.setSignature(signature);
+				return;
+			}
 		}
 		
-		if (node.child(1).getType() != PrimitiveType.INTEGER) {
-			typeCheckError(node, Arrays.asList(node.child(0).getType()));
-			return;
-		}
-
-		if (node.child(0).getType() instanceof ArrayType) {
-			Type subtype = ((ArrayType)node.child(0).getType()).getSubtype();
-			if (subtype instanceof TypeLiteral) {
-				subtype = ((TypeLiteral) subtype).getType();
-			}
-			node.setType(subtype);
-		} else {
-			//FIXME: Bad index?
-		}
+		typeCheckError(node, childTypes);
+		return;
 	}
 
 	
 	///////////////////////////////////////////////////////////////////////////
-	// helper methods for binding
+	// helper methods
 	private void addBinding(IdentifierNode identifierNode, Type type, Boolean mutable) {
 		Scope scope = identifierNode.getLocalScope();
 		Binding binding = scope.createBinding(identifierNode, type);
@@ -549,7 +555,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		binding.setSignature(signature);
 		identifierNode.setBinding(binding);
 	}
-	
+	private Lextant operatorFor(ParseNode node) {
+		LextantToken token = (LextantToken) node.getToken();
+		return token.getLextant();
+	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	// error logging/printing

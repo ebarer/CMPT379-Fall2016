@@ -2,14 +2,20 @@ package parseTree.nodeTypes;
 
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import semanticAnalyzer.signatures.FunctionSignature;
+import semanticAnalyzer.types.PrimitiveType;
+import semanticAnalyzer.types.Type;
 import lexicalAnalyzer.Lextant;
 import tokens.LextantToken;
 import tokens.Token;
 
 public class IndexNode extends ParseNode {
+	protected Type indexedItemType = PrimitiveType.ANY;
+	protected FunctionSignature signature;
 
 	public IndexNode(Token token) {
 		super(token);
+		signature = null;
 	}
 
 	public IndexNode(ParseNode node) {
@@ -25,6 +31,20 @@ public class IndexNode extends ParseNode {
 	}
 	public LextantToken lextantToken() {
 		return (LextantToken)token;
+	}
+	
+	public void setIndexType(Type t) {
+		this.indexedItemType = t;
+	}
+	public Type getIndexType() {
+		return this.indexedItemType;
+	}
+	
+	public void setSignature(FunctionSignature signature) {
+		this.signature = signature;
+	}
+	public FunctionSignature getSignature() {
+		return signature;
 	}
 
 	

@@ -5,6 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import asmCodeGenerator.codeGenerator.*;
+import asmCodeGenerator.codeGenerator.array.ArrayAllocateSCG;
+import asmCodeGenerator.codeGenerator.array.ArrayCloneSCG;
+import asmCodeGenerator.codeGenerator.array.ArrayGenerateRecordSCG;
+import asmCodeGenerator.codeGenerator.array.ArrayNegativeIndexSCG;
+import asmCodeGenerator.codeGenerator.array.ArrayPopulateSCG;
+import asmCodeGenerator.codeGenerator.array.ArrayReleaseSCG;
+import asmCodeGenerator.codeGenerator.array.ArrayTempToStackSCG;
+import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForLoadSCG;
+import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreFunctionSCG;
+import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
+import asmCodeGenerator.codeGenerator.rational.RationalMemToStackSCG;
+import asmCodeGenerator.codeGenerator.rational.RationalNegateSCG;
+import asmCodeGenerator.codeGenerator.rational.RationalStackToTempSCG;
+import asmCodeGenerator.codeGenerator.rational.RationalTempToStackSCG;
+import asmCodeGenerator.codeGenerator.string.StringReleaseSCG;
 import asmCodeGenerator.codeStorage.*;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 import asmCodeGenerator.runtime.*;
@@ -457,14 +472,23 @@ public class ASMCodeGenerator {
 		public void visitLeave(IndexNode node) {
 			newAddressCode(node);
 			
-			ASMCodeFragment array = removeValueCode(node.child(0));
+			ASMCodeFragment indexedItem = removeValueCode(node.child(0));
 			ASMCodeFragment index = removeValueCode(node.child(1));
 			
-			code.append(array);
+			code.append(indexedItem);
 			code.append(index);
-								
-			ArrayOffsetSCG scg = new ArrayOffsetSCG();
-			code.addChunk(scg.generate());
+			
+			if (node.nChildren() > 2) {
+				index = removeValueCode(node.child(2));
+				code.append(index);
+			}
+			
+			Object variant = node.getSignature().getVariant();
+			
+			if (variant instanceof SimpleCodeGenerator) {
+				SimpleCodeGenerator scg1 = (SimpleCodeGenerator) variant;
+				code.addChunk(scg1.generate());
+			}
 		}		
 				
 		///////////////////////////////////////////////////////////////////////////

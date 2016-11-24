@@ -6,10 +6,8 @@ import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
 import tokens.LextantToken;
 import tokens.Token;
-import semanticAnalyzer.signatures.FunctionSignature;
 
 public class UnaryOperatorNode extends OperatorNode {
-	protected FunctionSignature signature;
 
 	public UnaryOperatorNode(Token token) {
 		super(token);
@@ -29,13 +27,6 @@ public class UnaryOperatorNode extends OperatorNode {
 	}
 	public LextantToken lextantToken() {
 		return (LextantToken)token;
-	}
-
-	public void setSignature(FunctionSignature signature) {
-		this.signature = signature;
-	}
-	public FunctionSignature getSignature() {
-		return signature;
 	}
 
 	
