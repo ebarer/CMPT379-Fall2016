@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import asmCodeGenerator.codeGenerator.array.ArrayLengthSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayOffsetSCG;
+import asmCodeGenerator.codeGenerator.array.ArrayReverseSCG;
+import asmCodeGenerator.codeGenerator.string.StringReverseSCG;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
@@ -412,13 +414,21 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visitLeave(ReverseNode node) {
 		assert node.nChildren() == 1;
+		Type operandType = node.child(0).getType();
 		
-		if (node.child(0).getType() == PrimitiveType.STRING) {
-			node.setType(PrimitiveType.STRING);
-		} else {
-			typeCheckError(node, Arrays.asList(node.child(0).getType()));
+		if (operandType == PrimitiveType.STRING) {
+			node.setType(operandType);
+			node.setSCG(new StringReverseSCG());
 			return;
 		}
+		
+		if (operandType instanceof ArrayType) {
+			node.setType(operandType);
+			node.setSCG(new ArrayReverseSCG(((ArrayType) operandType).getSubtype()));
+			return;
+		}
+		
+		typeCheckError(node, Arrays.asList(operandType));
 	}
 	@Override
 	public void visitLeave(ArrayNode node) {

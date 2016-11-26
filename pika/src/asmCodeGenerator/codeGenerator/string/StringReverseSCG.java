@@ -14,7 +14,7 @@ public class StringReverseSCG implements SimpleCodeGenerator {
 		Labeller labeller = new Labeller("reverse-string");
 		String startLabel 		= labeller.newLabel();
 		String allocateLabel 	= labeller.newLabel("allocate");
-		String copyLabel1 		= labeller.newLabel("begin-string-copy-1");
+		String copyLabel1 		= labeller.newLabel("begin-string-copy");
 		
 		chunk.add(ASMOpcode.Label, startLabel);
 		

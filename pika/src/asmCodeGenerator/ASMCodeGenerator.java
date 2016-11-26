@@ -203,7 +203,7 @@ public class ASMCodeGenerator {
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
-		
+
 		public void visitLeave(ProgramNode node) {
 			newVoidCode(node);
 			
@@ -247,7 +247,6 @@ public class ASMCodeGenerator {
 
 		///////////////////////////////////////////////////////////////////////////
 		// functions and lambdas
-
 		public void visitLeave(FunctionDefinitionNode node) {
 			newVoidCode(node);
 			
@@ -460,7 +459,6 @@ public class ASMCodeGenerator {
 		
 		///////////////////////////////////////////////////////////////////////////
 		// identifiers
-		
 		public void visitLeave(IdentifierNode node) {
 			newAddressCode(node);
 			Binding binding = node.getBinding();
@@ -469,7 +467,6 @@ public class ASMCodeGenerator {
 		
 		///////////////////////////////////////////////////////////////////////////
 		// index	
-		
 		public void visitLeave(IndexNode node) {
 			newAddressCode(node);
 			
@@ -894,8 +891,7 @@ public class ASMCodeGenerator {
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));
 			code.append(arg1);
 			
-			StringReverseSCG scg = new StringReverseSCG();
-			code.addChunk(scg.generate());
+			code.addChunk(node.getSCG().generate());
 		}
 		
 		public void visitLeave(CastNode node) {

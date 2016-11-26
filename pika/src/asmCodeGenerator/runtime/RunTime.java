@@ -42,6 +42,7 @@ public class RunTime {
 	public static final String ARRAY_TEMP_3					= "$array-temp-3";
 	public static final String ARRAY_TEMP_4					= "$array-temp-4";
 	public static final String ARRAY_TEMP_5					= "$array-temp-5";
+	public static final String ARRAY_TEMP_6					= "$array-temp-6";
 	public static final String STRING_TEMP_1				= "$string-temp-1";
 	public static final String STRING_ADDR_1				= "$string-addr-1";
 	public static final String STRING_ADDR_2				= "$string-addr-2";
@@ -204,6 +205,8 @@ public class RunTime {
 		frag.add(DLabel, ARRAY_TEMP_4);
 		frag.add(DataI, 0);
 		frag.add(DLabel, ARRAY_TEMP_5);
+		frag.add(DataI, 0);
+		frag.add(DLabel, ARRAY_TEMP_6);
 		frag.add(DataI, 0);
 		
 		frag.add(DLabel, STRING_TEMP_1);

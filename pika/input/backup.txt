@@ -10,31 +10,13 @@ exec {
 }
 
 exec {
-	#var s := "Elliot".
-
-	#print "Index: ", s[1], _n_.
-	#print "Index Range: ", s[1, 3], _n_.
-	
-	#print "Test"[3], _n_.
-	print "Test"[0,4], _n_.
-}
-
-func printRange<string s, int a, int b> -> void {
-	var i := a.
-	
-	while (i < b) {
-		print s[i].
-		i := i + 1.
-	}
-	
-	return.
-}
-
-exec {
 	var s := "Elliot".
+
+	print "Index: ", s[1], _n_.
+	print "Index Range: ", s[1, 3], _n_.
 	
-	print s, _n_.
-	call printRange(s, 0, 4).
+	print "Test"[3], _n_.
+	print "Test"[0,4], _n_.
 }
 
 exec {
@@ -47,7 +29,32 @@ exec {
 	print s + t.
 	
 	var a := ^!^.
-	
 	print a + s, _n_.
-	#print s + a, _n_.
+	print s + a, _n_.
+}
+
+exec {
+	print "Elliot", _n_.
+	print reverse "Elliot", _n_.
+	
+	var a := [[1, 2], [3, 4]].
+	print a, _n_.
+	print reverse a.
+}
+
+exec {
+	for index i of "rabbit" {
+		print i, _n_.
+	}
+	
+	for elem c of "rabbit" {
+		print c, _n_.
+		continue.
+	}
+	
+	var g := [[1, 2], [3, 4], [5, 6]].
+	for elem e of g {
+		print e, _n_.
+		break.
+	}
 }
