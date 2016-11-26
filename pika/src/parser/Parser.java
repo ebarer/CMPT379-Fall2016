@@ -165,6 +165,9 @@ public class Parser {
 		if(startsWhileStatement(nowReading)) {
 			return parseWhileStatement();
 		}
+		if(startsForStatement(nowReading)) {
+			return parseForStatement();
+		}
 		if(startsControlStatement(nowReading)) {
 			return parseControlStatement();
 		}
@@ -182,6 +185,7 @@ public class Parser {
 			   startsReleaseStatement(token) || 
 			   startsIfStatement(token) ||
 			   startsWhileStatement(token) ||
+			   startsForStatement(token) ||
 			   startsControlStatement(token) ||
 			   startsPrintStatement(token) ||
 			   startsBlockStatement(token);
@@ -371,12 +375,36 @@ public class Parser {
 		expect(Punctuator.CLOSE_PARENTHESIS);
 		
 		ParseNode blockStatement = parseBlockStatement();
-		
-		ParseNode whileNode = new WhileNode(whileToken, condition, blockStatement);	
-		return whileNode;
+	
+		return new WhileNode(whileToken, condition, blockStatement);
 	}
 	private boolean startsWhileStatement(Token token) {
 		return token.isLextant(Keyword.WHILE);
+	}
+	
+	///////////////////////////////////////////////////////////
+		
+	// whileStmt -> while (expression) blockStatement
+	private ParseNode parseForStatement() {
+		if(!startsForStatement(nowReading)) {
+			return syntaxErrorNode("for-statement");
+		}
+	
+		expect(Keyword.FOR);
+		expect(Keyword.INDEX, Keyword.ELEMENT);
+		Token forToken = previouslyRead;
+		
+		ParseNode identifier = parseIdentifier();
+		
+		expect(Keyword.OF);
+		ParseNode sequence = parseExpression();
+		
+		ParseNode blockStatement = parseBlockStatement();
+	
+		return ForNode.withChildren(forToken, identifier, sequence, blockStatement);
+	}
+	private boolean startsForStatement(Token token) {
+		return token.isLextant(Keyword.FOR);
 	}
 	
 	///////////////////////////////////////////////////////////

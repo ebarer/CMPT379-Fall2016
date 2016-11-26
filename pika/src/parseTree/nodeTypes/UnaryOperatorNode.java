@@ -45,8 +45,8 @@ public class UnaryOperatorNode extends OperatorNode {
 	public boolean isComparator() {
 		Lextant operator = getOperator();
 		return (operator == Punctuator.LESS_OR_EQUAL || operator == Punctuator.LESS ||
-				operator == Punctuator.EQUAL || operator == Punctuator.NOT_EQUAL ||
-				operator == Punctuator.GREATER || operator == Punctuator.GREATER_OR_EQUAL);
+				operator == Punctuator.EQUAL 		 || operator == Punctuator.NOT_EQUAL ||
+				operator == Punctuator.GREATER 		 || operator == Punctuator.GREATER_OR_EQUAL);
 	}
 	
 	public boolean isBooleanOperator() {

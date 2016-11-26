@@ -40,6 +40,10 @@ public enum Keyword implements Lextant {
 	IF("if"),
 	ELSE("else"),
 	WHILE("while"),
+	FOR("for"),
+	INDEX("index"),
+	ELEMENT("elem"),
+	OF("of"),
 	CONTINUE("continue"),
 	BREAK("break"),
 	

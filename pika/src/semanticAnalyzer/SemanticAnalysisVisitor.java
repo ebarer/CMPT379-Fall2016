@@ -47,10 +47,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	
 	public void visitEnter(BlockNode node) {
-		enterScope(node);
+		if (!(node.getParent() instanceof ForNode)) {
+			enterScope(node);
+		}
 	}
 	public void visitLeave(BlockNode node) {
-		leaveScope(node);
+		if (!(node.getParent() instanceof ForNode)) {
+			leaveScope(node);
+		}
 	}
 	
 	
@@ -130,7 +134,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			typeCheckError(function, childTypes);
 		}
 	}
-	
 	@Override
 	public void visitLeave(ReturnNode node) {
 		ParseNode parent = node.getParent();
@@ -272,11 +275,41 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	@Override
 	public void visitLeave(WhileNode node) {
 		assert node.nChildren() >= 2;
+		
 		if (node.child(0).getType() != PrimitiveType.BOOLEAN) {
 			typeCheckError(node, Arrays.asList(node.child(0).getType()));
 		}
 	}
-
+	@Override
+	public void visitEnter(ForNode node) {
+		enterScope(node);
+	}
+	@Override
+	public void visitLeave(ForNode node) {
+		leaveScope(node);
+		
+		assert node.nChildren() >= 3;
+		
+		Type seqType = node.child(0).getType();
+		if (!(seqType == PrimitiveType.STRING || seqType instanceof ArrayType)) {
+			typeCheckError(node, Arrays.asList(node.child(1).getType()));
+			return;
+		}
+	}
+	public void visitLeave(ControlNode node) {
+		ParseNode parent = node.getParent();
+		while (!(parent instanceof WhileNode || parent instanceof ForNode)) {
+			if (parent.getParent() == null) {
+				Token token = node.getToken();
+				logError("operator " + token.getLexeme() + " only allowed inside the body" +
+						 " of a while loop or for loop, at " + token.getLocation());
+				node.setType(PrimitiveType.ERROR);
+				return;
+			}
+			
+			parent = parent.getParent();
+		}
+	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	// expressions
@@ -477,11 +510,34 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	// IdentifierNodes, with helper methods
 	@Override
 	public void visitLeave(IdentifierNode node) {
-		if(!isBeingDeclared(node) && !isBeingAssigned(node) &&
+		if(isForIdentifier(node)) {
+			ParseNode parent = node.getParent();
+			if (parent.getToken().isLextant(Keyword.INDEX)) {
+				node.setType(PrimitiveType.INTEGER);
+				addBinding(node, PrimitiveType.INTEGER, false);
+				return;
+			} else if (parent.getToken().isLextant(Keyword.ELEMENT)) {
+				Type identifierType = parent.child(0).getType();
+				if (identifierType instanceof ArrayType) {
+					identifierType = ((ArrayType) identifierType).getSubtype();
+				}
+				if (identifierType == PrimitiveType.STRING) {
+					identifierType = PrimitiveType.CHARACTER;
+				}
+				
+				node.setType(identifierType);
+				addBinding(node, identifierType, false);
+				return;
+			}
+		} 
+		
+		if(!isBeingDeclared(node) && !isBeingAssigned(node) && 
 		   !isFunctionIdentifier(node) && !isFunctionParameter(node)) {		
 			node.setBinding(node.findVariableBinding());
 			node.setType(node.getBinding().getType());
+			return;
 		}
+		
 		// else parent DeclarationNode does the processing.
 	}
 	private boolean isBeingDeclared(IdentifierNode node) {
@@ -499,6 +555,10 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private boolean isFunctionParameter(IdentifierNode node) {
 		ParseNode parent = node.getParent();
 		return (parent instanceof LambdaParamNode) && (node == parent.child(0));
+	}
+	private boolean isForIdentifier(IdentifierNode node) {
+		ParseNode parent = node.getParent();
+		return (parent instanceof ForNode) && (node == parent.child(1));
 	}
 	
 	

@@ -35,11 +35,17 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	}
 	@Override
 	public void visitEnter(BlockNode node) {
-		if (node.getParent() instanceof LambdaNode) {
-			createProcedureScope(node);
-		} else {
-			createSubscope(node);
+		if (!(node.getParent() instanceof ForNode)) {
+			if (node.getParent() instanceof LambdaNode) {
+				createProcedureScope(node);
+			} else {
+				createSubscope(node);
+			}
 		}
+	}
+	@Override
+	public void visitEnter(ForNode node) {
+		createSubscope(node);
 	}
 
 	
@@ -89,7 +95,6 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	
 	///////////////////////////////////////////////////////////////////////////
 	// lambda
-	
 	@Override
 	public void visitEnter(LambdaNode node) {
 		node.generateLabels();
@@ -148,6 +153,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 	public void visit(LambdaTypeNode node) {
 	}
 	
+	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for types
 	private Type getType(ParseNode node) {
@@ -169,6 +175,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 		return PrimitiveType.ERROR;
 	}
 
+	
 	///////////////////////////////////////////////////////////////////////////
 	// declaration (to ensure inline recursion)
 	@Override
@@ -187,6 +194,7 @@ class SemanticPreprocessorVisitor extends ParseNodeVisitor.Default {
 			addBinding(identifier, functionType, lambda.getStartLabel(), signature, mutable);		
 		}
 	}
+	
 	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods for binding

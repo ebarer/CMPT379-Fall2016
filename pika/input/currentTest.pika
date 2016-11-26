@@ -1,4 +1,16 @@
 exec {
-	var s := "Elliot".
-	print s; reverse s.
+	for index i of "rabbit" {
+		print i, _n_.
+	}
+	
+	for elem c of "rabbit" {
+		print c, _n_.
+		continue.
+	}
+	
+	var g := [[1, 2], [3, 4], [5, 6]].
+	for elem e of g {
+		print e, _n_.
+		break.
+	}
 }
