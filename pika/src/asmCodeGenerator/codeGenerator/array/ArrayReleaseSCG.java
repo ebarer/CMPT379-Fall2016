@@ -22,7 +22,7 @@ public class ArrayReleaseSCG implements SimpleCodeGenerator {
 		ASMCodeChunk chunk = new ASMCodeChunk();
 
 		Labeller labeller = new Labeller("release-stmt");
-		String startLabel 		 = labeller.newLabel("");
+		String startLabel 		 = labeller.newLabel();
 		String loopLabel  		 = labeller.newLabel("loop");
 		String joinLoopLabel	 = labeller.newLabel("join-loop");
 		String joinDeletedLabel  = labeller.newLabel("join-deleted");
@@ -151,7 +151,7 @@ public class ArrayReleaseSCG implements SimpleCodeGenerator {
 		// DEBUG: Release
 		if (debug) { 
 			chunk.add(ASMOpcode.Label, joinDeletedLabel);
-			chunk.add(ASMOpcode.PushD, RunTime.ARRAY_ALREADY_RELEASED);
+			chunk.add(ASMOpcode.PushD, RunTime.ALREADY_RELEASED);
 			chunk.add(ASMOpcode.PushD, RunTime.STRING_PRINT_FORMAT);
 			chunk.add(ASMOpcode.Printf);
 		}

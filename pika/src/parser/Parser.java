@@ -614,23 +614,30 @@ public class Parser {
 			return syntaxErrorNode("unaryExpression");
 		}
 		
-		if (nowReading.isLextant(Keyword.CLONE)) {
+		if (startsClone(nowReading)) {
 			return parseArrayExpression();
 		}
 		
-		if (startsNegation(nowReading) || startsLength(nowReading)) {
-			expect(Punctuator.NOT, Keyword.LENGTH);
+		if (startsReverse(nowReading)) {
+			expect(Keyword.REVERSE);
 			Token token = previouslyRead;
 			
-			ParseNode right = parseExpression();
-			ParseNode left = UnaryOperatorNode.withChild(token, right); 
-			return left;
+			ParseNode node = parseExpression();
+			return ReverseNode.withChildren(token, node);
+		}
+		
+		if (startsNegation(nowReading) || startsLength(nowReading)) {
+			readToken();
+			Token token = previouslyRead;
+			
+			ParseNode node = parseExpression(); 
+			return UnaryOperatorNode.withChild(token, node);
 		}
 		
 		return parseAtomicExpression();
 	}
 	private boolean startsUnaryExpression(Token token) {
-		if (startsNegation(token) || startsLength(token) || startsClone(token)) {
+		if (startsClone(token) || startsNegation(token) || startsLength(token) || startsReverse(token)) {
 			return true;
 		} else {
 			return startsAtomicExpression(token);
@@ -644,6 +651,9 @@ public class Parser {
 	}
 	private boolean startsClone(Token token) {
 		return token.isLextant(Keyword.CLONE); 
+	}
+	private boolean startsReverse(Token token) {
+		return token.isLextant(Keyword.REVERSE); 
 	}
 		
 	// atomicExpression -> literal

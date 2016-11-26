@@ -20,6 +20,7 @@ import asmCodeGenerator.codeGenerator.rational.RationalNegateSCG;
 import asmCodeGenerator.codeGenerator.rational.RationalStackToTempSCG;
 import asmCodeGenerator.codeGenerator.rational.RationalTempToStackSCG;
 import asmCodeGenerator.codeGenerator.string.StringReleaseSCG;
+import asmCodeGenerator.codeGenerator.string.StringReverseSCG;
 import asmCodeGenerator.codeStorage.*;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 import asmCodeGenerator.runtime.*;
@@ -489,7 +490,7 @@ public class ASMCodeGenerator {
 				SimpleCodeGenerator scg1 = (SimpleCodeGenerator) variant;
 				code.addChunk(scg1.generate());
 			}
-		}		
+		}	
 				
 		///////////////////////////////////////////////////////////////////////////
 		// statements and declarations
@@ -560,7 +561,7 @@ public class ASMCodeGenerator {
 			newVoidCode(node);
 			
 			Labeller labeller = new Labeller("if-stmt");
-			String startLabel = labeller.newLabel("");
+			String startLabel = labeller.newLabel();
 			String ifLabel = labeller.newLabel("if");
 			String elseLabel  = labeller.newLabel("else");
 			String joinLabel  = labeller.newLabel("join");
@@ -887,6 +888,16 @@ public class ASMCodeGenerator {
 			}
 		}
 		
+		public void visitLeave(ReverseNode node) {
+			newValueCode(node);
+
+			ASMCodeFragment arg1 = removeValueCode(node.child(0));
+			code.append(arg1);
+			
+			StringReverseSCG scg = new StringReverseSCG();
+			code.addChunk(scg.generate());
+		}
+		
 		public void visitLeave(CastNode node) {
 			newValueCode(node);
 
@@ -910,7 +921,7 @@ public class ASMCodeGenerator {
 			newValueCode(node);
 			
 			Labeller labeller = new Labeller("array");
-			String startLabel  = labeller.newLabel("");
+			String startLabel  = labeller.newLabel();
 			String recordLabel  = labeller.newLabel("create-record");
 			String startChildrenLabel  = labeller.newLabel("start-store-children");
 			String endChildrenLabel  = labeller.newLabel("end-store-children");

@@ -28,7 +28,7 @@ public class ArrayPopulateSCG implements SimpleCodeGenerator {
 		//chunk.add(ASMOpcode.Label, RunTime.SUB_PRINT_ARRAY);
 
 		Labeller labeller = new Labeller("populate-array");
-		String startLabel = labeller.newLabel("");
+		String startLabel = labeller.newLabel();
 		String loopLabel  = labeller.newLabel("loop");
 		String joinLabel  = labeller.newLabel("join");
 		

@@ -26,7 +26,7 @@ public class ArrayCloneSCG implements SimpleCodeGenerator {
 			Type subtype = ((ArrayType) type).getSubtype();
 				
 			Labeller labeller = new Labeller("clone-array");
-			String startLabel  		= labeller.newLabel("");
+			String startLabel  		= labeller.newLabel();
 			String recordLabel  	= labeller.newLabel("record");
 			String dataLabel  		= labeller.newLabel("data");
 			String loopLabel  		= labeller.newLabel("loop");

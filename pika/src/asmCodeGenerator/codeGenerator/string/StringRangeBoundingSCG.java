@@ -6,10 +6,15 @@ import asmCodeGenerator.runtime.RunTime;
 
 public class StringRangeBoundingSCG implements SimpleCodeGenerator {
 	
+	// EXPECTED:
+	//		INDEX_TEMP_1 	== address of string being indexed
+	//		INDEX_TEMP_2 	== START index
+	//		INDEX_TEMP_3 	== END index
+	
 	@Override
 	public ASMCodeChunk generate() {
 		ASMCodeChunk chunk = new ASMCodeChunk();
-
+		
 		// Check if START index is negative
 		chunk.add(ASMOpcode.PushD, RunTime.INDEX_TEMP_2);
 		chunk.add(ASMOpcode.LoadI);

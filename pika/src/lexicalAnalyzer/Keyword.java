@@ -28,6 +28,9 @@ public enum Keyword implements Lextant {
 	RELEASE("release"),
 	LENGTH("length"),
 	
+	// STRING METHODS
+	REVERSE("reverse"),
+	
 	// FUNCTION METHODS
 	FUNCTION("func"),
 	CALL("call"),

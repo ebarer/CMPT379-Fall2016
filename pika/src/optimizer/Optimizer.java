@@ -62,7 +62,8 @@ public class Optimizer {
 		//FIXME: Label simple loops
 		
 		// Grab optimized instructions from BasicBlocks
-		replaceLabels(cfg);
+		//FIXME: Commented out relabelling for debug
+		//replaceLabels(cfg);
 		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
 		while(cleanupJumps(programFragments[INSTRUCTIONS]));
 		

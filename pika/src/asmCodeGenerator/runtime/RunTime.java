@@ -23,7 +23,7 @@ public class RunTime {
 	public static final String SPACE_PRINT_FORMAT     				= "$print-format-space";
 	public static final String BOOLEAN_TRUE_STRING    				= "$boolean-true-string";
 	public static final String BOOLEAN_FALSE_STRING   				= "$boolean-false-string";
-	public static final String ARRAY_ALREADY_RELEASED				= "$array-released";
+	public static final String ALREADY_RELEASED						= "$already-released";
 	public static final String ARRAY_RECURSE_RELEASED   			= "$array-recurse-released";
 	
 	public static final String RATIONAL_TEMP_NUMERATOR_1	= "$rational-temp-numerator-1";
@@ -42,12 +42,15 @@ public class RunTime {
 	public static final String ARRAY_TEMP_3					= "$array-temp-3";
 	public static final String ARRAY_TEMP_4					= "$array-temp-4";
 	public static final String ARRAY_TEMP_5					= "$array-temp-5";
+	public static final String STRING_TEMP_1				= "$string-temp-1";
 	public static final String STRING_ADDR_1				= "$string-addr-1";
 	public static final String STRING_ADDR_2				= "$string-addr-2";
 	public static final String STRING_SIZE_1				= "$string-size-1";
+	public static final String STRING_SIZE_2				= "$string-size-2";
+	public static final String STRING_OFFSET_1				= "$string-offset-1";
+	public static final String STRING_OFFSET_2				= "$string-offset-2";
 	public static final String STRING_COPY_START			= "$string-copy-start";
 	public static final String STRING_COPY_END				= "$string-copy-end";
-	public static final String STRING_TEMP_1				= "$string-temp-1";
 	public static final String PRINT_RATIONAL_TEMP_1		= "$print-rational-temp-1";
 	public static final String PRINT_RATIONAL_TEMP_2 		= "$print-rational-temp-2";
 	public static final String PRINT_RATIONAL_TEMP_3 		= "$print-rational-temp-3";
@@ -123,8 +126,8 @@ public class RunTime {
 		
 		frag.add(DLabel, ARRAY_RECURSE_RELEASED);
 		frag.add(DataS, "Array recursively released\n");
-		frag.add(DLabel, ARRAY_ALREADY_RELEASED);
-		frag.add(DataS, "Array already released\n");
+		frag.add(DLabel, ALREADY_RELEASED);
+		frag.add(DataS, "Already released\n");
 		
 		return frag;
 	}
@@ -203,17 +206,23 @@ public class RunTime {
 		frag.add(DLabel, ARRAY_TEMP_5);
 		frag.add(DataI, 0);
 		
+		frag.add(DLabel, STRING_TEMP_1);
+		frag.add(DataI, 0);
 		frag.add(DLabel, STRING_ADDR_1);
 		frag.add(DataI, 0);
 		frag.add(DLabel, STRING_ADDR_2);
 		frag.add(DataI, 0);
 		frag.add(DLabel, STRING_SIZE_1);
 		frag.add(DataI, 0);
+		frag.add(DLabel, STRING_SIZE_2);
+		frag.add(DataI, 0);
+		frag.add(DLabel, STRING_OFFSET_1);
+		frag.add(DataI, 0);
+		frag.add(DLabel, STRING_OFFSET_2);
+		frag.add(DataI, 0);
 		frag.add(DLabel, STRING_COPY_START);
 		frag.add(DataI, 0);
 		frag.add(DLabel, STRING_COPY_END);
-		frag.add(DataI, 0);
-		frag.add(DLabel, STRING_TEMP_1);
 		frag.add(DataI, 0);
 		
 		frag.add(DLabel, RELEASE_TEMP_1);

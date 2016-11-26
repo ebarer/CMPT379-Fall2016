@@ -63,6 +63,9 @@ public interface ParseNodeVisitor {
 	void visitEnter(UnaryOperatorNode node);
 	void visitLeave(UnaryOperatorNode node);
 	
+	void visitEnter(ReverseNode node);
+	void visitLeave(ReverseNode node);
+	
 	void visitEnter(CastNode node);
 	void visitLeave(CastNode node);
 	
@@ -224,6 +227,12 @@ public interface ParseNodeVisitor {
 			defaultVisitEnter(node);
 		}
 		public void visitLeave(UnaryOperatorNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(ReverseNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(ReverseNode node) {
 			defaultVisitLeave(node);
 		}
 		public void visitEnter(CastNode node) {

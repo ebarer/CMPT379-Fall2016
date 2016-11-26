@@ -1,9 +1,4 @@
 exec {
-	#var s := "Elliot".
-
-	#print "Index: ", s[1], _n_.
-	#print "Index Range: ", s[1, 3], _n_.
-	
-	#print "Test"[3], _n_.
-	print "Test"[0,4], _n_.
+	var s := "Elliot".
+	print s; reverse s.
 }

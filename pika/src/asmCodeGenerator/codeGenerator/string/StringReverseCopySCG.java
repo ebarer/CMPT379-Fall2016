@@ -5,7 +5,7 @@ import asmCodeGenerator.runtime.*;
 import asmCodeGenerator.Labeller;
 import asmCodeGenerator.codeGenerator.SimpleCodeGenerator;
 
-public class StringCopySCG implements SimpleCodeGenerator {
+public class StringReverseCopySCG implements SimpleCodeGenerator {
 	
 	// EXPECTED:
 	// 		STRING_ADDR_1 		== new string address (cloning to)
@@ -14,6 +14,7 @@ public class StringCopySCG implements SimpleCodeGenerator {
 	// 		STRING_OFFSET_2 	== old string copy offset
 	// 		STRING_COPY_START 	== loop start/index
 	// 		STRING_COPY_END 	== loop end
+	//		STRING_SIZE_1		== string length
 	
 	// DEF: 	loop between STRING_COPY_START and STRING_COPY_END
 	//			STRING_OFFSET_1 = STRING_ADDR_1 + 12 + STRING_OFFSET_1
@@ -47,7 +48,12 @@ public class StringCopySCG implements SimpleCodeGenerator {
 		chunk.add(ASMOpcode.PushD, RunTime.STRING_COPY_START);
 		chunk.add(ASMOpcode.LoadI);
 		chunk.add(ASMOpcode.Add);
-		chunk.add(ASMOpcode.StoreI);
+		chunk.add(ASMOpcode.PushD, RunTime.STRING_SIZE_1);
+		chunk.add(ASMOpcode.LoadI);
+		chunk.add(ASMOpcode.Add);
+		chunk.add(ASMOpcode.PushI, -1);
+		chunk.add(ASMOpcode.Add);
+		chunk.add(ASMOpcode.StoreI);		
 		
 	// Start data cloning loop
 		chunk.add(ASMOpcode.Label, startLabel);
@@ -85,7 +91,7 @@ public class StringCopySCG implements SimpleCodeGenerator {
 		chunk.add(ASMOpcode.PushD, RunTime.STRING_OFFSET_2);
 		chunk.add(ASMOpcode.PushD, RunTime.STRING_OFFSET_2);
 		chunk.add(ASMOpcode.LoadI);
-		chunk.add(ASMOpcode.PushI, 1);
+		chunk.add(ASMOpcode.PushI, -1);
 		chunk.add(ASMOpcode.Add);
 		chunk.add(ASMOpcode.StoreI);
 			

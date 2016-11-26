@@ -20,8 +20,7 @@ import asmCodeGenerator.runtime.RunTime;
 public class PrintStatementGenerator {
 	ASMCodeFragment code;
 	ASMCodeGenerator.CodeVisitor visitor;
-	
-	
+		
 	public PrintStatementGenerator(ASMCodeFragment code, CodeVisitor visitor) {
 		super();
 		this.code = code;
@@ -69,7 +68,6 @@ public class PrintStatementGenerator {
 			code.add(ASMOpcode.Printf);
 		}
 	}
-
 
 	private static String printFormat(Type type) {
 		if (type instanceof LambdaType) {

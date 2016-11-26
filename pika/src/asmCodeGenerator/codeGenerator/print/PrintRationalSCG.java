@@ -16,12 +16,12 @@ public class PrintRationalSCG implements SimpleCodeGenerator {
 		ASMCodeChunk chunk = new ASMCodeChunk();
 		
 		Labeller labeller = new Labeller("print-rational");
-		String startLabel = labeller.newLabel("");
-		String skipFractionLabel = labeller.newLabel("skip-fraction");
-		String skipWholeLabel = labeller.newLabel("skip-whole");
-		String skipNegateLabel = labeller.newLabel("skip-negate");
-		String skipFractionNegateLabel = labeller.newLabel("skip-fraction-negate");
-		String joinLabel= labeller.newLabel("join");
+		String startLabel 				= labeller.newLabel();
+		String skipFractionLabel 		= labeller.newLabel("skip-fraction");
+		String skipWholeLabel 			= labeller.newLabel("skip-whole");
+		String skipNegateLabel 			= labeller.newLabel("skip-negate");
+		String skipFractionNegateLabel 	= labeller.newLabel("skip-fraction-negate");
+		String joinLabel				= labeller.newLabel("join");
 		
 		RationalStackToTempSCG scg1 = new RationalStackToTempSCG();
 		chunk.append(scg1.generate());

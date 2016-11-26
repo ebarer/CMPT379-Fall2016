@@ -36,3 +36,18 @@ exec {
 	print s, _n_.
 	call printRange(s, 0, 4).
 }
+
+exec {
+	print "Elliot"[0, 4], _n_.
+
+	var s := "Hello".
+	var t := ", world!".
+	
+	print s; _n_, t; _n_.
+	print s + t.
+	
+	var a := ^!^.
+	
+	print a + s, _n_.
+	#print s + a, _n_.
+}
