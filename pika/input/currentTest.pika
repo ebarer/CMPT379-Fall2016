@@ -1,11 +1,11 @@
 exec {
-	var numbers := [1, 3, 5, 8, 11, 12].
+	var numbers := [1//3, -5//8, 11//12].
 	
-	var parityString := <int a>->string {
-		if ((a/2)*2 == a) {
-			return "even".
+	var parityString := <rat a>->string {
+		if (a > 0) {
+			return "pos".
 		} else {
-			return "odd".
+			return "neg".
 		}
 	}.
 	

@@ -10,6 +10,8 @@ import asmCodeGenerator.codeGenerator.array.ArrayAllocateSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayGenerateRecordSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForCloneSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForLoadSCG;
+import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
+
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
 public class MapOperatorSCG {
@@ -47,9 +49,9 @@ public class MapOperatorSCG {
 		ArrayAllocateSCG allocateSCG = new ArrayAllocateSCG();
 		ArrayGenerateRecordSCG recordSCG = new ArrayGenerateRecordSCG(outType);
 		OpcodeForLoadSCG loadArgSCG = new OpcodeForLoadSCG(inType);
-		OpcodeForCloneSCG storeArgSCG = new OpcodeForCloneSCG(inType);
+		OpcodeForStoreSCG storeArgSCG = new OpcodeForStoreSCG(inType);
 		OpcodeForLoadSCG loadResultSCG = new OpcodeForLoadSCG(outType);
-		OpcodeForCloneSCG storeResultSCG = new OpcodeForCloneSCG(outType);
+		OpcodeForStoreSCG storeResultSCG = new OpcodeForStoreSCG(outType);
 
 		code.add(PushD, RunTime.ARRAY_TEMP_2);
 		code.append(oldArray);
