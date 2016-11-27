@@ -44,17 +44,44 @@ exec {
 
 exec {
 	for index i of "rabbit" {
-		print i, _n_.
+		print i;.
 	}
+	print _n_.
 	
 	for elem c of "rabbit" {
-		print c, _n_.
-		continue.
+		print c;.
 	}
+	print _n_.
 	
-	var g := [[1, 2], [3, 4], [5, 6]].
+	var g := [[1//2, -2//1], [3//9, 40//2]].
 	for elem e of g {
-		print e, _n_.
-		break.
+		print e;.
 	}
+	print _n_.
+	
+	for index i of "rabbit" + " hello" {
+		print i;.
+	}
+	print _n_.
+	
+	for elem c of "rabbit" + " hello" {
+		print c;.
+	}
+	print _n_.
+}
+
+exec {
+	for index i of "rabbit" + " hello" {
+		print i;.
+	}
+	print _n_.
+		
+	for index i of "rabbit" + " hello" {
+		print ("rabbit" + " hello")[i];.
+	}
+	print _n_.
+	
+	var a := "rabbit" + "hello".
+	print a, _n_.
+	print a[0, 2].
 }

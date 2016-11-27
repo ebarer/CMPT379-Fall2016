@@ -34,6 +34,11 @@ public class RunTime {
 	public static final String RELEASE_TEMP_2				= "$release-temp-2";
 	public static final String RELEASE_TEMP_3				= "$release-temp-3";
 	public static final String RELEASE_TEMP_4				= "$release-temp-4";
+	public static final String FOR_LOOP_INDEX				= "$for-loop-index";
+	public static final String FOR_LOOP_OFFSET				= "$for-loop-offset";
+	public static final String FOR_LOOP_END_INDEX			= "$for-loop-end-index";
+	public static final String FOR_LOOP_IDENTIFIER			= "$for-loop-identifier";
+	public static final String FOR_LOOP_SEQUENCE			= "$for-loop-sequence";
 	public static final String INDEX_TEMP_1					= "$index-temp-1";
 	public static final String INDEX_TEMP_2					= "$index-temp-2";
 	public static final String INDEX_TEMP_3					= "$index-temp-3";
@@ -188,6 +193,17 @@ public class RunTime {
 	
 	private ASMCodeFragment temporaryStorage() {
 		ASMCodeFragment frag = new ASMCodeFragment(GENERATES_VOID);
+		
+		frag.add(DLabel, FOR_LOOP_INDEX);
+		frag.add(DataI, 0);
+		frag.add(DLabel, FOR_LOOP_OFFSET);
+		frag.add(DataI, 0);
+		frag.add(DLabel, FOR_LOOP_END_INDEX);
+		frag.add(DataI, 0);
+		frag.add(DLabel, FOR_LOOP_IDENTIFIER);
+		frag.add(DataI, 0);
+		frag.add(DLabel, FOR_LOOP_SEQUENCE);
+		frag.add(DataI, 0);
 		
 		frag.add(DLabel, INDEX_TEMP_1);
 		frag.add(DataI, 0);

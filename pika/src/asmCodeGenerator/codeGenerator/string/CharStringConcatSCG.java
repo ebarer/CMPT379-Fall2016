@@ -48,9 +48,6 @@ public class CharStringConcatSCG implements SimpleCodeGenerator {
 		StringGenerateRecordSCG scg3 = new StringGenerateRecordSCG();
 		chunk.append(scg3.generate());
 		
-		// Copy strings
-		StringCopySCG scg4 = new StringCopySCG();
-		
 		// Copy character
 		chunk.add(ASMOpcode.PushD, RunTime.STRING_ADDR_1);
 		chunk.add(ASMOpcode.LoadI);
@@ -82,9 +79,13 @@ public class CharStringConcatSCG implements SimpleCodeGenerator {
 		chunk.add(ASMOpcode.Add);
 		chunk.add(ASMOpcode.LoadI);
 		chunk.add(ASMOpcode.StoreI);
+		
+		chunk.add(ASMOpcode.PushD, RunTime.STRING_OFFSET_1);
+		chunk.add(ASMOpcode.PushI, 0);
+		chunk.add(ASMOpcode.StoreI);
 
+		StringCopySCG scg4 = new StringCopySCG();
 		chunk.append(scg4.generate());
-
 		
 		// Push address of dynamically allocated string on stack
 		chunk.add(ASMOpcode.PushD, RunTime.STRING_ADDR_1);

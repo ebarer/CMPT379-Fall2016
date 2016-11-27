@@ -2,9 +2,6 @@ package parseTree.nodeTypes;
 
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
-import semanticAnalyzer.signatures.FunctionSignature;
-import semanticAnalyzer.types.PrimitiveType;
-import semanticAnalyzer.types.Type;
 import asmCodeGenerator.codeGenerator.SimpleCodeGenerator;
 import lexicalAnalyzer.Lextant;
 import tokens.LextantToken;

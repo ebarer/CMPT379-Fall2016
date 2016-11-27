@@ -400,7 +400,7 @@ public class Parser {
 		ParseNode sequence = parseExpression();
 		
 		ParseNode blockStatement = parseBlockStatement();
-	
+
 		return ForNode.withChildren(forToken, identifier, sequence, blockStatement);
 	}
 	private boolean startsForStatement(Token token) {
@@ -694,6 +694,7 @@ public class Parser {
 			expect(Punctuator.OPEN_PARENTHESIS);
 			ParseNode left = parseExpression();
 			expect(Punctuator.CLOSE_PARENTHESIS);
+			left = parseIndexOrInvocation(left);
 			return left;
 		}
 		

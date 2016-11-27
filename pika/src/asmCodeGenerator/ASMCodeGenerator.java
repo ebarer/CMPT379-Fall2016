@@ -20,7 +20,6 @@ import asmCodeGenerator.codeGenerator.rational.RationalNegateSCG;
 import asmCodeGenerator.codeGenerator.rational.RationalStackToTempSCG;
 import asmCodeGenerator.codeGenerator.rational.RationalTempToStackSCG;
 import asmCodeGenerator.codeGenerator.string.StringReleaseSCG;
-import asmCodeGenerator.codeGenerator.string.StringReverseSCG;
 import asmCodeGenerator.codeStorage.*;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 import asmCodeGenerator.runtime.*;
@@ -612,23 +611,295 @@ public class ASMCodeGenerator {
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
+		// for statements
+		public void visitEnter(ForNode node){
+			Labeller labeller = new Labeller("for-stmt");
+			String loopLabel  = labeller.newLabel("condition");
+			String bodyLabel  = labeller.newLabel("body");
+			String incLabel  = labeller.newLabel("increment");
+			String joinLabel  = labeller.newLabel("end");
+			
+			node.setLabels(loopLabel, bodyLabel, incLabel, joinLabel);
+		}
+		public void visitLeave(ForNode node) {
+			newVoidCode(node);
+			
+			if (node.isForElement()) {
+				visitForElementNode(node);
+			} else {
+				visitForIndexNode(node);
+			}
+		}
+		private void visitForIndexNode(ForNode node) {
+			Type type = node.child(0).getType();
+			int recordOffset = 8;
+			if (type instanceof ArrayType) { recordOffset = 12; }
+			
+			ASMCodeFragment sequenceCode = removeValueCode(node.child(0));
+			ASMCodeFragment identifier = removeAddressCode(node.child(1));
+			ASMCodeFragment bodyCode = removeVoidCode(node.child(2));
+			
+			//////////////////////////////////////////////////
+			// Push temp values on stack
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER, "!! dump temp values");
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_SEQUENCE);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_END_INDEX);
+			code.add(LoadI);
+
+			//////////////////////////////////////////////////
+			// Configure for loop temp values
+			// Store identifier address
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER);
+			code.append(identifier);
+			code.add(StoreI);
+			// Store sequence address
+			code.add(PushD, RunTime.FOR_LOOP_SEQUENCE);
+			code.append(sequenceCode);
+			code.add(StoreI);
+			
+			//////////////////////////////////////////////////
+			// Initialize indices
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(PushI, 0);
+			code.add(StoreI);		// Start at index 0
+							
+			code.add(PushD, RunTime.FOR_LOOP_END_INDEX);
+			code.add(PushD, RunTime.FOR_LOOP_SEQUENCE);
+			code.add(LoadI);
+			code.add(PushI, recordOffset);
+			code.add(Add);
+			code.add(LoadI);
+			code.add(StoreI);		// Finish at index (length-1)
+			
+			//////////////////////////////////////////////////
+			// Initialize identifier
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(LoadI);
+			code.add(StoreI);
+
+			//////////////////////////////////////////////////
+			// Loop
+			code.add(Label, node.getLoopLabel());
+			code.add(PushD, RunTime.FOR_LOOP_END_INDEX);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(LoadI);
+			code.add(Subtract);
+			code.add(JumpFalse, node.getJoinLabel());
+			
+			//////////////////////////////////////////////////
+			// Body
+			code.add(Label, node.getBodyLabel());
+			code.append(bodyCode);
+			
+			//////////////////////////////////////////////////
+			// Update loop index and identifier
+			// Update index
+			code.add(Label, node.getIncrementLabel());
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(LoadI);
+			code.add(PushI, 1);
+			code.add(Add);
+			code.add(StoreI);
+			// Update identifier (INDEX)
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(LoadI);
+			code.add(StoreI);
+			
+			code.add(Jump, node.getLoopLabel());
+			code.add(Label, node.getJoinLabel());
+
+			//////////////////////////////////////////////////
+			// Return temp values from stack
+			code.add(PushD, RunTime.FOR_LOOP_END_INDEX, "!! restore temp values");
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.FOR_LOOP_SEQUENCE);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER);
+			code.add(Exchange);
+			code.add(StoreI);
+		}
+		private void visitForElementNode(ForNode node) {
+			Type type = node.child(0).getType();
+			Type subtype = PrimitiveType.CHARACTER;
+			int recordOffset = 8;
+			int dataOffset = 12;
+			
+			if (type instanceof ArrayType) {
+				recordOffset = 12;
+				dataOffset = 16;
+				subtype = ((ArrayType) type).getSubtype();
+			}
+			
+			ASMCodeFragment sequenceCode = removeValueCode(node.child(0));
+			ASMCodeFragment identifier = removeAddressCode(node.child(1));
+			ASMCodeFragment bodyCode = removeVoidCode(node.child(2));
+			SimpleCodeGenerator loadSCG = new OpcodeForLoadSCG(subtype);
+			SimpleCodeGenerator storeSCG = new OpcodeForStoreSCG(subtype);
+			
+			//////////////////////////////////////////////////
+			// Push temp values on stack
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER, "!! dump temp values");
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_SEQUENCE);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_OFFSET);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_END_INDEX);
+			code.add(LoadI);
+
+			//////////////////////////////////////////////////
+			// Configure for loop temp values
+			// Store identifier address
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER);
+			code.append(identifier);
+			code.add(StoreI);
+			// Store sequence address
+			code.add(PushD, RunTime.FOR_LOOP_SEQUENCE);
+			code.append(sequenceCode);
+			code.add(StoreI);
+			
+			//////////////////////////////////////////////////
+			// Initialize indices
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(PushI, 0);
+			code.add(StoreI);		// Start at index 0
+							
+			code.add(PushD, RunTime.FOR_LOOP_OFFSET);
+			code.add(PushD, RunTime.FOR_LOOP_SEQUENCE);
+			code.add(LoadI);
+			code.add(PushI, dataOffset);
+			code.add(Add);
+			code.add(StoreI);
+			
+			code.add(PushD, RunTime.FOR_LOOP_END_INDEX);
+			code.add(PushD, RunTime.FOR_LOOP_SEQUENCE);
+			code.add(LoadI);
+			code.add(PushI, recordOffset);
+			code.add(Add);
+			code.add(LoadI);
+			code.add(StoreI);		// Finish at index (length-1)
+			
+			//////////////////////////////////////////////////
+			// Initialize identifier
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_OFFSET);
+			code.add(LoadI);
+			code.addChunk(loadSCG.generate());
+			code.addChunk(storeSCG.generate());
+
+			//////////////////////////////////////////////////
+			// Loop
+			code.add(Label, node.getLoopLabel());
+			code.add(PushD, RunTime.FOR_LOOP_END_INDEX);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(LoadI);
+			code.add(Subtract);
+			code.add(JumpFalse, node.getJoinLabel());
+			
+			//////////////////////////////////////////////////
+			// Body
+			code.add(Label, node.getBodyLabel());
+			code.append(bodyCode);
+			
+			//////////////////////////////////////////////////
+			// Update loop index, offset, and identifier
+			// Update index
+			code.add(Label, node.getIncrementLabel());
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(LoadI);
+			code.add(PushI, 1);
+			code.add(Add);
+			code.add(StoreI);
+			// Update offset
+			code.add(PushD, RunTime.FOR_LOOP_OFFSET);
+			code.add(PushD, RunTime.FOR_LOOP_OFFSET);
+			code.add(LoadI);
+			code.add(PushI, subtype.getSize());
+			code.add(Add);
+			code.add(StoreI);
+			// Update identifier (ELEMENT)
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER);
+			code.add(LoadI);
+			code.add(PushD, RunTime.FOR_LOOP_OFFSET);
+			code.add(LoadI);
+			code.addChunk(loadSCG.generate());
+			code.addChunk(storeSCG.generate());
+			
+			code.add(Jump, node.getLoopLabel());
+			code.add(Label, node.getJoinLabel());
+
+			//////////////////////////////////////////////////
+			// Return temp values from stack
+			code.add(PushD, RunTime.FOR_LOOP_END_INDEX, "!! restore temp values");
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.FOR_LOOP_OFFSET);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.FOR_LOOP_INDEX);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.FOR_LOOP_SEQUENCE);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.FOR_LOOP_IDENTIFIER);
+			code.add(Exchange);
+			code.add(StoreI);
+		}
+		
+		
+		///////////////////////////////////////////////////////////////////////////
 		// control statements
 		public void visitLeave(ControlNode node) {
 			newVoidCode(node);
 			
 			ParseNode pNode = node.getParent();
-			while (!(pNode instanceof WhileNode)) {
+			while (!(pNode instanceof WhileNode || pNode instanceof ForNode)) {
 				pNode = pNode.getParent();
 			}
 			
-			WhileNode parent = (WhileNode) pNode;
-			
-			if (node.getToken().isLextant(Keyword.CONTINUE)) {
-				code.add(Jump, parent.getLoopLabel());
+			if (pNode instanceof WhileNode) {
+				WhileNode parent = (WhileNode)pNode;
+				
+				if (node.getToken().isLextant(Keyword.CONTINUE)) {
+					code.add(Jump, parent.getLoopLabel());
+				}
+				
+				if (node.getToken().isLextant(Keyword.BREAK)) {
+					code.add(Jump, parent.getJoinLabel());
+				}
 			}
 			
-			if (node.getToken().isLextant(Keyword.BREAK)) {
-				code.add(Jump, parent.getJoinLabel());
+			if (pNode instanceof ForNode) {
+				ForNode parent = (ForNode)pNode;
+				
+				if (node.getToken().isLextant(Keyword.CONTINUE)) {
+					code.add(Jump, parent.getIncrementLabel());
+				}
+				
+				if (node.getToken().isLextant(Keyword.BREAK)) {
+					code.add(Jump, parent.getJoinLabel());
+				}
 			}
 		}
 

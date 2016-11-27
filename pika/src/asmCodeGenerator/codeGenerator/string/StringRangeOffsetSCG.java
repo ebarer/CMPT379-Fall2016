@@ -62,6 +62,10 @@ public class StringRangeOffsetSCG implements SimpleCodeGenerator {
 		chunk.add(ASMOpcode.LoadI);
 		chunk.add(ASMOpcode.StoreI);
 		
+		chunk.add(ASMOpcode.PushD, RunTime.STRING_OFFSET_1);
+		chunk.add(ASMOpcode.PushI, 0);
+		chunk.add(ASMOpcode.StoreI);
+		
 		StringCopySCG scg4 = new StringCopySCG();
 		chunk.append(scg4.generate());
 		

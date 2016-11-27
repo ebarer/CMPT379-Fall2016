@@ -59,11 +59,11 @@ public class Optimizer {
 		addFallthroughJumps(cfg);
 		printCFG(cfg);
 		
-		//FIXME: Label simple loops
+		// FIXME: Label simple loops
 		
 		// Grab optimized instructions from BasicBlocks
-		//FIXME: Commented out relabelling for debug
-		//replaceLabels(cfg);
+		// FIXME: Commented out relabelling for debug
+//		replaceLabels(cfg);
 		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
 		while(cleanupJumps(programFragments[INSTRUCTIONS]));
 		
@@ -220,8 +220,10 @@ public class Optimizer {
 					// Insert DLabel at location of first instance of string
 					int addLoc = stringLegend.get(stringData) + 1;
 					for (ASMInstruction label : labels) {
-						instructions.add(addLoc++, label);
+						instructions.add(addLoc, label);
+						updateStringLegend(stringLegend, stringData, addLoc);
 						removedInstrCount--;
+						addLoc++;
 					}
 				} else {
 					stringLegend.put(stringData, loc);				
@@ -251,7 +253,19 @@ public class Optimizer {
 			return "";
 		}
 	}
-
+	private void updateStringLegend(HashMap<Object, Integer> legend, Object stringData, int addLoc) {
+		for (Object key : legend.keySet()) {
+			// If key is string that was modified, increment its index
+			if (key.equals(stringData)) {
+				legend.put(key, addLoc);
+			}
+			
+			// Update position of strings further in the instruction set
+			if (legend.get(key) > addLoc) {
+				legend.put(key, legend.get(key) + 1);
+			}
+		}
+	}
 	
 	// Constant arithmetic calculations
 	static int numChanges = -1;
