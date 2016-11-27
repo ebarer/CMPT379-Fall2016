@@ -6,6 +6,7 @@ import java.util.List;
 import asmCodeGenerator.codeGenerator.array.ArrayLengthSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayOffsetSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayReverseSCG;
+import asmCodeGenerator.codeGenerator.operators.MapOperatorSCG;
 import asmCodeGenerator.codeGenerator.string.StringReverseSCG;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
@@ -295,7 +296,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		Type seqType = node.child(0).getType();
 		if (!(seqType == PrimitiveType.STRING || seqType instanceof ArrayType)) {
 			typeCheckError(node, Arrays.asList(node.child(1).getType()));
-			return;
 		}
 	}
 	public void visitLeave(ControlNode node) {
@@ -313,25 +313,9 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 	
+	
 	///////////////////////////////////////////////////////////////////////////
 	// expressions
-	@Override
-	public void visitLeave(RationalOperatorNode node) {
-		assert node.nChildren() == 2;
-		ParseNode left  = node.child(0);
-		ParseNode right = node.child(1);
-		List<Type> childTypes = Arrays.asList(left.getType(), right.getType());
-		
-		Lextant operator = operatorFor(node);
-		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
-		
-		if (signature.accepts(childTypes)) {
-			node.setSignature(signature);
-			node.setType(signature.resultType());
-		} else {
-			typeCheckError(node, childTypes);
-		}
-	}
 	@Override
 	public void visitLeave(BinaryOperatorNode node) {
 		assert node.nChildren() == 2;
@@ -360,6 +344,74 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 	@Override
+	public void visitLeave(RationalOperatorNode node) {
+		assert node.nChildren() == 2;
+		ParseNode left  = node.child(0);
+		ParseNode right = node.child(1);
+		List<Type> childTypes = Arrays.asList(left.getType(), right.getType());
+		
+		Lextant operator = operatorFor(node);
+		FunctionSignature signature = FunctionSignatures.signature(operator, childTypes);
+		
+		if (signature.accepts(childTypes)) {
+			node.setSignature(signature);
+			node.setType(signature.resultType());
+		} else {
+			typeCheckError(node, childTypes);
+		}
+	}
+	@Override
+	public void visitLeave(MapOperatorNode node) {
+		assert node.nChildren() == 2;
+		ParseNode left  = node.child(0);
+		ParseNode right = node.child(1);
+		List<Type> childTypes = Arrays.asList(left.getType(), right.getType());
+		
+		// First expression must be an array type
+		if (childTypes.get(0) instanceof ArrayType) {
+			Type arrSubtype = ((ArrayType)childTypes.get(0)).getSubtype();
+			// Second expression must be a one-argument-type lambda
+			// where the argument has the type of the array’s subtype
+			if (childTypes.get(1) instanceof LambdaType) {
+				List<Type> lambdaTypes = ((LambdaType)childTypes.get(1)).getTypeList();
+				if (lambdaTypes.size() == 1 && lambdaTypes.get(0) == arrSubtype) {
+					Type returnType = ((LambdaType)childTypes.get(1)).getReturnType();
+					Type mapType = ArrayType.withSubtype(returnType);
+					MapOperatorSCG mapSCG = new MapOperatorSCG(arrSubtype, returnType);
+					node.setSCG(mapSCG);
+					node.setType(mapType);
+					return;
+				}
+			}
+		}
+		
+		typeCheckError(node, childTypes);
+		return;
+	}
+	@Override
+	public void visitLeave(ReduceOperatorNode node) {
+		
+	}
+	@Override
+	public void visitLeave(ReverseNode node) {
+		assert node.nChildren() == 1;
+		Type operandType = node.child(0).getType();
+		
+		if (operandType == PrimitiveType.STRING) {
+			node.setType(operandType);
+			node.setSCG(new StringReverseSCG());
+			return;
+		}
+		
+		if (operandType instanceof ArrayType) {
+			node.setType(operandType);
+			node.setSCG(new ArrayReverseSCG(((ArrayType) operandType).getSubtype()));
+			return;
+		}
+		
+		typeCheckError(node, Arrays.asList(operandType));
+	}
+	@Override
 	public void visitLeave(UnaryOperatorNode node) {
 		assert node.nChildren() == 1;
 		ParseNode left  = node.child(0);
@@ -385,6 +437,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			typeCheckError(node, childTypes);
 		}
 	}
+	
 	@Override
 	public void visitLeave(CastNode node) {
 		assert node.nChildren() == 1;
@@ -411,25 +464,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			}
 		}
 	}
-	@Override
-	public void visitLeave(ReverseNode node) {
-		assert node.nChildren() == 1;
-		Type operandType = node.child(0).getType();
-		
-		if (operandType == PrimitiveType.STRING) {
-			node.setType(operandType);
-			node.setSCG(new StringReverseSCG());
-			return;
-		}
-		
-		if (operandType instanceof ArrayType) {
-			node.setType(operandType);
-			node.setSCG(new ArrayReverseSCG(((ArrayType) operandType).getSubtype()));
-			return;
-		}
-		
-		typeCheckError(node, Arrays.asList(operandType));
-	}
+	
 	@Override
 	public void visitLeave(ArrayNode node) {
 		List<Type> childTypes = new ArrayList<Type>();

@@ -19,6 +19,7 @@ public enum Keyword implements Lextant {
 	VOID("void"),
 	
 	// VARIABLE DECLARATION
+	STATIC("static"),
 	CONST("const"),
 	VAR("var"),
 
@@ -30,6 +31,12 @@ public enum Keyword implements Lextant {
 	
 	// STRING METHODS
 	REVERSE("reverse"),
+	
+	// OPERATORS
+	FOLD("fold"),
+	MAP("map"),
+	REDUCE("reduce"),
+	ZIP("zip"),
 	
 	// FUNCTION METHODS
 	FUNCTION("func"),

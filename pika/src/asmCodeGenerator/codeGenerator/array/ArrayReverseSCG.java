@@ -23,7 +23,7 @@ public class ArrayReverseSCG implements SimpleCodeGenerator {
 		Labeller labeller = new Labeller("reverse-array");
 		String startLabel 		= labeller.newLabel();
 		String allocateLabel 	= labeller.newLabel("allocate");
-		String recordLabel  	= labeller.newLabel("record");
+		String recordLabel  	= labeller.newLabel("create-record");
 		String copyLabel  		= labeller.newLabel("copy");
 		String loopLabel  		= labeller.newLabel("loop");
 		String joinLabel  		= labeller.newLabel("join");

@@ -10,7 +10,21 @@ public class ArrayAllocateSCG implements SimpleCodeGenerator {
 	
 	@Override
 	public ASMCodeChunk generate() {
-		return null;
+		ASMCodeChunk chunk = new ASMCodeChunk();
+		
+		// allocationSize = header + arraySize
+		// Add 16 bytes for header record
+		chunk.add(ASMOpcode.PushI, 16);
+		chunk.add(ASMOpcode.Add);
+		
+		// Allocate memory for array
+		chunk.add(ASMOpcode.Call, MemoryManager.MEM_MANAGER_ALLOCATE);
+		
+		// Store heap address in stack
+		ArrayStackToTempSCG scg = new ArrayStackToTempSCG();
+		chunk.append(scg.generate());
+		
+		return chunk;
 	}
 	
 	@Override

@@ -29,6 +29,12 @@ public class ArrayType implements Type {
 	}
 	
 // HELPER FUNCTIONS
+	public static ArrayType withSubtype(Type subtype) {
+		ArrayType arrayT = new ArrayType();
+		arrayT.setSubtype(subtype);
+		return arrayT;
+	}
+			
 	@Override
 	public boolean equals(Object type2) {
 		if (!(type2 instanceof ArrayType)) {

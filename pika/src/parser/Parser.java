@@ -618,11 +618,11 @@ public class Parser {
 			return syntaxErrorNode("multiplicativeExpression");
 		}
 		
-		ParseNode left = parseUnaryExpression();
+		ParseNode left = parseFoldExpression();
 		while(nowReading.isLextant(Punctuator.getMultiplicatives())) {
 			Token multiplicativeToken = nowReading;
 			readToken();
-			ParseNode right = parseUnaryExpression();
+			ParseNode right = parseFoldExpression();
 			
 			if (multiplicativeToken.isLextant(Punctuator.getRationals())) {
 				left = RationalOperatorNode.withChildren(multiplicativeToken, left, right);
@@ -633,9 +633,47 @@ public class Parser {
 		return left;
 	}
 	private boolean startsMultiplicativeExpression(Token token) {
-		return startsUnaryExpression(token);
+		return startsFoldExpression(token);
 	}
 
+	// foldExpression -> (map|reduce)Expression
+	private ParseNode parseFoldExpression() {
+		if(!startsFoldExpression(nowReading)) {
+			return syntaxErrorNode("foldExpression");
+		}
+
+		return parseMapReduceExpression();
+	}
+	private boolean startsFoldExpression(Token token) {
+		return startsMapReduceExpression(token);
+	}
+	
+	// (map|reduce)Expression -> unaryExpression
+	private ParseNode parseMapReduceExpression() {
+		if(!startsFoldExpression(nowReading)) {
+			return syntaxErrorNode("foldExpression");
+		}
+		
+		ParseNode left = parseUnaryExpression();
+		while(nowReading.isLextant(Keyword.MAP, Keyword.REDUCE)) {
+			Token token = nowReading;
+			readToken();
+			ParseNode right = parseUnaryExpression();
+			
+			if (token.isLextant(Keyword.MAP)) {
+				left = MapOperatorNode.withChildren(token, left, right);
+			}
+			
+			if (token.isLextant(Keyword.REDUCE)) {
+				left = ReduceOperatorNode.withChildren(token, left, right);
+			}
+		}
+		return left;
+	}
+	private boolean startsMapReduceExpression(Token token) {
+		return startsUnaryExpression(token);
+	}
+	
 	// unaryExpression -> [MULT atomicExpression]*  (right-assoc)
 	private ParseNode parseUnaryExpression() {
 		if(!startsUnaryExpression(nowReading)) {

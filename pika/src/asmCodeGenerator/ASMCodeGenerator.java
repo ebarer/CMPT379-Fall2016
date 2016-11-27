@@ -426,15 +426,13 @@ public class ASMCodeGenerator {
 			}
 			
 			// Push lambda location
-			if (!(node.child(0) instanceof IdentifierNode)) {
-				ASMCodeFragment subroutineCode = removeValueCode(node.child(0));
-				code.append(subroutineCode);
-			}
-
 			if (node.child(0) instanceof IdentifierNode) {				
 				ASMCodeFragment identifier = removeAddressCode(node.child(0));
 				code.append(identifier);
 				code.add(LoadI);
+			} else {
+				ASMCodeFragment subroutineCode = removeValueCode(node.child(0));
+				code.append(subroutineCode);
 			}
 			
 			// Call function
@@ -465,7 +463,7 @@ public class ASMCodeGenerator {
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
-		// index	
+		// index and cast
 		public void visitLeave(IndexNode node) {
 			newAddressCode(node);
 			
@@ -488,6 +486,25 @@ public class ASMCodeGenerator {
 			}
 		}	
 				
+		public void visitLeave(CastNode node) {
+			newValueCode(node);
+
+			ASMCodeFragment arg1 = removeValueCode(node.child(0));
+			code.append(arg1);
+			
+			Object variant = node.getSignature().getVariant();
+			
+			if (variant instanceof SimpleCodeGenerator) {
+				SimpleCodeGenerator scg = (SimpleCodeGenerator) variant;
+				code.addChunk(scg.generate());
+			}
+			
+			if (variant instanceof ASMOpcode) {
+				ASMOpcode opcode = (ASMOpcode) variant;
+				code.add(opcode);
+			}
+		}
+		
 		///////////////////////////////////////////////////////////////////////////
 		// statements and declarations
 
@@ -1156,6 +1173,18 @@ public class ASMCodeGenerator {
 			}
 		}
 		
+		///////////////////////////////////////////////////////////////////////////
+		// high level operators
+		public void visitLeave(MapOperatorNode node) {
+			newValueCode(node);
+			
+			ASMCodeFragment arrayCode = removeValueCode(node.child(0));			
+			ASMCodeFragment lambdaCode = removeValueCode(node.child(1));
+			
+			node.getSCG().setArray(arrayCode);
+			node.getSCG().setLambda(lambdaCode);
+			code.append(node.getSCG().generate());
+		}
 		public void visitLeave(ReverseNode node) {
 			newValueCode(node);
 
@@ -1164,26 +1193,9 @@ public class ASMCodeGenerator {
 			
 			code.addChunk(node.getSCG().generate());
 		}
-		
-		public void visitLeave(CastNode node) {
-			newValueCode(node);
 
-			ASMCodeFragment arg1 = removeValueCode(node.child(0));
-			code.append(arg1);
-			
-			Object variant = node.getSignature().getVariant();
-			
-			if (variant instanceof SimpleCodeGenerator) {
-				SimpleCodeGenerator scg = (SimpleCodeGenerator) variant;
-				code.addChunk(scg.generate());
-			}
-			
-			if (variant instanceof ASMOpcode) {
-				ASMOpcode opcode = (ASMOpcode) variant;
-				code.add(opcode);
-			}
-		}
-
+		///////////////////////////////////////////////////////////////////////////
+		// array node
 		public void visitLeave(ArrayNode node) {
 			newValueCode(node);
 			
@@ -1222,12 +1234,8 @@ public class ASMCodeGenerator {
 				
 				// Store header
 				code.add(ASMOpcode.Label, recordLabel);
-				ArrayGenerateRecordSCG scg2 = new ArrayGenerateRecordSCG();
-				boolean isReference = false;
-				if (node.getSubtype() instanceof ArrayType) {
-					isReference = true;
-				}
-				code.addChunk(scg2.generate(node, isReference));
+				ArrayGenerateRecordSCG scg2 = new ArrayGenerateRecordSCG(node.getSubtype());
+				code.addChunk(scg2.generate());
 				
 				// Push address onto stack
 				ArrayTempToStackSCG scg3 = new ArrayTempToStackSCG();
@@ -1273,7 +1281,7 @@ public class ASMCodeGenerator {
 		}
 		
 		///////////////////////////////////////////////////////////////////////////
-		// leaf nodes (ErrorNode not necessary)
+		// type nodes (ErrorNode not necessary)
 		public void visit(BooleanConstantNode node) {
 			newValueCode(node);
 			code.add(PushI, node.getValue() ? 1 : 0);

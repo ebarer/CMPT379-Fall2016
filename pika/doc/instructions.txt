@@ -15,3 +15,6 @@ gtr init (in test directory)
 gtr test -compile
 gtr accept -all
 gtr view -test-set=compiler <-test> -build -run <name>
+
+#create symlink
+ln -s <from> <to>
