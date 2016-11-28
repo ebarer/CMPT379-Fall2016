@@ -58,7 +58,7 @@ public class ReduceOperatorSCG {
 		
 		code.add(PushD, RunTime.ARRAY_TEMP_2);
 		code.append(oldArray);
-		code.add(StoreI)
+		code.add(StoreI);
 		
 		// Setup temp values
 		code.add(PushD, RunTime.ARRAY_TEMP_4);

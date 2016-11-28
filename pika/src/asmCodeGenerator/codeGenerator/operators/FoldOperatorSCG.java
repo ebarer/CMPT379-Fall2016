@@ -5,8 +5,6 @@ import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 import asmCodeGenerator.runtime.*;
 import semanticAnalyzer.types.Type;
 import asmCodeGenerator.Labeller;
-import asmCodeGenerator.codeGenerator.array.ArrayAllocateSCG;
-import asmCodeGenerator.codeGenerator.array.ArrayGenerateRecordSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForLoadSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
 
