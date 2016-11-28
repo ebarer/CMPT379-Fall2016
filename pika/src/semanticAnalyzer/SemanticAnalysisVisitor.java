@@ -6,8 +6,10 @@ import java.util.List;
 import asmCodeGenerator.codeGenerator.array.ArrayLengthSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayOffsetSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayReverseSCG;
+import asmCodeGenerator.codeGenerator.operators.FoldOperatorSCG;
 import asmCodeGenerator.codeGenerator.operators.MapOperatorSCG;
 import asmCodeGenerator.codeGenerator.operators.ReduceOperatorSCG;
+import asmCodeGenerator.codeGenerator.operators.ZipOperatorSCG;
 import asmCodeGenerator.codeGenerator.string.StringReverseSCG;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
@@ -362,6 +364,45 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 	}
 	@Override
+	public void visitLeave(FoldOperatorNode node) {
+		assert node.nChildren() >= 2;
+		ParseNode c1 = node.child(0);
+		ParseNode c2 = node.child(node.nChildren() - 1);
+		List<Type> childTypes = Arrays.asList(c1.getType(), c2.getType());
+		
+		// First expression must be an array type
+		if (childTypes.get(0) instanceof ArrayType) {
+			Type arrSubtype = ((ArrayType)childTypes.get(0)).getSubtype();
+			// Last expression must be a two-argument-type lambda
+			if (childTypes.get(1) instanceof LambdaType) {
+				List<Type> lambdaTypes = ((LambdaType)childTypes.get(1)).getTypeList();
+				Type returnType = ((LambdaType)childTypes.get(1)).getReturnType();
+				
+				if (lambdaTypes.size() == 2) {
+					if (node.nChildren() == 3) {
+						Type baseType = node.child(1).getType();
+						if (lambdaTypes.get(0) == baseType && lambdaTypes.get(1) == arrSubtype && returnType == baseType) {
+							FoldOperatorSCG foldSCG = new FoldOperatorSCG(baseType, arrSubtype, returnType);
+							node.setSCG(foldSCG);
+							node.setType(baseType);
+							return;
+						}
+					} else {
+						if (lambdaTypes.get(0) == arrSubtype && lambdaTypes.get(1) == arrSubtype && returnType == arrSubtype) {
+							FoldOperatorSCG foldSCG = new FoldOperatorSCG(arrSubtype, arrSubtype, returnType);
+							node.setSCG(foldSCG);
+							node.setType(arrSubtype);
+							return;
+						}
+					}
+				}
+			}
+		}
+		
+		typeCheckError(node, childTypes);
+		return;
+	}
+	@Override
 	public void visitLeave(MapOperatorNode node) {
 		assert node.nChildren() == 2;
 		ParseNode left  = node.child(0);
@@ -421,7 +462,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		return;
 	}
 	@Override
-	public void visitLeave(ReverseNode node) {
+	public void visitLeave(ReverseOperatorNode node) {
 		assert node.nChildren() == 1;
 		Type operandType = node.child(0).getType();
 		
@@ -438,6 +479,41 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		}
 		
 		typeCheckError(node, Arrays.asList(operandType));
+	}
+	@Override
+	public void visitLeave(ZipOperatorNode node) {
+		assert node.nChildren() == 3;
+		ParseNode c1 = node.child(0);
+		ParseNode c2 = node.child(1);
+		ParseNode c3 = node.child(2);
+		List<Type> childTypes = Arrays.asList(c1.getType(), c2.getType(), c3.getType());
+		
+		// First two expression arguments must be arrays
+		if (childTypes.get(0) instanceof ArrayType) {
+			if (childTypes.get(1) instanceof ArrayType) {
+				Type arrSubtype1 = ((ArrayType)childTypes.get(0)).getSubtype();
+				Type arrSubtype2 = ((ArrayType)childTypes.get(1)).getSubtype();
+				
+				// Third expression is a lambda which takes two arguments
+				// with argument types the subtypes of the first and second arrays
+				if (childTypes.get(2) instanceof LambdaType) {
+					List<Type> lambdaTypes = ((LambdaType)childTypes.get(2)).getTypeList();
+					if (lambdaTypes.size() == 2) {
+						if (lambdaTypes.get(0) == arrSubtype1 && lambdaTypes.get(1) == arrSubtype2) {
+							Type returnType = ((LambdaType)childTypes.get(2)).getReturnType();
+							Type zipType = ArrayType.withSubtype(returnType);
+							ZipOperatorSCG zipSCG = new ZipOperatorSCG(arrSubtype1, arrSubtype2, returnType);
+							node.setSCG(zipSCG);
+							node.setType(zipType);
+							return;						
+						}
+					}
+				}
+			}
+		}
+		
+		typeCheckError(node, childTypes);
+		return;
 	}
 	@Override
 	public void visitLeave(UnaryOperatorNode node) {

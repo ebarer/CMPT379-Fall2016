@@ -1175,6 +1175,16 @@ public class ASMCodeGenerator {
 		
 		///////////////////////////////////////////////////////////////////////////
 		// high level operators
+		public void visitLeave(FoldOperatorNode node) {
+			newValueCode(node);
+			
+			ASMCodeFragment arrayCode = removeValueCode(node.child(0));			
+			ASMCodeFragment lambdaCode = removeValueCode(node.child(1));
+			
+			node.getSCG().setArray(arrayCode);
+			node.getSCG().setLambda(lambdaCode);
+			code.append(node.getSCG().generate());
+		}
 		public void visitLeave(MapOperatorNode node) {
 			newValueCode(node);
 			
@@ -1195,7 +1205,19 @@ public class ASMCodeGenerator {
 			node.getSCG().setLambda(lambdaCode);
 			code.append(node.getSCG().generate());
 		}
-		public void visitLeave(ReverseNode node) {
+		public void visitLeave(ZipOperatorNode node) {
+			newValueCode(node);
+			
+			ASMCodeFragment array1Code = removeValueCode(node.child(0));
+			ASMCodeFragment array2Code = removeValueCode(node.child(1));
+			ASMCodeFragment lambdaCode = removeValueCode(node.child(2));
+			
+			node.getSCG().setArray1(array1Code);
+			node.getSCG().setArray2(array2Code);
+			node.getSCG().setLambda(lambdaCode);
+			code.append(node.getSCG().generate());
+		}
+		public void visitLeave(ReverseOperatorNode node) {
 			newValueCode(node);
 
 			ASMCodeFragment arg1 = removeValueCode(node.child(0));

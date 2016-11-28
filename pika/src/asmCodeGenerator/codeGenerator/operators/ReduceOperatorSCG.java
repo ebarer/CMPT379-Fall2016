@@ -54,11 +54,11 @@ public class ReduceOperatorSCG {
 		OpcodeForLoadSCG loadResultSCG = new OpcodeForLoadSCG(outType);
 		ByteCopySCG byteCopySCG = new ByteCopySCG();
 
+		code.add(Label, startLabel);
+		
 		code.add(PushD, RunTime.ARRAY_TEMP_2);
 		code.append(oldArray);
-		code.add(StoreI);
-		
-		code.add(Label, startLabel);
+		code.add(StoreI)
 		
 		// Setup temp values
 		code.add(PushD, RunTime.ARRAY_TEMP_4);
@@ -104,14 +104,12 @@ public class ReduceOperatorSCG {
 		
 		// Push argument onto Frame Stack						
 			// Move Stack Pointer
-			ASMCodeFragment argFrag = new ASMCodeFragment(CodeType.GENERATES_VALUE);
-			argFrag.add(PushD, RunTime.STACK_POINTER);
-			argFrag.add(PushD, RunTime.STACK_POINTER);
-			argFrag.add(LoadI);
-			argFrag.add(PushI, inType.getSize());
-			argFrag.add(Subtract);
-			argFrag.add(StoreI);
-			code.append(argFrag);
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(LoadI);
+			code.add(PushI, inType.getSize());
+			code.add(Subtract);
+			code.add(StoreI);
 			
 			// Put argument value
 			code.add(PushD, RunTime.STACK_POINTER, "%% store arg");
@@ -128,9 +126,18 @@ public class ReduceOperatorSCG {
 			code.addChunk(loadArgSCG.generate());
 			code.addChunk(storeArgSCG.generate());
 			
+			// Preserve ARRAY_TEMP_1
+			code.add(PushD, RunTime.ARRAY_TEMP_1);
+			code.add(LoadI);
+			
 			// Push lambda and call
 			code.append(lambda);
 			code.add(CallV);
+			
+			// Return ARRAY_TEMP_1
+			code.add(PushD, RunTime.ARRAY_TEMP_1);
+			code.add(Exchange);
+			code.add(StoreI);
 			
 			// If result is true, store value
 			code.add(PushD, RunTime.STACK_POINTER);

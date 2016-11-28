@@ -7,15 +7,15 @@ import lexicalAnalyzer.Lextant;
 import tokens.LextantToken;
 import tokens.Token;
 
-public class ReverseNode extends ParseNode {
+public class ReverseOperatorNode extends ParseNode {
 	SimpleCodeGenerator scg;
 
-	public ReverseNode(Token token) {
+	public ReverseOperatorNode(Token token) {
 		super(token);
 		scg = null;
 	}
 
-	public ReverseNode(ParseNode node) {
+	public ReverseOperatorNode(ParseNode node) {
 		super(node);
 	}
 	
@@ -41,8 +41,8 @@ public class ReverseNode extends ParseNode {
 	////////////////////////////////////////////////////////////
 	// convenience factory
 	
-	public static ReverseNode withChildren(Token token, ParseNode string) {
-		ReverseNode node = new ReverseNode(token);
+	public static ReverseOperatorNode withChildren(Token token, ParseNode string) {
+		ReverseOperatorNode node = new ReverseOperatorNode(token);
 		node.appendChild(string);
 		return node;
 	}

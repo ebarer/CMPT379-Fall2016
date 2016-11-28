@@ -12,33 +12,42 @@ import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
 
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
-public class MapOperatorSCG {
-	private Type inType;
+public class ZipOperatorSCG {
+	private Type inType1;
+	private Type inType2;
 	private Type outType;
-	private ASMCodeFragment oldArray;
+	private ASMCodeFragment oldArray1;
+	private ASMCodeFragment oldArray2;
 	private ASMCodeFragment lambda;
 	
-	public MapOperatorSCG(Type in, Type out) {
-		this.inType = in;
+	public ZipOperatorSCG(Type in1, Type in2, Type out) {
+		this.inType1 = in1;
+		this.inType2 = in2;
 		this.outType = out;
-		this.oldArray = null;
+		this.oldArray1 = null;
+		this.oldArray2 = null;
 		this.lambda = null;
 	}
-	public void setArray(ASMCodeFragment array) {
-		this.oldArray = array;
+	public void setArray1(ASMCodeFragment array) {
+		this.oldArray1 = array;
+	}
+	public void setArray2(ASMCodeFragment array) {
+		this.oldArray2 = array;
 	}
 	public void setLambda(ASMCodeFragment lambda) {
 		this.lambda = lambda;
 	}
 	
 	public ASMCodeFragment generate() {
-		assert oldArray != null;
+		assert oldArray1 != null;
+		assert oldArray2 != null;
 		assert lambda != null;
 		
 		ASMCodeFragment code = new ASMCodeFragment(CodeType.GENERATES_VALUE);
 			
-		Labeller labeller = new Labeller("map-operator");
+		Labeller labeller = new Labeller("zip-operator");
 		String startLabel 		= labeller.newLabel();
+		String lengthLabel 		= labeller.newLabel("length-check");
 		String allocateLabel 	= labeller.newLabel("allocate");
 		String loopLabel  		= labeller.newLabel("loop");
 		String joinLabel  		= labeller.newLabel("join");
@@ -46,16 +55,37 @@ public class MapOperatorSCG {
 		// Generators
 		ArrayAllocateSCG allocateSCG = new ArrayAllocateSCG();
 		ArrayGenerateRecordSCG recordSCG = new ArrayGenerateRecordSCG(outType);
-		OpcodeForLoadSCG loadArgSCG = new OpcodeForLoadSCG(inType);
-		OpcodeForStoreSCG storeArgSCG = new OpcodeForStoreSCG(inType);
+		OpcodeForLoadSCG loadArg1SCG = new OpcodeForLoadSCG(inType1);
+		OpcodeForStoreSCG storeArg1SCG = new OpcodeForStoreSCG(inType1);
+		OpcodeForLoadSCG loadArg2SCG = new OpcodeForLoadSCG(inType2);
+		OpcodeForStoreSCG storeArg2SCG = new OpcodeForStoreSCG(inType2);
 		OpcodeForLoadSCG loadResultSCG = new OpcodeForLoadSCG(outType);
 		OpcodeForStoreSCG storeResultSCG = new OpcodeForStoreSCG(outType);
-
+		
 		code.add(Label, startLabel);
 		
 		code.add(PushD, RunTime.ARRAY_TEMP_2);
-		code.append(oldArray);
+		code.append(oldArray1);
 		code.add(StoreI);
+		
+		code.add(PushD, RunTime.ARRAY_TEMP_5);
+		code.append(oldArray2);
+		code.add(StoreI);
+		
+		// Check that arrays are same length
+		code.add(Label, lengthLabel);
+		code.add(PushD, RunTime.ARRAY_TEMP_2);
+		code.add(LoadI);
+		code.add(PushI, 12);
+		code.add(Add);
+		code.add(LoadI);
+		code.add(PushD, RunTime.ARRAY_TEMP_5);
+		code.add(LoadI);
+		code.add(PushI, 12);
+		code.add(Add);
+		code.add(LoadI);
+		code.add(Subtract);
+		code.add(JumpTrue, RunTime.UNEQUAL_LENGTH_RUNTIME_ERROR);
 		
 		// Setup temp values
 		code.add(PushD, RunTime.ARRAY_TEMP_4);
@@ -67,11 +97,8 @@ public class MapOperatorSCG {
 		code.add(StoreI);	
 		
 		// Determine allocation size of new array
-		code.add(PushD, RunTime.ARRAY_TEMP_2);
+		code.add(PushD, RunTime.ARRAY_TEMP_4);
 		code.add(LoadI);
-		code.add(PushI, 12);
-		code.add(Add);
-		code.add(LoadI);		// Array length
 		code.add(Duplicate); 	// Duplicate for storage in record
 		code.add(PushI, outType.getSize());
 		code.add(Multiply);
@@ -96,16 +123,16 @@ public class MapOperatorSCG {
 		code.add(JumpFalse, joinLabel);
 		
 		// Push argument onto Frame Stack						
-			// Move Stack Pointer
+			// Move Stack Pointer			
 			code.add(PushD, RunTime.STACK_POINTER);
 			code.add(PushD, RunTime.STACK_POINTER);
 			code.add(LoadI);
-			code.add(PushI, inType.getSize());
+			code.add(PushI, inType1.getSize());
 			code.add(Subtract);
 			code.add(StoreI);
 			
 			// Put argument value
-			code.add(PushD, RunTime.STACK_POINTER, "%% store arg");
+			code.add(PushD, RunTime.STACK_POINTER, "%% store arg 1");
 			code.add(LoadI);
 			code.add(PushD, RunTime.ARRAY_TEMP_2);
 			code.add(LoadI);
@@ -113,11 +140,34 @@ public class MapOperatorSCG {
 			code.add(Add);
 			code.add(PushD, RunTime.ARRAY_TEMP_3);
 			code.add(LoadI);
-			code.add(PushI, inType.getSize());
+			code.add(PushI, inType1.getSize());
 			code.add(Multiply);
 			code.add(Add);
-			code.addChunk(loadArgSCG.generate());
-			code.addChunk(storeArgSCG.generate());
+			code.addChunk(loadArg1SCG.generate());
+			code.addChunk(storeArg1SCG.generate());
+			
+			// Move Stack Pointer
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(PushD, RunTime.STACK_POINTER);
+			code.add(LoadI);
+			code.add(PushI, inType2.getSize());
+			code.add(Subtract);
+			code.add(StoreI);
+			
+			// Put argument value
+			code.add(PushD, RunTime.STACK_POINTER, "%% store arg 2");
+			code.add(LoadI);
+			code.add(PushD, RunTime.ARRAY_TEMP_5);
+			code.add(LoadI);
+			code.add(PushI, 16);
+			code.add(Add);
+			code.add(PushD, RunTime.ARRAY_TEMP_3);
+			code.add(LoadI);
+			code.add(PushI, inType2.getSize());
+			code.add(Multiply);
+			code.add(Add);
+			code.addChunk(loadArg2SCG.generate());
+			code.addChunk(storeArg2SCG.generate());
 			
 			// Preserve ARRAY_TEMP_1
 			code.add(PushD, RunTime.ARRAY_TEMP_1);

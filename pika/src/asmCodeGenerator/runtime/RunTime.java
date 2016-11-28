@@ -79,6 +79,7 @@ public class RunTime {
 	public static final String GENERAL_RUNTIME_ERROR 			= "$$general-runtime-error";
 	public static final String DIVIDE_BY_ZERO_RUNTIME_ERROR 	= "$$divide-by-zero";
 	public static final String BAD_INDEX_RUNTIME_ERROR 			= "$$bad-index";
+	public static final String UNEQUAL_LENGTH_RUNTIME_ERROR 	= "$$unequal-length";
 	public static final String FUNCTION_RUNOFF_RUNTIME_ERROR	= "$$function-runoff";
 
 	private ASMCodeFragment environmentASM() {
@@ -146,6 +147,7 @@ public class RunTime {
 		divideByZeroError(frag);
 		arrayBadIndexError(frag);
 		functionRunoffError(frag);
+		unequalLengthError(frag);
 		
 		return frag;
 	}
@@ -189,6 +191,16 @@ public class RunTime {
 		
 		frag.add(Label, FUNCTION_RUNOFF_RUNTIME_ERROR);
 		frag.add(PushD, functionRunoffMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+	private void unequalLengthError(ASMCodeFragment frag) {
+		String functionUnequalLengthMessage = "$errors-function-unequal-length";
+		
+		frag.add(DLabel, functionUnequalLengthMessage);
+		frag.add(DataS, "array arguments are of unequal length");
+		
+		frag.add(Label, UNEQUAL_LENGTH_RUNTIME_ERROR);
+		frag.add(PushD, functionUnequalLengthMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 	

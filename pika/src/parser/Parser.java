@@ -642,7 +642,25 @@ public class Parser {
 			return syntaxErrorNode("foldExpression");
 		}
 
-		return parseMapReduceExpression();
+		ParseNode left = parseMapReduceExpression();
+		while(nowReading.isLextant(Keyword.FOLD)) {
+			Token foldToken = nowReading;
+			readToken();
+			
+			left = FoldOperatorNode.withChildren(foldToken, left);
+			
+			if (nowReading.isLextant(Punctuator.OPEN_BRACKET)) {
+				expect(Punctuator.OPEN_BRACKET);
+				ParseNode base = parseMapReduceExpression();
+				left.appendChild(base);
+				expect(Punctuator.CLOSE_BRACKET);
+			}
+			
+			ParseNode right = parseMapReduceExpression();
+			left.appendChild(right);
+			return left;
+		}
+		return left;
 	}
 	private boolean startsFoldExpression(Token token) {
 		return startsMapReduceExpression(token);
@@ -689,7 +707,22 @@ public class Parser {
 			Token token = previouslyRead;
 			
 			ParseNode node = parseExpression();
-			return ReverseNode.withChildren(token, node);
+			return ReverseOperatorNode.withChildren(token, node);
+		}
+		
+		if (startsZip(nowReading)) {
+			expect(Keyword.ZIP);
+			Token token = previouslyRead;
+			ParseNode zipNode = new ZipOperatorNode(token);
+			
+			for (int i = 0; i < 3; i++) {
+				zipNode.appendChild(parseExpression());
+				if (i < 2) {
+					expect(Punctuator.SEPARATOR);
+				}
+			}
+			
+			return zipNode;
 		}
 		
 		if (startsNegation(nowReading) || startsLength(nowReading)) {
@@ -703,7 +736,8 @@ public class Parser {
 		return parseAtomicExpression();
 	}
 	private boolean startsUnaryExpression(Token token) {
-		if (startsClone(token) || startsNegation(token) || startsLength(token) || startsReverse(token)) {
+		if (startsClone(token) 	|| startsNegation(token) ||
+			startsLength(token) || startsReverse(token) || startsZip(token)) {
 			return true;
 		} else {
 			return startsAtomicExpression(token);
@@ -721,7 +755,11 @@ public class Parser {
 	private boolean startsReverse(Token token) {
 		return token.isLextant(Keyword.REVERSE); 
 	}
+	private boolean startsZip(Token token) {
+		return token.isLextant(Keyword.ZIP); 
+	}
 		
+	
 	// atomicExpression -> literal
 	private ParseNode parseAtomicExpression() {
 		if(!startsAtomicExpression(nowReading)) {

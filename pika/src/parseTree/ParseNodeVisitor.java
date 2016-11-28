@@ -53,12 +53,16 @@ public interface ParseNodeVisitor {
 	void visitLeave(BinaryOperatorNode node);
 	void visitEnter(RationalOperatorNode node);
 	void visitLeave(RationalOperatorNode node);
+	void visitEnter(FoldOperatorNode node);
+	void visitLeave(FoldOperatorNode node);
 	void visitEnter(MapOperatorNode node);
 	void visitLeave(MapOperatorNode node);
 	void visitEnter(ReduceOperatorNode node);
 	void visitLeave(ReduceOperatorNode node);
-	void visitEnter(ReverseNode node);
-	void visitLeave(ReverseNode node);
+	void visitEnter(ZipOperatorNode node);
+	void visitLeave(ZipOperatorNode node);
+	void visitEnter(ReverseOperatorNode node);
+	void visitLeave(ReverseOperatorNode node);
 	void visitEnter(UnaryOperatorNode node);
 	void visitLeave(UnaryOperatorNode node);
 	
@@ -230,6 +234,12 @@ public interface ParseNodeVisitor {
 		public void visitLeave(RationalOperatorNode node) {
 			defaultVisitLeave(node);
 		}
+		public void visitEnter(FoldOperatorNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(FoldOperatorNode node) {
+			defaultVisitLeave(node);
+		}
 		public void visitEnter(MapOperatorNode node) {
 			defaultVisitEnter(node);
 		}
@@ -242,10 +252,16 @@ public interface ParseNodeVisitor {
 		public void visitLeave(ReduceOperatorNode node) {
 			defaultVisitLeave(node);
 		}
-		public void visitEnter(ReverseNode node) {
+		public void visitEnter(ZipOperatorNode node) {
 			defaultVisitEnter(node);
 		}
-		public void visitLeave(ReverseNode node) {
+		public void visitLeave(ZipOperatorNode node) {
+			defaultVisitLeave(node);
+		}
+		public void visitEnter(ReverseOperatorNode node) {
+			defaultVisitEnter(node);
+		}
+		public void visitLeave(ReverseOperatorNode node) {
 			defaultVisitLeave(node);
 		}		
 		public void visitEnter(UnaryOperatorNode node) {
