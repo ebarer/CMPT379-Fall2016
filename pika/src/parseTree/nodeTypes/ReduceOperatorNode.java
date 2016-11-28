@@ -2,19 +2,19 @@ package parseTree.nodeTypes;
 
 import parseTree.ParseNode;
 import parseTree.ParseNodeVisitor;
+import asmCodeGenerator.codeGenerator.operators.ReduceOperatorSCG;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
-import lexicalAnalyzer.Punctuator;
 import tokens.LextantToken;
 import tokens.Token;
-import semanticAnalyzer.signatures.FunctionSignature;
 
 public class ReduceOperatorNode extends OperatorNode {
-	protected FunctionSignature signature;
+	ReduceOperatorSCG scg;
 
 	public ReduceOperatorNode(Token token) {
 		super(token);
 		assert(token.isLextant(Keyword.REDUCE));
+		this.scg = null;
 	}
 
 	public ReduceOperatorNode(ParseNode node) {
@@ -32,11 +32,11 @@ public class ReduceOperatorNode extends OperatorNode {
 		return (LextantToken)token;
 	}
 
-	public void setSignature(FunctionSignature signature) {
-		this.signature = signature;
+	public void setSCG(ReduceOperatorSCG scg) {
+		this.scg = scg;
 	}
-	public FunctionSignature getSignature() {
-		return signature;
+	public ReduceOperatorSCG getSCG() {
+		return this.scg;
 	}
 
 	

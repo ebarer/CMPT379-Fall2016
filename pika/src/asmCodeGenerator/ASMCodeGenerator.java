@@ -1185,6 +1185,16 @@ public class ASMCodeGenerator {
 			node.getSCG().setLambda(lambdaCode);
 			code.append(node.getSCG().generate());
 		}
+		public void visitLeave(ReduceOperatorNode node) {
+			newValueCode(node);
+			
+			ASMCodeFragment arrayCode = removeValueCode(node.child(0));			
+			ASMCodeFragment lambdaCode = removeValueCode(node.child(1));
+			
+			node.getSCG().setArray(arrayCode);
+			node.getSCG().setLambda(lambdaCode);
+			code.append(node.getSCG().generate());
+		}
 		public void visitLeave(ReverseNode node) {
 			newValueCode(node);
 

@@ -3,7 +3,6 @@ package asmCodeGenerator.codeGenerator.array;
 import asmCodeGenerator.codeGenerator.SimpleCodeGenerator;
 import asmCodeGenerator.codeStorage.*;
 import asmCodeGenerator.runtime.*;
-import parseTree.nodeTypes.ArrayNode;
 import semanticAnalyzer.types.ArrayType;
 import semanticAnalyzer.types.PrimitiveType;
 import semanticAnalyzer.types.Type;

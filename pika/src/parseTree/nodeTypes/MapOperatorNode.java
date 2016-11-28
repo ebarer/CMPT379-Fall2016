@@ -5,10 +5,8 @@ import parseTree.ParseNodeVisitor;
 import asmCodeGenerator.codeGenerator.operators.MapOperatorSCG;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
-import lexicalAnalyzer.Punctuator;
 import tokens.LextantToken;
 import tokens.Token;
-import semanticAnalyzer.signatures.FunctionSignature;
 
 public class MapOperatorNode extends OperatorNode {
 	MapOperatorSCG scg;

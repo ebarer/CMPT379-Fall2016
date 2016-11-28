@@ -7,6 +7,7 @@ import asmCodeGenerator.codeGenerator.array.ArrayLengthSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayOffsetSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayReverseSCG;
 import asmCodeGenerator.codeGenerator.operators.MapOperatorSCG;
+import asmCodeGenerator.codeGenerator.operators.ReduceOperatorSCG;
 import asmCodeGenerator.codeGenerator.string.StringReverseSCG;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
@@ -390,7 +391,34 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	}
 	@Override
 	public void visitLeave(ReduceOperatorNode node) {
+		assert node.nChildren() == 2;
+		ParseNode left  = node.child(0);
+		ParseNode right = node.child(1);
+		List<Type> childTypes = Arrays.asList(left.getType(), right.getType());
 		
+		// First expression must be an array type
+		if (childTypes.get(0) instanceof ArrayType) {
+			Type arrSubtype = ((ArrayType)childTypes.get(0)).getSubtype();
+			// Second expression must be a one-argument-type lambda
+			// where the argument has the type of the array’s subtype
+			// and the return type is boolean
+			if (childTypes.get(1) instanceof LambdaType) {
+				List<Type> lambdaTypes = ((LambdaType)childTypes.get(1)).getTypeList();
+				if (lambdaTypes.size() == 1 && lambdaTypes.get(0) == arrSubtype) {
+					Type returnType = ((LambdaType)childTypes.get(1)).getReturnType();
+					if (returnType == PrimitiveType.BOOLEAN) {
+						Type reduceType = childTypes.get(0);
+						ReduceOperatorSCG reduceSCG = new ReduceOperatorSCG(arrSubtype, returnType);
+						node.setSCG(reduceSCG);
+						node.setType(reduceType);
+						return;
+					}
+				}
+			}
+		}
+		
+		typeCheckError(node, childTypes);
+		return;
 	}
 	@Override
 	public void visitLeave(ReverseNode node) {

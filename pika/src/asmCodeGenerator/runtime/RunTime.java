@@ -34,6 +34,7 @@ public class RunTime {
 	public static final String RELEASE_TEMP_2				= "$release-temp-2";
 	public static final String RELEASE_TEMP_3				= "$release-temp-3";
 	public static final String RELEASE_TEMP_4				= "$release-temp-4";
+	public static final String REDUCE_ARR_LENGTH			= "$reduce-arr-length";
 	public static final String FOR_LOOP_INDEX				= "$for-loop-index";
 	public static final String FOR_LOOP_OFFSET				= "$for-loop-offset";
 	public static final String FOR_LOOP_END_INDEX			= "$for-loop-end-index";
@@ -251,6 +252,9 @@ public class RunTime {
 		frag.add(DLabel, RELEASE_TEMP_3);
 		frag.add(DataI, 0);
 		frag.add(DLabel, RELEASE_TEMP_4);
+		frag.add(DataI, 0);
+		
+		frag.add(DLabel, REDUCE_ARR_LENGTH);
 		frag.add(DataI, 0);
 		
 		frag.add(DLabel, RATIONAL_TEMP_NUMERATOR_1);
