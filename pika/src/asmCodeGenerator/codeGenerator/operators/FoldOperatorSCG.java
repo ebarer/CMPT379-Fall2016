@@ -7,27 +7,19 @@ import semanticAnalyzer.types.Type;
 import asmCodeGenerator.Labeller;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForLoadSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
-
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
 public class FoldOperatorSCG {
-	private Type baseType;
-	private Type arrType;
-	private Type outType;
-	private ASMCodeFragment base;
-	private ASMCodeFragment array;
-	private ASMCodeFragment lambda;
+	protected Type arrType;
+	protected Type outType;
+	protected ASMCodeFragment array;
+	protected ASMCodeFragment lambda;
 	
-	public FoldOperatorSCG(Type baseT, Type arrT, Type outT) {
-		this.baseType = baseT;
+	public FoldOperatorSCG(Type arrT, Type outT) {
 		this.arrType = arrT;		
 		this.outType = outT;
-		this.base = null;
 		this.array = null;
 		this.lambda = null;
-	}
-	public void setBase(ASMCodeFragment base) {
-		this.base = base;
 	}
 	public void setArray(ASMCodeFragment array) {
 		this.array = array;
@@ -48,28 +40,44 @@ public class FoldOperatorSCG {
 		String joinLabel  		= labeller.newLabel("join");
 		
 		// Generators
-		OpcodeForLoadSCG loadArrSCG = new OpcodeForLoadSCG(arrType);
-		OpcodeForStoreSCG storeArrSCG = new OpcodeForStoreSCG(arrType);
-		OpcodeForLoadSCG loadBaseSCG = new OpcodeForLoadSCG(baseType);
-		OpcodeForStoreSCG storeBaseSCG = new OpcodeForStoreSCG(baseType);
+		OpcodeForLoadSCG loadArgSCG = new OpcodeForLoadSCG(arrType);
+		OpcodeForStoreSCG storeArgSCG = new OpcodeForStoreSCG(arrType);
 		OpcodeForLoadSCG loadResultSCG = new OpcodeForLoadSCG(outType);
 		OpcodeForStoreSCG storeResultSCG = new OpcodeForStoreSCG(outType);
 
 		code.add(Label, startLabel);
 		
-		// FIXME: do we need to allocate space for the new item?
-		if (base != null) {
-			code.add(PushD, RunTime.INDEX_TEMP_1);
-			code.append(base);
-			code.add(StoreI);
-		} else {
-			//code.add(PushD, RunTime.INDEX_TEMP_1);
-			//code.add(StoreI);
-		}
-		
+		// Store array address in INDEX_TEMP_2
 		code.add(PushD, RunTime.INDEX_TEMP_2);
 		code.append(array);
 		code.add(StoreI);
+		
+		// Check if array length is 0, issue RTE
+		code.add(PushD, RunTime.INDEX_TEMP_2);
+		code.add(LoadI);
+		code.add(PushI, 12);
+		code.add(Add);
+		code.add(LoadI);
+		code.add(Duplicate);
+		code.add(JumpFalse, RunTime.FOLD_LENGTH_RUNTIME_ERROR);
+
+		// FIXME:
+		//		do we need to create a new memory space for the value,
+		// 		or do we replace A[0] with the fold value and then
+		//		return A[0]??
+		
+		// Store address of value in INDEX_TEMP_1
+		code.add(PushD, RunTime.INDEX_TEMP_1);
+		code.add(PushD, RunTime.INDEX_TEMP_2);
+		code.add(LoadI);
+		code.add(PushI, 16);
+		code.add(Add);
+		code.add(StoreI);
+		
+		// Check if array length is 1, return A[0]
+		code.add(PushI, 1);
+		code.add(Subtract);
+		code.add(JumpFalse, joinLabel);
 		
 		// Define loop invariants (index)
 		code.add(PushD, RunTime.INDEX_TEMP_3);
@@ -93,16 +101,16 @@ public class FoldOperatorSCG {
 			code.add(PushD, RunTime.STACK_POINTER);
 			code.add(PushD, RunTime.STACK_POINTER);
 			code.add(LoadI);
-			code.add(PushI, baseType.getSize());
+			code.add(PushI, arrType.getSize());
 			code.add(Subtract);
 			code.add(StoreI);
 			
 			// Put argument value
 			code.add(PushD, RunTime.STACK_POINTER, "%% store arg 1");
 			code.add(LoadI);
-			// FIXME: SOMETHING
-			code.addChunk(loadBaseSCG.generate());
-			code.addChunk(storeBaseSCG.generate());
+			code.add(PushD, RunTime.INDEX_TEMP_1);
+			code.addChunk(loadArgSCG.generate());
+			code.addChunk(storeArgSCG.generate());
 			
 			// Move Stack Pointer
 			code.add(PushD, RunTime.STACK_POINTER);
@@ -115,7 +123,6 @@ public class FoldOperatorSCG {
 			// Put argument value
 			code.add(PushD, RunTime.STACK_POINTER, "%% store arg 2");
 			code.add(LoadI);
-			// FIXME: SOMETHING
 			code.addChunk(loadArrSCG.generate());
 			code.addChunk(storeArrSCG.generate());
 			

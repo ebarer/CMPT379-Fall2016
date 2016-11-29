@@ -35,6 +35,7 @@ import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 public class ASMCodeGenerator {
 	ParseNode root;
 	List<IdentifierNode> functionDefinitions;
+	List<DeclarationNode> globalDeclarations;
 	ASMCodeFragment functions;
 
 	public static ASMCodeFragment generate(ParseNode syntaxTree) {
@@ -45,6 +46,7 @@ public class ASMCodeGenerator {
 		super();
 		this.root = root;
 		this.functionDefinitions = new ArrayList<IdentifierNode>();
+		this.globalDeclarations = new ArrayList<DeclarationNode>();
 		this.functions = new ASMCodeFragment(GENERATES_VOID);
 	}
 	
@@ -216,16 +218,28 @@ public class ASMCodeGenerator {
 			
 			code.add(Label, RunTime.MAIN_PROGRAM_LABEL);
 			
-			code.append(storeFunctionDefinitions());
+			code.append(storeGlobalDefinitions());
 			
 			for(ParseNode child : node.getChildren()) {
 				ASMCodeFragment childCode = removeVoidCode(child);
 				code.append(childCode);
 			}
 		}
-		private ASMCodeFragment storeFunctionDefinitions() {
+		private ASMCodeFragment storeGlobalDefinitions() {
 			ASMCodeFragment code = new ASMCodeFragment(GENERATES_VOID);
 
+			for (DeclarationNode node : globalDeclarations) {
+				Type type = node.getType();
+				ASMCodeFragment lvalue = removeAddressCode(node.child(0));	
+				ASMCodeFragment rvalue = removeValueCode(node.child(1));
+				
+				code.append(lvalue);
+				code.append(rvalue);
+				
+				OpcodeForStoreSCG scg = new OpcodeForStoreSCG(type);
+				code.addChunk(scg.generate());
+			}
+			
 			for (IdentifierNode identifier : functionDefinitions) {
 				String label = identifier.getBinding().getLabel();
 				ASMCodeFragment address = removeAddressCode(identifier);
@@ -252,9 +266,6 @@ public class ASMCodeGenerator {
 			if (node.child(0) instanceof IdentifierNode) {
 				functionDefinitions.add((IdentifierNode) node.child(0));
 			}
-			
-//			ASMCodeFragment lambda = removeValueCode(node.child(1));
-//			code.append(lambda);
 		}
 		
 		public void visitLeave(LambdaNode node) {
@@ -529,7 +540,16 @@ public class ASMCodeGenerator {
 		}
 		
 		public void visitLeave(DeclarationNode node) {
-			storeNode(node);
+			// Handle global declaration
+			if (node.getParent() instanceof ProgramNode) {
+				newVoidCode(node);
+				globalDeclarations.add((DeclarationNode) node);
+			} else if (node.isStatic()) {
+				newVoidCode(node);
+				globalDeclarations.add((DeclarationNode) node);
+			} else {
+				storeNode(node);
+			}
 		}
 		public void visitLeave(AssignmentNode node) {
 			storeNode(node);

@@ -94,6 +94,21 @@ public class Scope {
 
 		return binding;
 	}
+	public Binding createStaticGlobalBinding(IdentifierNode identifierNode, Type type) {
+		Token token = identifierNode.getToken();
+		symbolTable.errorIfAlreadyDefined(token);
+
+		String lexeme = "#"+token.getLexeme()+"-413";
+		Binding binding = allocateNewBinding(type, token.getLocation(), lexeme);	
+		symbolTable.install(lexeme, binding);
+
+		return binding;
+	}
+	public void createStaticEmptyBinding(IdentifierNode identifierNode, Binding binding) {
+		Token token = identifierNode.getToken();
+		String lexeme = token.getLexeme();	
+		symbolTable.install(lexeme, binding);
+	}
 	private Binding allocateNewBinding(Type type, TextLocation textLocation, String lexeme) {
 		MemoryLocation memoryLocation = allocator.allocate(type.getSize());
 		return new Binding(type, textLocation, memoryLocation, lexeme);

@@ -1,14 +1,7 @@
 exec {
-	var numbers := [1, 5, 3, 9, 2].
-	
-	var max := <int x, int y> -> int {
-		if (x > y) {
-			return x.
-		} else {
-			return y.
-		}
-	}.
-
-	#var maxity := numbers fold max.
-	var maxitz := numbers fold [12] max.
+	while (_true_) {
+		static var billyJoeBob := 15.
+		
+		print billyJoeBob.
+	}
 }

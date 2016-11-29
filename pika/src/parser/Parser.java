@@ -1,6 +1,9 @@
 package parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 import logging.PikaLogger;
 import parseTree.*;
 import parseTree.nodeTypes.*;
@@ -35,12 +38,10 @@ public class Parser {
 		if(!startsProgram(nowReading)) {
 			return syntaxErrorNode("program");
 		}		
+		
 		ParseNode program = new ProgramNode(nowReading);
 		
-		while (startsFunctionDefinition(nowReading)) {
-			ParseNode globalDefinition = parseFunctionDefinition();
-			program.appendChild(globalDefinition);
-		}
+		parseGlobalDefinitions(program);
 		
 		expect(Keyword.EXEC);
 		ParseNode mainBlock = parseMainBlock();
@@ -53,11 +54,43 @@ public class Parser {
 		return program;
 	}
 	private boolean startsProgram(Token token) {
-		return token.isLextant(Keyword.FUNCTION) || token.isLextant(Keyword.EXEC);
+		return startsGlobalDefinition(token) || token.isLextant(Keyword.EXEC);
+	}
+	
+
+	///////////////////////////////////////////////////////////
+	// globalDefinition -> functionDefinition || declaration
+	private void parseGlobalDefinitions(ParseNode program) {
+		List<ParseNode> globalDeclarations = new ArrayList<ParseNode>();
+		List<ParseNode> functionDefinitions = new ArrayList<ParseNode>();
+
+		while (startsGlobalDefinition(nowReading)) {
+			if (startsDeclaration(nowReading)) {
+				ParseNode globalDeclaration = parseDeclaration();
+				globalDeclarations.add(globalDeclaration);
+			}
+			
+			if (startsFunctionDefinition(nowReading)) {
+				ParseNode functionDefinition = parseFunctionDefinition();
+				functionDefinitions.add(functionDefinition);
+			}
+		}
+		
+		// Append declarations
+		for (ParseNode node : globalDeclarations) {
+			program.appendChild(node);
+		}
+		
+		// Append function definitions
+		for (ParseNode node : functionDefinitions) {
+			program.appendChild(node);
+		}
+	}
+	private boolean startsGlobalDefinition(Token token){
+		return startsFunctionDefinition(token) || startsDeclaration(token);
 	}
 	
 	///////////////////////////////////////////////////////////
-	
 	// functionDefinition -> FUNC identifier lambda
 	private ParseNode parseFunctionDefinition() {
 		if(!startsFunctionDefinition(nowReading)) {
@@ -78,7 +111,6 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////	
-	
 	// mainBlock -> { statement* }
 	private ParseNode parseMainBlock() {
 		if(!startsMainBlock(nowReading)) {
@@ -105,7 +137,6 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////	
-	
 	// blockStatement -> { statement* }
 	private ParseNode parseBlockStatement() {
 		if(!startsBlockStatement(nowReading)) {
@@ -132,7 +163,6 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////
-	
 	// statement-> declaration | printStmt
 	private ParseNode parseStatement() {
 		if(!startsStatement(nowReading)) {
@@ -192,11 +222,16 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////
-	
 	// declarationStmt -> CONST/VAR identifier := expression .
 	private ParseNode parseDeclaration() {
 		if(!startsDeclaration(nowReading)) {
 			return syntaxErrorNode("declaration");
+		}
+		
+		boolean isStatic = false;
+		if (nowReading.isLextant(Keyword.STATIC)) {
+			isStatic = true;
+			readToken();
 		}
 		
 		Token declarationToken = nowReading;
@@ -212,14 +247,13 @@ public class Parser {
 		
 		expect(Punctuator.TERMINATOR);
 		
-		return DeclarationNode.withChildren(declarationToken, identifier, initializer);
+		return DeclarationNode.withChildren(declarationToken, identifier, initializer, isStatic);
 	}
 	private boolean startsDeclaration(Token token) {		
-		return token.isLextant(Keyword.CONST, Keyword.VAR);
+		return token.isLextant(Keyword.STATIC, Keyword.CONST, Keyword.VAR);
 	}
 	
 	///////////////////////////////////////////////////////////
-	
 	// assignmentStmt -> target := expression .
 	private ParseNode parseAssignment() {
 		if(!startsAssignment(nowReading)) {
@@ -257,7 +291,6 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////
-	
 	// releaseStmt -> RELEASE expression
 	private ParseNode parseReleaseStatement() {
 		if(!startsReleaseStatement(nowReading)) {
@@ -278,7 +311,6 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////
-		
 	// returnStmt -> RETURN expression
 	private ParseNode parseCallStatement() {
 		if(!startsCallStatement(nowReading)) {
@@ -324,7 +356,6 @@ public class Parser {
 
 
 	///////////////////////////////////////////////////////////
-	
 	// ifStmt -> if (expression) blockStatement (else blockStatement)?
 	private ParseNode parseIfStatement() {
 		if(!startsIfStatement(nowReading)) {
@@ -359,7 +390,6 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////
-	
 	// whileStmt -> while (expression) blockStatement
 	private ParseNode parseWhileStatement() {
 		if(!startsWhileStatement(nowReading)) {
@@ -383,7 +413,6 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////
-		
 	// whileStmt -> while (expression) blockStatement
 	private ParseNode parseForStatement() {
 		if(!startsForStatement(nowReading)) {
@@ -408,7 +437,6 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////
-	
 	// controlStmt -> CONTINUE or BREAK.
 	private ParseNode parseControlStatement() {
 		if(!startsControlStatement(nowReading)) {
@@ -427,7 +455,6 @@ public class Parser {
 	}
 	
 	///////////////////////////////////////////////////////////
-	
 	// printStmt -> PRINT printExpressionList .
 	private ParseNode parsePrintStatement() {
 		if(!startsPrintStatement(nowReading)) {
@@ -758,8 +785,7 @@ public class Parser {
 	private boolean startsZip(Token token) {
 		return token.isLextant(Keyword.ZIP); 
 	}
-		
-	
+
 	// atomicExpression -> literal
 	private ParseNode parseAtomicExpression() {
 		if(!startsAtomicExpression(nowReading)) {
@@ -1248,7 +1274,6 @@ public class Parser {
 	
 	
 	///////////////////////////////////////////////////////////
-	
 	// if the current token is one of the given lextants, read the next token.
 	// otherwise, give a syntax error and read next token (to avoid endless looping).
 	private void expect(Lextant ...lextants) {

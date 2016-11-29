@@ -6,11 +6,14 @@ import java.util.List;
 import asmCodeGenerator.codeGenerator.array.ArrayLengthSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayOffsetSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayReverseSCG;
+import asmCodeGenerator.codeGenerator.operators.FoldOperatorBaseSCG;
 import asmCodeGenerator.codeGenerator.operators.FoldOperatorSCG;
 import asmCodeGenerator.codeGenerator.operators.MapOperatorSCG;
 import asmCodeGenerator.codeGenerator.operators.ReduceOperatorSCG;
 import asmCodeGenerator.codeGenerator.operators.ZipOperatorSCG;
 import asmCodeGenerator.codeGenerator.string.StringReverseSCG;
+import asmCodeGenerator.codeStorage.ASMOpcode;
+import javafx.scene.Parent;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;
@@ -195,12 +198,22 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			
 			Boolean mutable = node.getToken().isLextant(Keyword.VAR);
 			
+			FunctionSignature signature = null;
 			if (initializer instanceof LambdaNode) {
-				FunctionSignature signature = ((LambdaNode) initializer).getSignature();
-				addBinding(identifier, declarationType, mutable, signature);
-			} else {
-				addBinding(identifier, declarationType, mutable);
+				signature = ((LambdaNode) initializer).getSignature();
 			}
+			
+			// If node is static and not a global
+			if (node.isStatic() && !(node.getParent() instanceof ProgramNode)) {
+				addGlobalBinding(identifier, declarationType, mutable, signature);
+			} else {
+				addBinding(identifier, declarationType, mutable, signature);
+			}
+		} else {
+			List<Type> childTypes = new ArrayList<Type>();
+			node.getChildren().forEach((child) -> childTypes.add(child.getType()));
+			typeCheckError(node, childTypes);
+			return;
 		}
 	}
 	@Override
@@ -382,14 +395,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 					if (node.nChildren() == 3) {
 						Type baseType = node.child(1).getType();
 						if (lambdaTypes.get(0) == baseType && lambdaTypes.get(1) == arrSubtype && returnType == baseType) {
-							FoldOperatorSCG foldSCG = new FoldOperatorSCG(baseType, arrSubtype, returnType);
+							FoldOperatorSCG foldSCG = new FoldOperatorBaseSCG(baseType, arrSubtype, returnType);
 							node.setSCG(foldSCG);
 							node.setType(baseType);
 							return;
 						}
 					} else {
 						if (lambdaTypes.get(0) == arrSubtype && lambdaTypes.get(1) == arrSubtype && returnType == arrSubtype) {
-							FoldOperatorSCG foldSCG = new FoldOperatorSCG(arrSubtype, arrSubtype, returnType);
+							FoldOperatorSCG foldSCG = new FoldOperatorSCG(arrSubtype, returnType);
 							node.setSCG(foldSCG);
 							node.setType(arrSubtype);
 							return;
@@ -759,7 +772,6 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		return;
 	}
 
-	
 	///////////////////////////////////////////////////////////////////////////
 	// helper methods
 	private void addBinding(IdentifierNode identifierNode, Type type, Boolean mutable) {
@@ -771,6 +783,17 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 	private void addBinding(IdentifierNode identifierNode, Type type, Boolean mutable, FunctionSignature signature) {
 		Scope scope = identifierNode.getLocalScope();
 		Binding binding = scope.createBinding(identifierNode, type);
+		binding.setMutability(mutable);
+		binding.setSignature(signature);
+		identifierNode.setBinding(binding);
+	}
+	private void addGlobalBinding(IdentifierNode identifierNode, Type type, Boolean mutable, FunctionSignature signature) {
+		Scope globalScope = identifierNode.getGlobalScope();
+		Scope localScope = identifierNode.getLocalScope();
+		
+		Binding binding = globalScope.createStaticGlobalBinding(identifierNode, type);
+		localScope.createStaticEmptyBinding(identifierNode, binding);
+
 		binding.setMutability(mutable);
 		binding.setSignature(signature);
 		identifierNode.setBinding(binding);

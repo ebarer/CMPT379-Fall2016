@@ -79,8 +79,9 @@ public class RunTime {
 	public static final String GENERAL_RUNTIME_ERROR 			= "$$general-runtime-error";
 	public static final String DIVIDE_BY_ZERO_RUNTIME_ERROR 	= "$$divide-by-zero";
 	public static final String BAD_INDEX_RUNTIME_ERROR 			= "$$bad-index";
-	public static final String UNEQUAL_LENGTH_RUNTIME_ERROR 	= "$$unequal-length";
 	public static final String FUNCTION_RUNOFF_RUNTIME_ERROR	= "$$function-runoff";
+	public static final String UNEQUAL_LENGTH_RUNTIME_ERROR 	= "$$unequal-length";
+	public static final String FOLD_LENGTH_RUNTIME_ERROR 		= "$$fold-length";
 
 	private ASMCodeFragment environmentASM() {
 		ASMCodeFragment result = new ASMCodeFragment(GENERATES_VOID);
@@ -148,6 +149,7 @@ public class RunTime {
 		arrayBadIndexError(frag);
 		functionRunoffError(frag);
 		unequalLengthError(frag);
+		foldLengthError(frag);
 		
 		return frag;
 	}
@@ -194,13 +196,23 @@ public class RunTime {
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 	private void unequalLengthError(ASMCodeFragment frag) {
-		String functionUnequalLengthMessage = "$errors-function-unequal-length";
+		String unequalLengthMessage = "$errors-function-unequal-length";
 		
-		frag.add(DLabel, functionUnequalLengthMessage);
+		frag.add(DLabel, unequalLengthMessage);
 		frag.add(DataS, "array arguments are of unequal length");
 		
 		frag.add(Label, UNEQUAL_LENGTH_RUNTIME_ERROR);
-		frag.add(PushD, functionUnequalLengthMessage);
+		frag.add(PushD, unequalLengthMessage);
+		frag.add(Jump, GENERAL_RUNTIME_ERROR);
+	}
+	private void foldLengthError(ASMCodeFragment frag) {
+		String zeroLengthMessage = "$errors-fold-zero-length";
+		
+		frag.add(DLabel, zeroLengthMessage);
+		frag.add(DataS, "fold: array length must be >= 1");
+		
+		frag.add(Label, FOLD_LENGTH_RUNTIME_ERROR);
+		frag.add(PushD, zeroLengthMessage);
 		frag.add(Jump, GENERAL_RUNTIME_ERROR);
 	}
 	
