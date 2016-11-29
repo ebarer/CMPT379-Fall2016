@@ -2,6 +2,7 @@ package optimizer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,18 +55,17 @@ public class Optimizer {
 			while(simplifyJumps(cfg)) { loop = true; }
 		}
 
-		// For each block that "fallsthrough", add explicit jump
-		// to ensure code runs in the correct order
 		addFallthroughJumps(cfg);
+		//labelSimpleLoops(cfg);
 		printCFG(cfg);
 		
-		// FIXME: Label simple loops
-		
 		// Grab optimized instructions from BasicBlocks
-		// FIXME: Commented out relabelling for debug
-//		replaceLabels(cfg);
+		replaceLabels(cfg);
 		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
 		while(cleanupJumps(programFragments[INSTRUCTIONS]));
+
+		// Eliminate any data directives that are unused in program execution
+		//programFragments[DATA] = removeUnusedData(programFragments[INSTRUCTIONS]);
 		
 		// Merge fragments
 		returnFragment.append(programFragments[HEADER]);
@@ -91,14 +91,14 @@ public class Optimizer {
 
 		// Ensure header information stays at the top, using HEADER
 		int currentInstr = 0;
-		while (currentInstr < chunk.getInstructions().size()) {
-			Object argument = instructions.get(currentInstr).getArgument();
-			if (argument == null || !argument.equals("$$main")) {
-				fragments[HEADER].add(instructions.get(currentInstr++));
-			} else break;
-		}
-		
-		fragments[HEADER].add(instructions.get(currentInstr++));
+//		while (currentInstr < chunk.getInstructions().size()) {
+//			Object argument = instructions.get(currentInstr).getArgument();
+//			if (argument == null || !argument.equals("$$main")) {
+//				fragments[HEADER].add(instructions.get(currentInstr++));
+//			} else break;
+//		}
+//		
+//		fragments[HEADER].add(instructions.get(currentInstr++));
 			
 		// Move all instructions into DATA or INSTRUCTIONS
 		for (; currentInstr < chunk.getInstructions().size(); currentInstr++) {
@@ -867,6 +867,8 @@ public class Optimizer {
 		
 		return false;
 	}
+	// For each block that "fallsthrough", add explicit jump
+	// to ensure code runs in the correct order
 	private void addFallthroughJumps(BasicBlockFragment fragment) {
 		for (BasicBlock block : fragment.getBlocks()) {
 			// If last instruction isn't a leave or jump, add jump for fallthrough
@@ -883,7 +885,42 @@ public class Optimizer {
 			}
 		}
 	}
-
+	private void labelSimpleLoops(BasicBlockFragment fragment) {
+		
+	}
+	private ASMCodeFragment removeUnusedData(ASMCodeFragment fragment) {
+		ASMCodeFragment dataFragment = new ASMCodeFragment(CodeType.GENERATES_VOID);
+		List<ASMInstruction> instructions = programFragments[DATA].getChunk(0).getInstructions();
+		
+		// Get PushD
+		HashSet<String> dataCalls = new HashSet<String>();
+		for(ASMCodeChunk chunk : fragment.getChunks()) {
+			for (ASMInstruction instr : chunk.getInstructions()) {
+				if (instr.getOpcode() == ASMOpcode.PushD || instr.getOpcode() == ASMOpcode.DataD) {
+					dataCalls.add((String) instr.getArgument());
+				}
+			}
+		}
+		
+		for (String dlabel : dataCalls) {
+			for (int i = 0; i < instructions.size(); i++) {
+				if (i < instructions.size() && instructions.get(i).getArgument().equals(dlabel)) {					
+					// Add DLabels
+					while (i < instructions.size() && instructions.get(i).getOpcode() == ASMOpcode.DLabel) {
+						dataFragment.add(instructions.get(i++));
+					}
+					
+					// Add data directives
+					while (i < instructions.size() && instructions.get(i).getOpcode() != ASMOpcode.DLabel) {
+						dataFragment.add(instructions.get(i++));
+					}
+				}
+			}
+		}
+		
+		return dataFragment;
+	}
+	
 	
 	// Convert CFD into ASMCodeFragment
 	private void replaceLabels(BasicBlockFragment fragment) {
@@ -898,15 +935,15 @@ public class Optimizer {
 			}
 			
 			// Handle main program label
-			if (label == RunTime.MAIN_PROGRAM_LABEL) {
-				for (ASMInstruction instruction : programFragments[HEADER].getChunk(0).getInstructions()) {
-					if (instruction.getArgument() != null) {
-						if (instruction.getArgument() == label) {
-							instruction.setArgument(block.getOutputLabel());
-						}
-					}
-				}
-			}
+//			if (label == RunTime.MAIN_PROGRAM_LABEL) {
+//				for (ASMInstruction instruction : programFragments[HEADER].getChunk(0).getInstructions()) {
+//					if (instruction.getArgument() != null) {
+//						if (instruction.getArgument() == label) {
+//							instruction.setArgument(block.getOutputLabel());
+//						}
+//					}
+//				}
+//			}
 			
 			for (BasicBlock inBlock : fragment.getBlocks()) {
 				for (ASMInstruction instruction : inBlock.getInstructions()) {

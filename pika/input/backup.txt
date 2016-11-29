@@ -134,3 +134,14 @@ exec {
 	var maxitz := numbers fold [12] max.
 	var numList := numbers fold ["list:"] catNumber.
 }
+
+exec {
+	var numbers := [1, 5, 3, 9, 2].
+	
+	var catNumber := <string s, int x> -> string {
+		return s + ^ ^ + [x | char].
+	}.
+	
+	var numList := numbers fold ["list:"] catNumber.
+	print numList.
+}

@@ -18,12 +18,12 @@ public class StringCharConcatSCG implements SimpleCodeGenerator {
 		
 		chunk.add(ASMOpcode.Label, startLabel);
 		
-		// Store address of STRING1 in INDEX_TEMP_2
+		// Store address of CHAR in INDEX_TEMP_2
 		chunk.add(ASMOpcode.PushD, RunTime.INDEX_TEMP_2);
 		chunk.add(ASMOpcode.Exchange);
 		chunk.add(ASMOpcode.StoreC);
 		
-		// Store value of CHAR in INDEX_TEMP_1
+		// Store value of STRING in INDEX_TEMP_1
 		chunk.add(ASMOpcode.PushD, RunTime.INDEX_TEMP_1);
 		chunk.add(ASMOpcode.Exchange);
 		chunk.add(ASMOpcode.StoreI);

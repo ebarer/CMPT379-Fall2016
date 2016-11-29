@@ -12,8 +12,6 @@ import asmCodeGenerator.codeGenerator.operators.MapOperatorSCG;
 import asmCodeGenerator.codeGenerator.operators.ReduceOperatorSCG;
 import asmCodeGenerator.codeGenerator.operators.ZipOperatorSCG;
 import asmCodeGenerator.codeGenerator.string.StringReverseSCG;
-import asmCodeGenerator.codeStorage.ASMOpcode;
-import javafx.scene.Parent;
 import lexicalAnalyzer.Keyword;
 import lexicalAnalyzer.Lextant;
 import lexicalAnalyzer.Punctuator;

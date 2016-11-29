@@ -1,7 +1,7 @@
-exec {
-	while (_true_) {
-		static var billyJoeBob := 15.
-		
-		print billyJoeBob.
-	}
+exec {	
+	#print "list: 1 5 3 9" + ^,^ + ^2^, _n_.
+	
+	print "list: 1 5 3 9" + ^ ^ + [2 | char], _n_.
+	
+	print [^2^ | int].
 }

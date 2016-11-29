@@ -70,6 +70,16 @@ public class IdentifierNode extends ParseNode {
 			}
 			
 			if (current instanceof LambdaNode) {
+				// If declaration, handle recursive call
+				if (current.getParent() instanceof DeclarationNode) {
+					current = current.getParent().getParent();
+				}
+				
+				if(current != null && current.containsBindingOf(identifier)) {
+					declarationScope = current.getScope();
+					return current.bindingOf(identifier);
+				}
+				
 				while (current != null && !(current instanceof ProgramNode)) {
 					current = current.getParent();
 				}

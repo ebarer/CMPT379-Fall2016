@@ -15,6 +15,7 @@ import asmCodeGenerator.codeGenerator.array.ArrayTempToStackSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForLoadSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreFunctionSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
+import asmCodeGenerator.codeGenerator.operators.FoldOperatorBaseSCG;
 import asmCodeGenerator.codeGenerator.rational.RationalMemToStackSCG;
 import asmCodeGenerator.codeGenerator.rational.RationalNegateSCG;
 import asmCodeGenerator.codeGenerator.rational.RationalStackToTempSCG;
@@ -1199,10 +1200,16 @@ public class ASMCodeGenerator {
 			newValueCode(node);
 			
 			ASMCodeFragment arrayCode = removeValueCode(node.child(0));			
-			ASMCodeFragment lambdaCode = removeValueCode(node.child(1));
+			ASMCodeFragment lambdaCode = removeValueCode(node.child(node.nChildren() - 1));
 			
 			node.getSCG().setArray(arrayCode);
 			node.getSCG().setLambda(lambdaCode);
+			
+			if (node.nChildren() == 3 && node.getSCG() instanceof FoldOperatorBaseSCG) {
+				ASMCodeFragment baseCode = removeValueCode(node.child(1));
+				((FoldOperatorBaseSCG) node.getSCG()).setBase(baseCode);
+			}
+			
 			code.append(node.getSCG().generate());
 		}
 		public void visitLeave(MapOperatorNode node) {
