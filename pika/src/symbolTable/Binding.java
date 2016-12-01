@@ -8,6 +8,7 @@ import semanticAnalyzer.types.Type;
 
 public class Binding {
 	private Type type;
+	private Boolean isStatic = false;
 	private Boolean mutable = null;
 	private FunctionSignature signature = null;
 	private String label = null;
@@ -49,11 +50,18 @@ public class Binding {
 		memoryLocation.generateAddress(code, "%% " + lexeme);
 	}
 	
+	public void setStatic(Boolean isStatic) {
+		this.isStatic = isStatic;
+	}
+	public Boolean isStatic() {
+		return this.isStatic;
+	}
+	
 	public void setMutability(Boolean mutable) {
 		this.mutable = mutable;
 	}
 	public Boolean isMutable() {
-		return mutable;
+		return this.mutable;
 	}
 
 	public void setLabel(String label) {

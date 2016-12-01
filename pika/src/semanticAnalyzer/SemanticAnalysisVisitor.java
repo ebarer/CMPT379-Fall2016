@@ -792,6 +792,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 		Binding binding = globalScope.createStaticGlobalBinding(identifierNode, type);
 		localScope.createStaticEmptyBinding(identifierNode, binding);
 
+		binding.setStatic(true);
 		binding.setMutability(mutable);
 		binding.setSignature(signature);
 		identifierNode.setBinding(binding);

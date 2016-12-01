@@ -17,8 +17,6 @@ public class CastIntToCharSCG implements SimpleCodeGenerator {
 		
 		chunk.add(ASMOpcode.PushI, 127);
 		chunk.add(ASMOpcode.BTAnd);
-		chunk.add(ASMOpcode.Pop);
-		chunk.add(ASMOpcode.PushI, 50);
 		
 		return chunk;
 	}

@@ -30,7 +30,7 @@ public class Optimizer {
 		this.programFragments = splitDirectives(fragment);
 	}
 	
-	public ASMCodeFragment optimize() {		
+	public ASMCodeFragment optimize() {
 		ASMCodeFragment returnFragment = new ASMCodeFragment(CodeType.GENERATES_VOID);
 		
 		// Eliminate duplicate strings

@@ -62,34 +62,35 @@ public class IdentifierNode extends ParseNode {
 
 	public Binding findVariableBinding() {
 		String identifier = token.getLexeme();
+		boolean checkStatic = false;
 
 		for(ParseNode current : pathToRoot()) {
 			if(current.containsBindingOf(identifier)) {
 				declarationScope = current.getScope();
-				return current.bindingOf(identifier);
+				Binding binding = current.bindingOf(identifier);
+				
+				if (current instanceof ProgramNode) {
+					return binding;
+				}
+				
+				if (!checkStatic || binding.isStatic()) {
+					return binding;
+				}
 			}
 			
 			if (current instanceof LambdaNode) {
-				// If declaration, handle recursive call
+				// Handle recursive call in declaration
 				if (current.getParent() instanceof DeclarationNode) {
-					current = current.getParent().getParent();
-				}
-				
-				if(current != null && current.containsBindingOf(identifier)) {
-					declarationScope = current.getScope();
-					return current.bindingOf(identifier);
-				}
-				
-				while (current != null && !(current instanceof ProgramNode)) {
 					current = current.getParent();
+					if (identifier.equals(current.child(0).getToken().getLexeme())) {
+						if (current.getParent().containsBindingOf(identifier)) {
+							declarationScope = current.getScope();
+							return current.getParent().bindingOf(identifier);	
+						}
+					}
 				}
-				
-				if(current != null && current.containsBindingOf(identifier)) {
-					declarationScope = current.getScope();
-					return current.bindingOf(identifier);
-				}
-				
-				break;
+
+				checkStatic = true;
 			}
 		}
 		useBeforeDefineError();

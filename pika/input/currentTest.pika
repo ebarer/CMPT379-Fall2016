@@ -1,7 +1,24 @@
-exec {	
-	#print "list: 1 5 3 9" + ^,^ + ^2^, _n_.
+func asciiStringFor<int x> -> string {
+	var returnString := "".
+	var i := x.
 	
-	print "list: 1 5 3 9" + ^ ^ + [2 | char], _n_.
+	while (i > 10) {
+		var r := i - ((i / 10) * 10).		
+		returnString := returnString + [(r + 48) | char].
+		i := i / 10. 
+	} 
+	returnString := returnString + [(i + 48) | char].
 	
-	print [^2^ | int].
+	return reverse returnString.
+}
+
+exec {
+	var numbers := [401, 5, 3, 9, 2].
+	
+	var catNumber := <string s, int x> -> string {
+		return s + ^ ^ + asciiStringFor(x).
+	}.
+	
+	var numList := numbers fold ["list:"] catNumber.
+	print numList.
 }
