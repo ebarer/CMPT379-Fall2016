@@ -10,12 +10,12 @@ import asmCodeGenerator.codeStorage.ASMCodeChunk;
 import asmCodeGenerator.codeStorage.ASMCodeFragment;
 import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
-import asmCodeGenerator.runtime.RunTime;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
 public class Optimizer {
 	boolean debug = false;
 	boolean debugMerge = false;
+	boolean debugRemove = false;
 	
 	private ASMCodeFragment[] programFragments;
 	private static final int HEADER = 0;
@@ -56,7 +56,7 @@ public class Optimizer {
 		}
 
 		addFallthroughJumps(cfg);
-		//labelSimpleLoops(cfg);
+		labelSimpleLoops(cfg);
 		printCFG(cfg);
 		
 		// Grab optimized instructions from BasicBlocks
@@ -65,7 +65,7 @@ public class Optimizer {
 		while(cleanupJumps(programFragments[INSTRUCTIONS]));
 
 		// Eliminate any data directives that are unused in program execution
-		//programFragments[DATA] = removeUnusedData(programFragments[INSTRUCTIONS]);
+		programFragments[DATA] = removeUnusedData(programFragments[INSTRUCTIONS]);
 		
 		// Merge fragments
 		returnFragment.append(programFragments[HEADER]);
@@ -902,19 +902,24 @@ public class Optimizer {
 			}
 		}
 		
-		for (String dlabel : dataCalls) {
-			for (int i = 0; i < instructions.size(); i++) {
-				if (i < instructions.size() && instructions.get(i).getArgument().equals(dlabel)) {					
-					// Add DLabels
-					while (i < instructions.size() && instructions.get(i).getOpcode() == ASMOpcode.DLabel) {
-						dataFragment.add(instructions.get(i++));
-					}
-					
-					// Add data directives
-					while (i < instructions.size() && instructions.get(i).getOpcode() != ASMOpcode.DLabel) {
-						dataFragment.add(instructions.get(i++));
-					}
+		for (int i = 0; i < instructions.size(); i++) {
+			if (dataCalls.contains(instructions.get(i).getArgument())) {
+				if (debugRemove) {
+					System.out.println(instructions.get(i).getArgument());
 				}
+					
+				// Add DLabels
+				while (i < instructions.size() && instructions.get(i).getOpcode() == ASMOpcode.DLabel) {
+					dataFragment.add(instructions.get(i++));
+				}
+				
+				// Add data directives
+				while (i < instructions.size() && instructions.get(i).getOpcode() != ASMOpcode.DLabel) {
+					dataFragment.add(instructions.get(i++));
+				}
+				
+				// Decrement index to inspect last instruction accessed
+				i--;
 			}
 		}
 		
