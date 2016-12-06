@@ -222,8 +222,7 @@ public class Promoter {
 		return false;
 	}
 	public boolean promotable(ArrayNode node) {
-		// Skip promotion on empty arrays and arrays being cloned
-		if (node.isEmpty()) return false;
+		// Skip promotion on arrays being cloned
 		if (node.getToken().isLextant(Keyword.CLONE)) return false;
 		
 		List<Type> childTypes = new ArrayList<Type>();
@@ -231,6 +230,17 @@ public class Promoter {
 		
 		node.getChildren().forEach((child) -> childTypes.add(child.getType()));
 		node.getChildren().forEach((child) -> castTypes.add(child.getType()));
+		
+		// Attempt to promote index for empty arrays
+		if (node.isEmpty()) {
+			if (childTypes.get(0) == PrimitiveType.CHARACTER) {
+				castTypes.set(0, PrimitiveType.INTEGER);
+				addPromotion(node.child(0), Arrays.asList(TypeLiteral.INTEGER));
+				return true;
+			} else {
+				return false;
+			}
+		}
 		
 		int numType = 0;
 		int totalNum = node.nChildren();
