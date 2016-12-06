@@ -469,6 +469,7 @@ public class Optimizer {
 		BasicBlockFragment blocks = new BasicBlockFragment();
 		List<ASMInstruction> instructions = fragment.getChunk(0).getInstructions();
 		
+		outerloop:
 		for (int i = 0; i < instructions.size(); i++) {
 			ASMInstruction instruction = instructions.get(i);
 			
@@ -493,6 +494,7 @@ public class Optimizer {
 			if (instruction.getOpcode().isJump()) {
 				while (instruction.getOpcode().isJump()) {
 					blocks.add(instruction);
+					if (i >= instructions.size() - 1) break outerloop;
 					instruction = instructions.get(++i);
 				}
 				
@@ -501,7 +503,7 @@ public class Optimizer {
 				continue;
 			}
 			
-			blocks.add(instructions.get(i));
+			blocks.add(instruction);
 		}
 		
 		return blocks;

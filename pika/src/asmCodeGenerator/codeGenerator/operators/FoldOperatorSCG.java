@@ -6,6 +6,7 @@ import asmCodeGenerator.runtime.*;
 import semanticAnalyzer.types.Type;
 import asmCodeGenerator.Labeller;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForLoadSCG;
+import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreFunctionSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
@@ -41,12 +42,12 @@ public class FoldOperatorSCG {
 		
 		// Generators
 		OpcodeForLoadSCG loadArrSCG = new OpcodeForLoadSCG(arrType);
-		OpcodeForStoreSCG storeArrSCG = new OpcodeForStoreSCG(arrType);
+		OpcodeForStoreFunctionSCG storeArrSCG = new OpcodeForStoreFunctionSCG(arrType);
 		OpcodeForLoadSCG loadResultSCG = new OpcodeForLoadSCG(outType);
 
 		code.add(Label, startLabel);
 		
-		// Store array address in INDEX_TEMP_2
+		// Store array address in INDEX_TEMP_1
 		code.add(PushD, RunTime.INDEX_TEMP_1);
 		code.append(array);
 		code.add(StoreI);
@@ -64,7 +65,7 @@ public class FoldOperatorSCG {
 		code.add(LoadI);
 		code.add(PushI, 16);
 		code.add(Add);
-		code.add(LoadI);
+		code.addChunk(loadArrSCG.generate());
 		
 		// Define loop invariants (index)
 		code.add(PushD, RunTime.INDEX_TEMP_2);
@@ -93,9 +94,6 @@ public class FoldOperatorSCG {
 			code.add(StoreI);
 			
 			// Load argument 1 from stack
-			code.add(PushD, RunTime.STACK_POINTER, "%% store arg 1");
-			code.add(LoadI);
-			code.add(Exchange);
 			code.addChunk(storeArrSCG.generate());
 			
 			// Move Stack Pointer
@@ -107,8 +105,6 @@ public class FoldOperatorSCG {
 			code.add(StoreI);
 			
 			// Put argument value
-			code.add(PushD, RunTime.STACK_POINTER, "%% store arg 2");
-			code.add(LoadI);
 			code.add(PushD, RunTime.INDEX_TEMP_1);
 			code.add(LoadI);
 			code.add(PushI, 16);
@@ -121,9 +117,23 @@ public class FoldOperatorSCG {
 			code.addChunk(loadArrSCG.generate());
 			code.addChunk(storeArrSCG.generate());
 			
+			// Push values onto stack
+			code.add(PushD, RunTime.INDEX_TEMP_1);
+			code.add(LoadI);
+			code.add(PushD, RunTime.INDEX_TEMP_2);
+			code.add(LoadI);
+			
 			// Push lambda and call
 			code.append(lambda);
 			code.add(CallV);
+			
+			// Return values from stack
+			code.add(PushD, RunTime.INDEX_TEMP_2);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.INDEX_TEMP_1);
+			code.add(Exchange);
+			code.add(StoreI);
 			
 			// Get and store return value
 			code.add(PushD, RunTime.STACK_POINTER);

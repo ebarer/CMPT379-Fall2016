@@ -392,14 +392,14 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				if (lambdaTypes.size() == 2) {
 					if (node.nChildren() == 3) {
 						Type baseType = node.child(1).getType();
-						if (lambdaTypes.get(0) == baseType && lambdaTypes.get(1) == arrSubtype && returnType == baseType) {
+						if (lambdaTypes.get(0).equals(baseType) && lambdaTypes.get(1).equals(arrSubtype) && returnType.equals(baseType)) {
 							FoldOperatorSCG foldSCG = new FoldOperatorBaseSCG(baseType, arrSubtype, returnType);
 							node.setSCG(foldSCG);
 							node.setType(baseType);
 							return;
 						}
 					} else {
-						if (lambdaTypes.get(0) == arrSubtype && lambdaTypes.get(1) == arrSubtype && returnType == arrSubtype) {
+						if (lambdaTypes.get(0).equals(arrSubtype) && lambdaTypes.get(1).equals(arrSubtype) && returnType.equals(arrSubtype)) {
 							FoldOperatorSCG foldSCG = new FoldOperatorSCG(arrSubtype, returnType);
 							node.setSCG(foldSCG);
 							node.setType(arrSubtype);
@@ -427,7 +427,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			// where the argument has the type of the array’s subtype
 			if (childTypes.get(1) instanceof LambdaType) {
 				List<Type> lambdaTypes = ((LambdaType)childTypes.get(1)).getTypeList();
-				if (lambdaTypes.size() == 1 && lambdaTypes.get(0) == arrSubtype) {
+				if (lambdaTypes.size() == 1 && lambdaTypes.get(0).equals(arrSubtype)) {
 					Type returnType = ((LambdaType)childTypes.get(1)).getReturnType();
 					Type mapType = ArrayType.withSubtype(returnType);
 					MapOperatorSCG mapSCG = new MapOperatorSCG(arrSubtype, returnType);
@@ -456,7 +456,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 			// and the return type is boolean
 			if (childTypes.get(1) instanceof LambdaType) {
 				List<Type> lambdaTypes = ((LambdaType)childTypes.get(1)).getTypeList();
-				if (lambdaTypes.size() == 1 && lambdaTypes.get(0) == arrSubtype) {
+				if (lambdaTypes.size() == 1 && lambdaTypes.get(0).equals(arrSubtype)) {
 					Type returnType = ((LambdaType)childTypes.get(1)).getReturnType();
 					if (returnType == PrimitiveType.BOOLEAN) {
 						Type reduceType = childTypes.get(0);
@@ -510,7 +510,7 @@ class SemanticAnalysisVisitor extends ParseNodeVisitor.Default {
 				if (childTypes.get(2) instanceof LambdaType) {
 					List<Type> lambdaTypes = ((LambdaType)childTypes.get(2)).getTypeList();
 					if (lambdaTypes.size() == 2) {
-						if (lambdaTypes.get(0) == arrSubtype1 && lambdaTypes.get(1) == arrSubtype2) {
+						if (lambdaTypes.get(0).equals(arrSubtype1) && lambdaTypes.get(1).equals(arrSubtype2)) {
 							Type returnType = ((LambdaType)childTypes.get(2)).getReturnType();
 							Type zipType = ArrayType.withSubtype(returnType);
 							ZipOperatorSCG zipSCG = new ZipOperatorSCG(arrSubtype1, arrSubtype2, returnType);

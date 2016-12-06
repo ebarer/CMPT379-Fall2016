@@ -733,7 +733,7 @@ public class Parser {
 			expect(Keyword.REVERSE);
 			Token token = previouslyRead;
 			
-			ParseNode node = parseExpression();
+			ParseNode node = parseUnaryExpression();
 			return ReverseOperatorNode.withChildren(token, node);
 		}
 		
@@ -743,7 +743,7 @@ public class Parser {
 			ParseNode zipNode = new ZipOperatorNode(token);
 			
 			for (int i = 0; i < 3; i++) {
-				zipNode.appendChild(parseExpression());
+				zipNode.appendChild(parseUnaryExpression());
 				if (i < 2) {
 					expect(Punctuator.SEPARATOR);
 				}
@@ -756,7 +756,7 @@ public class Parser {
 			readToken();
 			Token token = previouslyRead;
 			
-			ParseNode node = parseExpression(); 
+			ParseNode node = parseUnaryExpression(); 
 			return UnaryOperatorNode.withChild(token, node);
 		}
 		

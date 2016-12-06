@@ -8,6 +8,7 @@ import asmCodeGenerator.Labeller;
 import asmCodeGenerator.codeGenerator.array.ArrayAllocateSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayGenerateRecordSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForLoadSCG;
+import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreFunctionSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
 
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
@@ -47,7 +48,7 @@ public class MapOperatorSCG {
 		ArrayAllocateSCG allocateSCG = new ArrayAllocateSCG();
 		ArrayGenerateRecordSCG recordSCG = new ArrayGenerateRecordSCG(outType);
 		OpcodeForLoadSCG loadArgSCG = new OpcodeForLoadSCG(inType);
-		OpcodeForStoreSCG storeArgSCG = new OpcodeForStoreSCG(inType);
+		OpcodeForStoreFunctionSCG storeArgSCG = new OpcodeForStoreFunctionSCG(inType);
 		OpcodeForLoadSCG loadResultSCG = new OpcodeForLoadSCG(outType);
 		OpcodeForStoreSCG storeResultSCG = new OpcodeForStoreSCG(outType);
 
@@ -105,8 +106,6 @@ public class MapOperatorSCG {
 			code.add(StoreI);
 			
 			// Put argument value
-			code.add(PushD, RunTime.STACK_POINTER, "%% store arg");
-			code.add(LoadI);
 			code.add(PushD, RunTime.ARRAY_TEMP_2);
 			code.add(LoadI);
 			code.add(PushI, 16);
@@ -122,12 +121,27 @@ public class MapOperatorSCG {
 			// Preserve ARRAY_TEMP_1
 			code.add(PushD, RunTime.ARRAY_TEMP_1);
 			code.add(LoadI);
+			code.add(PushD, RunTime.ARRAY_TEMP_2);
+			code.add(LoadI);
+			code.add(PushD, RunTime.ARRAY_TEMP_3);
+			code.add(LoadI);
+			code.add(PushD, RunTime.ARRAY_TEMP_4);
+			code.add(LoadI);
 			
 			// Push lambda and call
 			code.append(lambda);
 			code.add(CallV);
 			
 			// Return ARRAY_TEMP_1
+			code.add(PushD, RunTime.ARRAY_TEMP_4);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.ARRAY_TEMP_3);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.ARRAY_TEMP_2);
+			code.add(Exchange);
+			code.add(StoreI);
 			code.add(PushD, RunTime.ARRAY_TEMP_1);
 			code.add(Exchange);
 			code.add(StoreI);

@@ -9,6 +9,7 @@ import asmCodeGenerator.codeGenerator.array.ArrayAllocateSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayGenerateRecordSCG;
 import asmCodeGenerator.codeGenerator.array.ArrayReleaseSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForLoadSCG;
+import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreFunctionSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
@@ -49,8 +50,11 @@ public class ReduceOperatorSCG {
 		ArrayAllocateSCG allocateSCG = new ArrayAllocateSCG();
 		ArrayReleaseSCG releaseSCG = new ArrayReleaseSCG();
 		ArrayGenerateRecordSCG recordSCG = new ArrayGenerateRecordSCG(inType);
+		
 		OpcodeForLoadSCG loadArgSCG = new OpcodeForLoadSCG(inType);
-		OpcodeForStoreSCG storeArgSCG = new OpcodeForStoreSCG(inType);
+		OpcodeForStoreFunctionSCG storeArgSCG = new OpcodeForStoreFunctionSCG(inType);
+		OpcodeForStoreSCG storeGoodValueSCG = new OpcodeForStoreSCG(inType);
+		
 		OpcodeForLoadSCG loadResultSCG = new OpcodeForLoadSCG(outType);
 		ByteCopySCG byteCopySCG = new ByteCopySCG();
 
@@ -112,8 +116,6 @@ public class ReduceOperatorSCG {
 			code.add(StoreI);
 			
 			// Put argument value
-			code.add(PushD, RunTime.STACK_POINTER, "%% store arg");
-			code.add(LoadI);
 			code.add(PushD, RunTime.ARRAY_TEMP_2);
 			code.add(LoadI);
 			code.add(PushI, 16);
@@ -129,12 +131,33 @@ public class ReduceOperatorSCG {
 			// Preserve ARRAY_TEMP_1
 			code.add(PushD, RunTime.ARRAY_TEMP_1);
 			code.add(LoadI);
+			code.add(PushD, RunTime.ARRAY_TEMP_2);
+			code.add(LoadI);
+			code.add(PushD, RunTime.ARRAY_TEMP_3);
+			code.add(LoadI);
+			code.add(PushD, RunTime.ARRAY_TEMP_4);
+			code.add(LoadI);
+			code.add(PushD, RunTime.REDUCE_ARR_LENGTH);
+			code.add(LoadI);
+			
 			
 			// Push lambda and call
 			code.append(lambda);
 			code.add(CallV);
 			
 			// Return ARRAY_TEMP_1
+			code.add(PushD, RunTime.REDUCE_ARR_LENGTH);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.ARRAY_TEMP_4);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.ARRAY_TEMP_3);
+			code.add(Exchange);
+			code.add(StoreI);
+			code.add(PushD, RunTime.ARRAY_TEMP_2);
+			code.add(Exchange);
+			code.add(StoreI);
 			code.add(PushD, RunTime.ARRAY_TEMP_1);
 			code.add(Exchange);
 			code.add(StoreI);
@@ -165,7 +188,7 @@ public class ReduceOperatorSCG {
 				code.add(Multiply);
 				code.add(Add);
 				code.addChunk(loadArgSCG.generate());
-				code.addChunk(storeArgSCG.generate());
+				code.addChunk(storeGoodValueSCG.generate());
 				
 				// Increment reduce array length
 				code.add(PushD, RunTime.REDUCE_ARR_LENGTH);
