@@ -11,7 +11,7 @@ public class StringCharConcatSCG implements SimpleCodeGenerator {
 	public ASMCodeChunk generate() {
 		ASMCodeChunk chunk = new ASMCodeChunk();
 		
-		Labeller labeller = new Labeller("concat-char-string");
+		Labeller labeller = new Labeller("concat-string-char");
 		String startLabel 		= labeller.newLabel();
 		String allocateLabel 	= labeller.newLabel("allocate");
 		String copyLabel1 		= labeller.newLabel("begin-string-copy-1");
@@ -83,10 +83,6 @@ public class StringCharConcatSCG implements SimpleCodeGenerator {
 		chunk.add(ASMOpcode.PushI, 8);
 		chunk.add(ASMOpcode.Add);
 		chunk.add(ASMOpcode.LoadI);
-		chunk.add(ASMOpcode.StoreI);
-		
-		chunk.add(ASMOpcode.PushD, RunTime.STRING_OFFSET_1);
-		chunk.add(ASMOpcode.PushI, 0);
 		chunk.add(ASMOpcode.StoreI);
 
 		StringCopySCG scg4 = new StringCopySCG();

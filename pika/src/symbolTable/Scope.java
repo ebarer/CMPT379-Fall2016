@@ -10,6 +10,7 @@ public class Scope {
 	private Scope baseScope;
 	private MemoryAllocator allocator;
 	private SymbolTable symbolTable;
+	private int staticCount = 0;
 	
 //////////////////////////////////////////////////////////////////////
 // factories
@@ -98,7 +99,8 @@ public class Scope {
 		Token token = identifierNode.getToken();
 		symbolTable.errorIfAlreadyDefined(token);
 
-		String lexeme = "#"+token.getLexeme()+"-413";
+		staticCount++;
+		String lexeme = "#"+token.getLexeme()+"-"+staticCount;
 		Binding binding = allocateNewBinding(type, token.getLocation(), lexeme);	
 		symbolTable.install(lexeme, binding);
 
@@ -106,6 +108,8 @@ public class Scope {
 	}
 	public void createStaticEmptyBinding(IdentifierNode identifierNode, Binding binding) {
 		Token token = identifierNode.getToken();
+		symbolTable.errorIfAlreadyDefined(token);
+		
 		String lexeme = token.getLexeme();	
 		symbolTable.install(lexeme, binding);
 	}

@@ -105,6 +105,9 @@ public class BasicBlock {
 	public String getOutputLabel() {
 		return "basicBlock-" + blockNum;
 	}
+	public String getLoopLabel() {
+		return "basicBlockHeader-" + blockNum;
+	}
 	
 	public void mergeWith(BasicBlock target) {
 		// Eliminate the end JUMP from the current block

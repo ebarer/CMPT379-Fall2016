@@ -1,5 +1,7 @@
 package optimizer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,6 +13,7 @@ public class BasicBlockFragment {
 	private List<BasicBlock> blocks;
 	private HashMap<String, BasicBlock> labelLookup;
 	private HashSet<String> subroutineLookup;
+	private List<List<BasicBlock>> loopCandidates;
 	private BasicBlock firstBlock;
 	
 	public static int num = 1;
@@ -19,6 +22,7 @@ public class BasicBlockFragment {
 		this.blocks = new LinkedList<BasicBlock>();
 		this.labelLookup = new HashMap<String, BasicBlock>();
 		this.subroutineLookup = new HashSet<String>();
+		this.loopCandidates = new ArrayList<List<BasicBlock>>();
 	}
 	
 	public void add(ASMInstruction instruction){
@@ -53,57 +57,68 @@ public class BasicBlockFragment {
 /////////////////////////////////////////////////////////////////////////
 // Tree functions
 	public void traverseGraph() {
+		traverseGraph(false);
+	}
+	public void traverseGraph(boolean storeBackedges) {
 		if (firstBlock == null) {
 			firstBlock = blocks.get(0);
 		}
 		
-		traverse(firstBlock);
+		traverse(firstBlock, null, storeBackedges);
 	}
-	private void traverse(BasicBlock block) {
-		if (block.wasVisited()) return;
+	private void traverse(BasicBlock block, BasicBlock ancestor, boolean storeBackedges) {
+		if (block.wasVisited()) {
+			if (storeBackedges) {
+				loopCandidates.add(Arrays.asList(block, ancestor));
+			}
+			
+			return;
+		}
 		
 		block.visit();
 		
 		for (BasicBlock childBlock : block.getOutgoingEdges().values()) {
-			traverse(childBlock);
+			traverse(childBlock, block, storeBackedges);
 		}
 	}
 	
-	public BasicBlockFragment sortGraph() {
+	public HashMap<BasicBlock, Boolean> identifyHeaders() {
 		unvisitAllBlocks();
-		BasicBlockFragment fragment = new BasicBlockFragment();
+		traverseGraph(true);
 		
-		// Visit suroutines and prepend code
-		for (String subroutine : subroutineLookup) {
-			BasicBlock block = labelLookup.get(subroutine);
-			if (block != null) {
-				block.visit();
-				fragment.addBlock(block);
+		HashMap<BasicBlock, Boolean> candidates = new HashMap<BasicBlock, Boolean>();
+		
+		for (int i = 0; i < loopCandidates.size(); i++) {
+			unvisitAllBlocks();
+			
+			List<BasicBlock> candidate = loopCandidates.get(i);
+			BasicBlock target = candidate.get(0);
+			BasicBlock tail = candidate.get(1);
+			
+			boolean isValid = reverseTraverse(tail, target);
+			
+			Boolean value = candidates.putIfAbsent(target, isValid);
+			if (value != null) {
+				candidates.put(target, value && isValid);
 			}
 		}
 		
-		fragment.append(traverseSort(this.firstBlock));
+		unvisitAllBlocks();
 		
-		// Configure CFG
-		fragment.labelLookup = this.labelLookup;
-		fragment.subroutineLookup = this.subroutineLookup;
-		fragment.firstBlock = this.firstBlock;
-				
-		return fragment;
+		return candidates;
 	}
-	private BasicBlockFragment traverseSort(BasicBlock block) {
-		BasicBlockFragment fragment = new BasicBlockFragment();
+	private boolean reverseTraverse(BasicBlock block, BasicBlock target) {
+		if (block.equals(target) || block.wasVisited()) return true;
+		if (block.equals(firstBlock) || block.getIncomingEdges().isEmpty()) return false;
 		
-		if (block.wasVisited()) return fragment;
 		block.visit();
-		fragment.addBlock(block);
-
-		for (BasicBlock childBlock : block.getOutgoingEdges().values()) {
-			BasicBlockFragment childFragment = traverseSort(childBlock);
-			fragment.append(childFragment);
+		
+		boolean isValid = true;
+		for (BasicBlock childBlock : block.getIncomingEdges().values()) {
+			isValid = isValid && reverseTraverse(childBlock, target);
 		}
-
-		return fragment;
+		
+		return isValid;
 	}
 	
 	public void locateLabels() {
@@ -136,7 +151,7 @@ public class BasicBlockFragment {
 		for (String label : subroutineLookup) {
 			BasicBlock subroutineBlock = labelLookup.get(label);
 			if (subroutineBlock != null) {
-				traverse(subroutineBlock);
+				traverse(subroutineBlock, null, false);
 			}
 		}
 	}

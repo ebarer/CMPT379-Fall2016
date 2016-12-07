@@ -7,7 +7,6 @@ import semanticAnalyzer.types.Type;
 import asmCodeGenerator.Labeller;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForLoadSCG;
 import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreFunctionSCG;
-import asmCodeGenerator.codeGenerator.opcodeManipulation.OpcodeForStoreSCG;
 import static asmCodeGenerator.codeStorage.ASMOpcode.*;
 
 public class FoldOperatorSCG {

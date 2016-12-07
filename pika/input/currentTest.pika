@@ -1,19 +1,16 @@
-exec {	
-	var n1 := [[1, 3], [5, 7], [9, 11]].
-	var n2 := [[1, 2], [3, 5], [7, 11]].
+exec {
+	# string + string
+	print "sam" + "sung", _n_.
 	
-	const makePair := <int x, int y> -> [int] {
-		return [x, y].
-	}.
+	# char + string
+	print ^s^ + "amsung", _n_.
 	
-	const makeArrPair := <[int] x, [int] y> -> [[int]] {
-		return [x, y].
-	}.
+	# string + char
+	print "samsun" + ^g^, _n_.
 	
-	var pairList := zip n1, n2, makeArrPair.
-	print pairList.
+	# char + string + char
+	print ^s^ + "amsun" + ^g^, _n_.
 	
-	n1[0][0] := 99.
-	
-	print _n_, pairList.
+	# string + char + char
+	print "samsu" + ^n^ + ^g^, _n_.
 }

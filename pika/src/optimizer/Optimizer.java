@@ -12,11 +12,7 @@ import asmCodeGenerator.codeStorage.ASMInstruction;
 import asmCodeGenerator.codeStorage.ASMOpcode;
 import asmCodeGenerator.codeStorage.ASMCodeFragment.CodeType;
 
-public class Optimizer {
-	boolean debug = false;
-	boolean debugMerge = false;
-	boolean debugRemove = false;
-	
+public class Optimizer {	
 	private ASMCodeFragment[] programFragments;
 	private static final int HEADER = 0;
 	private static final int DATA = 1;
@@ -56,16 +52,17 @@ public class Optimizer {
 		}
 
 		addFallthroughJumps(cfg);
+		
+		// Relabel CFG
+		replaceLabels(cfg);
 		labelSimpleLoops(cfg);
-		printCFG(cfg);
 		
 		// Grab optimized instructions from BasicBlocks
-		replaceLabels(cfg);
 		programFragments[INSTRUCTIONS] = extractInstructions(cfg);
 		while(cleanupJumps(programFragments[INSTRUCTIONS]));
 
 		// Eliminate any data directives that are unused in program execution
-		programFragments[DATA] = removeUnusedData(programFragments[INSTRUCTIONS]);
+		removeUnusedData();
 		
 		// Merge fragments
 		returnFragment.append(programFragments[HEADER]);
@@ -566,10 +563,6 @@ public class Optimizer {
 		
 		fragment.locateSubroutines();
 		
-		if (debugMerge) {
-			printCFG(fragment);
-		}
-		
 		return nodesRemoved;
 	}
 	private boolean cloneBlocks(BasicBlockFragment fragment){
@@ -869,6 +862,7 @@ public class Optimizer {
 		
 		return false;
 	}
+	
 	// For each block that "fallsthrough", add explicit jump
 	// to ensure code runs in the correct order
 	private void addFallthroughJumps(BasicBlockFragment fragment) {
@@ -887,49 +881,60 @@ public class Optimizer {
 			}
 		}
 	}
-	private void labelSimpleLoops(BasicBlockFragment fragment) {
+	
+	private void removeUnusedData() {
+		int instrStartSize = 0;
+		int instrEndSize = 0;
 		
-	}
-	private ASMCodeFragment removeUnusedData(ASMCodeFragment fragment) {
-		ASMCodeFragment dataFragment = new ASMCodeFragment(CodeType.GENERATES_VOID);
-		List<ASMInstruction> instructions = programFragments[DATA].getChunk(0).getInstructions();
-		
-		// Get PushD
-		HashSet<String> dataCalls = new HashSet<String>();
-		for(ASMCodeChunk chunk : fragment.getChunks()) {
-			for (ASMInstruction instr : chunk.getInstructions()) {
-				if (instr.getOpcode() == ASMOpcode.PushD || instr.getOpcode() == ASMOpcode.DataD) {
-					dataCalls.add((String) instr.getArgument());
+		do {
+			ASMCodeFragment dataFragment = new ASMCodeFragment(CodeType.GENERATES_VOID);
+			
+			List<ASMInstruction> instructions = programFragments[DATA].getChunk(0).getInstructions();
+			instrStartSize = instructions.size();
+			
+			HashSet<String> dataCalls = new HashSet<String>();
+			
+			// Get PushD
+			for(ASMCodeChunk chunk : programFragments[INSTRUCTIONS].getChunks()) {
+				for (ASMInstruction instr : chunk.getInstructions()) {
+					if (instr.getOpcode() == ASMOpcode.PushD) {
+						dataCalls.add((String) instr.getArgument());
+					}
 				}
 			}
-		}
-		
-		for (int i = 0; i < instructions.size(); i++) {
-			if (dataCalls.contains(instructions.get(i).getArgument())) {
-				if (debugRemove) {
-					System.out.println(instructions.get(i).getArgument());
+			
+			// Get DataD
+			for(ASMCodeChunk chunk : programFragments[DATA].getChunks()) {
+				for (ASMInstruction instr : chunk.getInstructions()) {
+					if (instr.getOpcode() == ASMOpcode.DataD) {
+						dataCalls.add((String) instr.getArgument());
+					}
 				}
+			}
+			
+			for (int i = 0; i < instructions.size(); i++) {
+				if (dataCalls.contains(instructions.get(i).getArgument())) {						
+					// Add DLabels
+					while (i < instructions.size() && instructions.get(i).getOpcode() == ASMOpcode.DLabel) {
+						dataFragment.add(instructions.get(i++));
+					}
 					
-				// Add DLabels
-				while (i < instructions.size() && instructions.get(i).getOpcode() == ASMOpcode.DLabel) {
-					dataFragment.add(instructions.get(i++));
+					// Add data directives
+					while (i < instructions.size() && instructions.get(i).getOpcode() != ASMOpcode.DLabel) {
+						dataFragment.add(instructions.get(i++));
+					}
+					
+					// Decrement index to inspect last instruction accessed
+					i--;
 				}
-				
-				// Add data directives
-				while (i < instructions.size() && instructions.get(i).getOpcode() != ASMOpcode.DLabel) {
-					dataFragment.add(instructions.get(i++));
-				}
-				
-				// Decrement index to inspect last instruction accessed
-				i--;
 			}
-		}
 		
-		return dataFragment;
+			programFragments[DATA] = dataFragment;
+			instrEndSize = programFragments[DATA].getChunk(0).getInstructions().size();
+		} while (instrEndSize != instrStartSize);
 	}
-	
-	
-	// Convert CFD into ASMCodeFragment
+
+	// Relabel CFG blocks and loops
 	private void replaceLabels(BasicBlockFragment fragment) {
 		fragment.renumberBlocks();
 		
@@ -940,17 +945,6 @@ public class Optimizer {
 					instruction.setArgument(block.getOutputLabel());
 				}
 			}
-			
-			// Handle main program label
-//			if (label == RunTime.MAIN_PROGRAM_LABEL) {
-//				for (ASMInstruction instruction : programFragments[HEADER].getChunk(0).getInstructions()) {
-//					if (instruction.getArgument() != null) {
-//						if (instruction.getArgument() == label) {
-//							instruction.setArgument(block.getOutputLabel());
-//						}
-//					}
-//				}
-//			}
 			
 			for (BasicBlock inBlock : fragment.getBlocks()) {
 				for (ASMInstruction instruction : inBlock.getInstructions()) {
@@ -965,6 +959,34 @@ public class Optimizer {
 			}
 		}		
 	}
+	private void labelSimpleLoops(BasicBlockFragment fragment) {
+		HashMap<BasicBlock, Boolean> loopHeaders = fragment.identifyHeaders();
+		
+		for (BasicBlock block : loopHeaders.keySet()) {
+			String label = block.getOutputLabel();
+			String newLabel = block.getLoopLabel();
+			
+			for (ASMInstruction instruction : block.getInstructions()) {
+				if (instruction.getArgument() != null && instruction.getArgument().equals(label)) {
+					instruction.setArgument(newLabel);
+				}
+			}
+			
+			for (BasicBlock inBlock : fragment.getBlocks()) {
+				for (ASMInstruction instruction : inBlock.getInstructions()) {
+					if (instruction.getArgument() != null) {
+						if (instruction.getArgument() instanceof String) {
+							if (((String)instruction.getArgument()).equals(label)) {
+								instruction.setArgument(newLabel);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	// Convert CFG into ASMCodeFragment
 	private ASMCodeFragment extractInstructions(BasicBlockFragment fragment) {
 		ASMCodeFragment extractedInstructions = new ASMCodeFragment(CodeType.GENERATES_VOID);
 		
@@ -998,37 +1020,35 @@ public class Optimizer {
 	
 	// CFG print helper function
 	private void printCFG(BasicBlockFragment fragment) {
-		if (debug) {
-			StringBuilder stringBuilder = new StringBuilder();
-			
-			stringBuilder.append("<--------------------- CFG Print --------------------->\n");
-			stringBuilder.append("  Num Blocks: " + fragment.getBlocks().size() + "\n");
-			stringBuilder.append("<----------------------------------------------------->\n\n");
-			stringBuilder.append("===============================================================\n");
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		stringBuilder.append("<--------------------- CFG Print --------------------->\n");
+		stringBuilder.append("  Num Blocks: " + fragment.getBlocks().size() + "\n");
+		stringBuilder.append("<----------------------------------------------------->\n\n");
+		stringBuilder.append("===============================================================\n");
 
-			for (BasicBlock block : fragment.getBlocks()) {
-				stringBuilder.append("Block #" + block.getNum() + ":\n");
-				stringBuilder.append("  Visited: " + block.wasVisited() + "\n");
-				
-				stringBuilder.append("  Incoming Number of Edges: " + block.getIncomingEdges().size() + " - ");
-				stringBuilder.append("[");
-				for (BasicBlock inBlock : block.getIncomingEdges().values()) {
-					stringBuilder.append(inBlock.getNum() + ", ");
-				}
-				stringBuilder.append("]\n");
-				
-				stringBuilder.append("  Outgoing Number of Edges: " + block.getOutgoingEdges().size() + " - ");
-				stringBuilder.append("[");
-				for (BasicBlock outBlock : block.getOutgoingEdges().values()) {
-					stringBuilder.append(outBlock.getNum() + ", ");
-				}
-				stringBuilder.append("]\n\n");
-				
-			    stringBuilder.append(block.toString());
-			    stringBuilder.append("===============================================================\n");
+		for (BasicBlock block : fragment.getBlocks()) {
+			stringBuilder.append("Block #" + block.getNum() + ":\n");
+			//stringBuilder.append("  Visited: " + block.wasVisited() + "\n");
+			
+			stringBuilder.append("  Incoming Number of Edges: " + block.getIncomingEdges().size() + " - ");
+			stringBuilder.append("[");
+			for (BasicBlock inBlock : block.getIncomingEdges().values()) {
+				stringBuilder.append(inBlock.getNum() + ", ");
 			}
-			System.out.println(stringBuilder.toString());
+			stringBuilder.append("]\n");
+			
+			stringBuilder.append("  Outgoing Number of Edges: " + block.getOutgoingEdges().size() + " - ");
+			stringBuilder.append("[");
+			for (BasicBlock outBlock : block.getOutgoingEdges().values()) {
+				stringBuilder.append(outBlock.getNum() + ", ");
+			}
+			stringBuilder.append("]\n\n");
+			
+		    stringBuilder.append(block.toString());
+		    stringBuilder.append("===============================================================\n");
 		}
+		System.out.println(stringBuilder.toString());
 	}
 
 }

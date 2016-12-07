@@ -35,7 +35,6 @@ public class FoldOperatorBaseSCG extends FoldOperatorSCG {
 		String joinLabel  		= labeller.newLabel("join");
 		
 		// Generators
-		OpcodeForLoadSCG loadBaseSCG = new OpcodeForLoadSCG(baseType);
 		OpcodeForStoreSCG storeBaseSCG = new OpcodeForStoreSCG(baseType);
 		OpcodeForLoadSCG loadArrSCG = new OpcodeForLoadSCG(arrType);
 		OpcodeForStoreSCG storeArrSCG = new OpcodeForStoreSCG(arrType);
